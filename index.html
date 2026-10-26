@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<title>Torcode VTK</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Torcode">
+<meta name="theme-color" content="#0b0d12">
+<link rel="apple-touch-icon" href="data:image/png;base64,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HS8IAJCcnPL2W/9KSEjctn3n9u079+799ZOPPzCbxY4dOuTnFwCAo5Ojkplnr7Nv1sxtzZp1FeUVmzeu2/v7vuDgII7njUZj27Yez0+ZnJKaaq+zT0/PMJnMNaaapUsWr/hx5aLFn69e+YPBYEhLz2jVsuW27Tsj9v7+4gtT9++LWPvL+ieeaL5p81aNWqNz0N1c9w46+0p7ANDpHEw1N7+5YW9/86+OTo6U3w4OOrMozpg5OyMtJemVl5d/94OSWW2vs9fpdRzHrV69Zsjg4J07tkyZ8sLzU8LWrV39x/6DM2e8sGv3nqys7G++/W7P7h3LvvriTPQ5JyfHH39a5aDT2dnZ0kocHBzs7OweqrdCWV9QUGgy1WzYuLmiohIhlJiUHBMT27lzZzdX19y8vIsXLxFCysquR0dHS5IUGRkly7KHh8eOHbvi4xPS0zMMBkN+QWFcXDwle25eflx8gquri49P5+Likvc/+NhsNmdlZ1/JyWnbtm302XO7du9xd39Sq9X+vGbt5ctXEhISRdGcmnohLT0jMSn5xo0bzZs3O3v2fE5u7ukz0Z06dTx//vz69RuLi4vT0jPMZvH8+Zir165RUREfl1BQULj2l/XNmzd3dHTcvn3n4MHBmzZuqbxxw8uzvYd7my1btm3fsQsATpyI9PBwz8sviI4+e/DQYW9vr9atW5eUlCQlpxiNxm3bd8qy5O3tpdcbYuPi9fqqixcvZWRmAoBZFJOSkrOys0VRTElJoQ6aKIkpyamZmVkmszkmJraoqMhkMiUkJBaXlJw6FdWuXdvz52PpyT6EEFGSkhKT6XlABw8edm/TJiExafXPa52bOnu4u+/aveebb79DCJWUlGzfsfPJJ59s1apVbm5e6oULoijGJyTm5ORSSyU+ISE3Nw/uPcPyfkZIG0mw7y5z0xFCPbo/k5GZZTRWf/jBgl49e4QMGV47Pl2nngfau/p9ApLe9eAaJvzDLtFccNoxav0pnjd9KYh+VwZuxks56qnTbYLaf1X2DhRLDd+K7dErdD1RI4um5ionVtOhodJYsSqUb8LBrU/dKPsUyu8BA/q9+eYbAFBUVBQ2ZRqtUAkzKA1TvvSjfGJY+avSKcU0rt2e2haxskWitId2UPlx++5J7TbTvtNBUJ5IC9Pn1r54x84+vI23/619bfYF5PvnrfyPgTGDkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBgZGDgZGDgZGDgZGDgZGDgZGDgZGDgZGDgZGDgZGDgYGRg4GRg4GRg4GRg4GRg4GRg4GRg4GRg4GRg4GRg4GBkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBkYOBgZGDgZGDgZGDgZGDgZGDgZGDgZGDgZGDgZGDgZGDgYGRg4GRg4GRg4GRg4GRg4GRg4GRg4GRg4GRg+Hxwf8DT/H3TAangnEAAAAASUVORK5CYII=">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<style>
+/* Layout: App-Hülle mit Kopfzeile (Logo + Verbindung), vier Ansichten und Tab-Leiste unten.
+   Bewusst nur dunkel – wie ein Lichtpult im Dunkeln, Markenblau als Licht. */
+:root {
+  --bg: #0b0d12;
+  --surface: #141821;
+  --surface-2: #1c2130;
+  --line: rgba(255, 255, 255, .08);
+  --fg: #eef1f7;
+  --muted: #8a93a6;
+  --brand: #2f5fff;
+  --brand-soft: rgba(47, 95, 255, .16);
+  --ok: #3ddc97;
+  --warn: #ffb547;
+  --danger: #ff5d5d;
+  --font-ui: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 16px; line-height: 1.45;
+  background-image: radial-gradient(120% 60% at 50% -10%, rgba(47,95,255,.18), transparent 60%); background-attachment: fixed; }
+[hidden] { display: none !important; }
+button { font-family: inherit; color: inherit; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.app { max-width: 540px; margin: 0 auto; padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 16px 8px; }
+.top img { height: 44px; width: auto; display: block; }
+.conn { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 7px 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.conn i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.conn.live i { background: var(--ok); box-shadow: 0 0 0 0 rgba(61,220,151,.6); animation: ping 2.4s infinite; }
+.conn.warn i { background: var(--warn); }
+.conn.demo i { background: var(--brand); }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(61,220,151,.55); } 70%, 100% { box-shadow: 0 0 0 8px rgba(61,220,151,0); } }
+
+h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0 0 16px; font-size: 15px; }
+.view { display: grid; gap: 14px; animation: viewIn .32s var(--ease); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+.label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.note { color: var(--muted); font-size: 13px; margin: 0; }
+.wifi { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.wbars { width: 28px; height: 28px; flex: none; }
+.wbars rect { fill: rgba(255,255,255,.14); transition: fill .4s ease; }
+.wifi[data-q="3"] rect { fill: #3ddc97; }
+.wifi[data-q="2"] rect:nth-child(-n+2) { fill: #ffb547; }
+.wifi[data-q="1"] rect:first-child { fill: #ff6b6b; }
+.err { color: var(--danger); font-size: 14px; margin: 0; }
+.banner { border: 1px dashed rgba(47,95,255,.6); background: var(--brand-soft); border-radius: 14px; padding: 12px 14px; font-size: 14px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.banner button { background: none; border: 0; color: #9db4ff; font-weight: 600; font-size: 14px; cursor: pointer; padding: 0; }
+
+/* ---------- Tor ---------- */
+.gate { padding: 0; gap: 0; overflow: hidden; }
+.gate svg { display: block; width: 100%; height: auto; }
+.gate .door { transition: transform 2.4s var(--ease); }
+.gate .glow { transition: opacity 1.6s var(--ease); }
+.gate-info { padding: 14px 18px 16px; display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+.gate-state { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.gate-hint { font-size: 13px; color: var(--muted); }
+.chip { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(11,13,18,.7); border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); white-space: nowrap; }
+
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hold { position: relative; overflow: hidden; border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 16px; text-align: left;
+  display: grid; gap: 2px; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .15s var(--ease), border-color .2s; }
+.hold.big { grid-column: 1 / -1; background: var(--brand); border-color: var(--brand); padding: 20px; }
+.hold b { font-size: 18px; font-weight: 700; position: relative; }
+.hold small { font-size: 13px; color: var(--muted); position: relative; }
+.hold.big small { color: rgba(255,255,255,.78); }
+.hold .fill { position: absolute; inset: 0; transform-origin: left; transform: scaleX(var(--p, 0)); background: rgba(255,255,255,.14); }
+.hold.big .fill { background: rgba(255,255,255,.22); }
+.hold:active { transform: scale(.98); }
+.hold.done { animation: flash .5s var(--ease); }
+@keyframes flash { 0% { box-shadow: 0 0 0 0 rgba(47,95,255,.7); } 100% { box-shadow: 0 0 0 16px rgba(47,95,255,0); } }
+.hold.stop b { color: var(--danger); }
+.hold:disabled { opacity: .45; cursor: not-allowed; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+/* Tür mit Elektroschloss: kleines Abbild des Displays an der Tür */
+.door-card { grid-template-columns: auto 1fr; align-items: center; gap: 16px; }
+.dmini { width: 66px; height: 46px; border-radius: 9px; background: #0b0d12; border: 4px solid #d3d8df; display: grid; place-items: center; color: #8a93a6; transition: color .35s, box-shadow .35s; }
+.dmini svg { width: 24px; height: 24px; }
+.dmini .op { display: none; }
+.dmini.locked { color: #ff5d5d; }
+.dmini.unlocked { color: #3ddc97; }
+.dmini.unlocked .op { display: block; } .dmini.unlocked .cl { display: none; }
+.dmini.auth { box-shadow: 0 0 0 2px #ffb547, 0 0 16px rgba(255,181,71,.55); animation: glowY 1.6s ease-in-out infinite; }
+.dmini.off { opacity: .45; }
+@keyframes glowY { 50% { box-shadow: 0 0 0 2px #ffb547, 0 0 6px rgba(255,181,71,.3); } }
+.door-info { display: grid; gap: 4px; min-width: 0; }
+.door-info b { font-size: 19px; }
+.door-info .note { overflow-wrap: anywhere; }
+.door-card .hold { grid-column: 1 / -1; }
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 14px; cursor: pointer; }
+.toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle .sw { flex: none; width: 46px; height: 28px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); position: relative; transition: background .25s; }
+.toggle .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #c9d0dd; transition: transform .25s var(--ease), background .25s; }
+.toggle input:checked + .sw { background: var(--brand); }
+.toggle input:checked + .sw::after { transform: translateX(18px); background: #fff; }
+.toggle input:focus-visible + .sw { outline: 2px solid var(--brand); outline-offset: 2px; }
+.pill.door { color: #ffd166; background: rgba(255,197,49,.12); }
+.auth-row { display: flex; gap: 10px; align-items: center; }
+.auth-row input { width: 90px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-num); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+
+/* ---------- Codes ---------- */
+.durs { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; margin: 0 -18px; padding-inline: 18px; scrollbar-width: none; }
+.durs::-webkit-scrollbar { display: none; }
+.durs button { flex: none; scroll-snap-align: start; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 10px 14px;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s, transform .15s; }
+.durs button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); }
+.durs button:active { transform: scale(.96); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 12px; padding: 4px; position: relative; }
+.seg::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 9px; background: #2a3042;
+  transition: transform .3s var(--ease); }
+.seg.right::before { transform: translateX(100%); }
+.seg button { position: relative; border: 0; background: none; padding: 9px; font-size: 15px; font-weight: 600; cursor: pointer; color: var(--muted); transition: color .2s; }
+.seg button[aria-pressed="true"] { color: var(--fg); }
+input[type="text"], input[type="password"], input[type="datetime-local"] { width: 100%; font: 16px var(--font-ui); padding: 13px 14px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); transition: border-color .2s; }
+input:focus { border-color: var(--brand); outline: none; }
+.field { display: grid; gap: 8px; }
+.btn { border: 0; border-radius: 14px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; background: var(--brand); color: #fff;
+  transition: transform .15s var(--ease), opacity .2s; }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .5; }
+.btn.ghost { background: var(--surface-2); border: 1px solid var(--line); font-weight: 600; }
+.btn.small { padding: 9px 12px; font-size: 14px; border-radius: 10px; }
+
+.codes { display: grid; gap: 10px; }
+.code { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: center;
+  animation: viewIn .35s var(--ease) both; }
+.code .num { font-family: var(--font-num); font-size: 26px; font-weight: 600; letter-spacing: .14em; grid-row: 1 / span 2; font-variant-numeric: tabular-nums; }
+.code.off .num { color: var(--muted); }
+.code .who { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.code .when { grid-column: 2; font-size: 13px; color: var(--muted); }
+.code .side { grid-column: 3; grid-row: 1 / span 2; display: grid; gap: 6px; justify-items: end; }
+.code .bar { grid-column: 1 / -1; height: 3px; border-radius: 3px; background: var(--surface-2); overflow: hidden; margin-top: 8px; }
+.code .bar span { display: block; height: 100%; background: var(--ok); border-radius: 3px; transition: width .6s var(--ease); }
+.pill { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.on { color: var(--ok); background: rgba(61,220,151,.12); }
+.pill.wait { color: #9db4ff; background: var(--brand-soft); }
+.pill.off { color: var(--muted); background: var(--surface-2); }
+.del { background: none; border: 0; color: var(--muted); font-size: 13px; cursor: pointer; padding: 2px 0; }
+.del.confirm { color: var(--danger); font-weight: 600; }
+.empty { color: var(--muted); font-size: 14px; text-align: center; padding: 18px; }
+
+.master-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pins { display: flex; gap: 8px; }
+.pins span { width: 44px; height: 54px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center;
+  font-family: var(--font-num); font-size: 24px; font-weight: 600; transition: transform .3s var(--ease); }
+.pins.reveal span { animation: flip .4s var(--ease) both; }
+.pins.reveal span:nth-child(2) { animation-delay: .05s; } .pins.reveal span:nth-child(3) { animation-delay: .1s; } .pins.reveal span:nth-child(4) { animation-delay: .15s; }
+@keyframes flip { from { transform: rotateX(90deg); } to { transform: none; } }
+.pin-in { font-family: var(--font-num) !important; font-size: 26px !important; letter-spacing: .5em; text-align: center; padding-left: calc(14px + .5em) !important; }
+
+/* ---------- Chips ---------- */
+.tagrow { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto;
+  gap: 2px 14px; align-items: center; animation: viewIn .35s var(--ease) both; }
+.tagrow .ico { grid-row: 1 / span 2; width: 42px; height: 42px; border-radius: 50%; background: var(--brand-soft); color: #9db4ff; display: grid; place-items: center; font-weight: 700; font-size: 17px; }
+.tagrow.off .ico { background: var(--surface-2); color: var(--muted); }
+.tagrow .who { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.tagrow.off .who { color: var(--muted); }
+.tagrow .when { grid-column: 2; font-size: 13px; color: var(--muted); }
+.tagrow .side { grid-column: 3; grid-row: 1 / span 2; }
+.tagrow .acts { grid-column: 1 / -1; display: flex; gap: 20px; justify-content: flex-end; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+.tagrow .acts .del { font-size: 14px; padding: 4px 0; }
+.learn { justify-items: center; text-align: center; border-color: rgba(47,95,255,.6); }
+.pulse { position: relative; width: 88px; height: 88px; display: grid; place-items: center; color: #9db4ff; }
+.pulse svg { width: 36px; height: 36px; position: relative; }
+.pulse i { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--brand); opacity: 0; animation: ring 2s var(--ease) infinite; }
+.pulse i:nth-child(2) { animation-delay: 1s; }
+@keyframes ring { 0% { transform: scale(.45); opacity: .9; } 100% { transform: scale(1); opacity: 0; } }
+
+/* ---------- Ergebnis-Blatt ---------- */
+.sheet-bg { position: fixed; inset: 0; background: rgba(5,6,10,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 30; animation: fade .25s; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; max-width: 540px; margin: 0 auto; background: var(--surface); border-radius: 24px 24px 0 0;
+  border: 1px solid var(--line); border-bottom: 0; padding: 12px 20px calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 16px; animation: up .4s var(--ease); }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--surface-2); margin: 0 auto; }
+@keyframes up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.digits { display: flex; justify-content: center; gap: 10px; }
+.digits span { width: min(19vw, 76px); height: min(24vw, 96px); border-radius: 16px; background: var(--surface-2); border: 1px solid var(--line);
+  display: grid; place-items: center; font-family: var(--font-num); font-weight: 600; font-size: min(12vw, 52px); font-variant-numeric: tabular-nums; }
+.digits span.set { border-color: rgba(47,95,255,.7); box-shadow: 0 0 24px rgba(47,95,255,.35); animation: pop .3s var(--ease); }
+@keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.06); } 100% { transform: none; } }
+.sheet .valid { text-align: center; color: var(--muted); font-size: 15px; }
+.sheet .valid strong { color: var(--fg); font-weight: 600; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row > * { flex: 1 1 140px; }
+textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding: 10px; background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
+
+/* ---------- Verlauf ---------- */
+.day { display: grid; gap: 0; }
+.day h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin: 4px 0 8px; text-transform: uppercase; letter-spacing: .08em; }
+.ev { display: grid; grid-template-columns: 52px 14px 1fr; gap: 10px; align-items: start; padding: 8px 0; animation: viewIn .3s var(--ease) both; }
+.ev time { font-family: var(--font-num); font-size: 13px; color: var(--muted); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.ev i { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; background: var(--ok); }
+.ev.bad i { background: var(--danger); }
+.ev.bad span { color: #ffb3b3; }
+
+/* ---------- Tabs & Toast ---------- */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: rgba(11,13,18,.82); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border-top: 1px solid var(--line); }
+.tabs nav { max-width: 540px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.tabs button { background: none; border: 0; padding: 6px 0; display: grid; justify-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; transition: color .2s; }
+.tabs button svg { width: 24px; height: 24px; transition: transform .25s var(--ease); }
+.tabs button[aria-current="page"] { color: var(--fg); }
+.tabs button[aria-current="page"] svg { transform: translateY(-2px); color: var(--brand); }
+.toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40;
+  background: #f2f4f9; color: #0b0d12; font-weight: 600; font-size: 14px; padding: 10px 16px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.4);
+  animation: toastIn .3s var(--ease); max-width: calc(100% - 32px); text-align: center; }
+.toast.bad { background: var(--danger); color: #fff; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+
+/* ---------- Mitteilung (Beispiel) ---------- */
+.notif { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%; width: min(520px, calc(100% - 20px)); transform: translate(-50%, -140%);
+  z-index: 50; background: rgba(40,44,56,.86); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-radius: 20px; padding: 12px 14px; display: grid; grid-template-columns: 38px 1fr auto; gap: 2px 12px; align-items: center; cursor: pointer;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5); transition: transform .5s var(--ease); border: 0; color: var(--fg); text-align: left; font: inherit; }
+.notif.show { transform: translate(-50%, 0); }
+.notif .ico { grid-row: 1 / span 2; width: 38px; height: 38px; border-radius: 9px; background: #317f6f; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff; }
+.notif b { font-size: 15px; } .notif small { color: #b9bfcc; font-size: 12px; }
+.notif p { margin: 0; grid-column: 2 / span 2; font-size: 14px; color: #dfe3ec; }
+
+/* ---------- Mitteilungen ---------- */
+.push-list { display: grid; gap: 14px; }
+.push-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.push-row .btn { flex: 1 1 140px; }
+.devs { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.devs li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); }
+.devs li b { color: var(--fg); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+
+<style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <img src="data:image/png;base64,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" alt="VTK Veranstaltungstechnik Koch">
+    <span class="conn" id="conn"><i></i><span id="connTxt">Verbinde …</span></span>
+  </header>
+
+  <div class="banner" id="demoBanner" hidden>
+    <span>Vorschau mit Beispieldaten</span>
+    <span class="row" style="flex:0 1 auto;gap:16px"><button type="button" id="testNotif">Mitteilung testen</button><button type="button" data-go="settings">Verbindung einrichten</button></span>
+  </div>
+
+  <!-- TOR -->
+  <section class="view" id="v-gate">
+    <h2>Tor</h2>
+    <div class="card gate">
+      <svg viewBox="0 0 320 200" role="img" aria-label="Torzustand">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="100%" r="80%">
+            <stop offset="0" stop-color="#2f5fff" stop-opacity=".55"></stop>
+            <stop offset="1" stop-color="#2f5fff" stop-opacity="0"></stop>
+          </radialGradient>
+          <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#2b3246"></stop>
+            <stop offset="1" stop-color="#20263a"></stop>
+          </linearGradient>
+          <clipPath id="clip"><rect x="60" y="28" width="200" height="146"></rect></clipPath>
+        </defs>
+        <rect x="0" y="0" width="320" height="200" fill="#11141c"></rect>
+        <rect x="60" y="28" width="200" height="146" fill="#07080c"></rect>
+        <rect class="glow" id="glow" x="60" y="28" width="200" height="146" fill="url(#g1)" opacity="0"></rect>
+        <g clip-path="url(#clip)">
+          <g class="door" id="door">
+            <rect x="60" y="28" width="200" height="146" fill="url(#g2)"></rect>
+            <g stroke="#0e1118" stroke-width="2">
+              <line x1="60" y1="57" x2="260" y2="57"></line>
+              <line x1="60" y1="86" x2="260" y2="86"></line>
+              <line x1="60" y1="115" x2="260" y2="115"></line>
+              <line x1="60" y1="144" x2="260" y2="144"></line>
+            </g>
+            <g fill="#3a4360" opacity=".55">
+              <rect x="78" y="38" width="38" height="10" rx="2"></rect><rect x="141" y="38" width="38" height="10" rx="2"></rect><rect x="204" y="38" width="38" height="10" rx="2"></rect>
+            </g>
+            <rect x="60" y="170" width="200" height="4" fill="#2f5fff"></rect>
+          </g>
+        </g>
+        <rect x="54" y="22" width="212" height="156" fill="none" stroke="#2a3042" stroke-width="6" rx="3"></rect>
+        <rect x="0" y="178" width="320" height="22" fill="#0d1017"></rect>
+      </svg>
+      <div class="gate-info">
+        <div>
+          <div class="gate-state" id="gateState">–</div>
+          <div class="gate-hint" id="gateHint"></div>
+        </div>
+        <span class="chip" id="lockChip" hidden>Tastatur gesperrt</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="hold big" id="btnOpen" type="button" data-ms="700"><span class="fill"></span><b>Öffnen</b><small>Gedrückt halten</small></button>
+      <button class="hold" id="btnClose" type="button" data-ms="1200"><span class="fill"></span><b>Schließen</b><small>Länger halten</small></button>
+      <button class="hold stop" id="btnStop" type="button"><span class="fill"></span><b>Stopp</b><small>Sofort</small></button>
+    </div>
+    <p class="note">Schließen aus der Ferne nur, wenn niemand im Torbereich ist. Die Schließkantensicherung muss aktiv sein.</p>
+
+    <h2>Tür zum Lager</h2>
+    <div class="card door-card">
+      <div class="dmini" id="dmini" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path class="cl" d="M7 10V8a5 5 0 0 1 10 0v2h-2.2V8a2.8 2.8 0 0 0-5.6 0v2z"/><path class="op" d="M7 10V8a5 5 0 0 1 9.6-2l-2 .9A2.8 2.8 0 0 0 9.2 8v2z"/><rect x="5" y="10" width="14" height="11" rx="2"/></svg></div>
+      <div class="door-info">
+        <b id="doorState">–</b>
+        <span class="note" id="doorAuth">Niemand berechtigt</span>
+        <span class="note" id="dispState"></span>
+      </div>
+      <button class="hold" id="btnDoor" type="button" data-ms="600"><span class="fill"></span><b>Tür entriegeln</b><small>Gedrückt halten</small></button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="stActive">0</b><span>Aktive Codes</span></div>
+      <div class="stat"><b id="stToday">0</b><span>Heute geöffnet</span></div>
+      <div class="stat"><b id="stFails">0</b><span>Fehlversuche heute</span></div>
+    </div>
+    <button class="btn ghost" id="unlockBtn" type="button" hidden>Tastatur-Sperre aufheben</button>
+  </section>
+
+  <!-- CODES -->
+  <section class="view" id="v-codes" hidden>
+    <h2>Codes</h2>
+    <div class="card">
+      <span class="label">Neuer Einmalcode</span>
+      <div class="field">
+        <span class="note">Gültig für</span>
+        <div class="durs" id="durs"></div>
+      </div>
+      <div class="field">
+        <span class="note">Gültig ab</span>
+        <div class="seg" id="seg">
+          <button type="button" id="startNow" aria-pressed="true">Jetzt</button>
+          <button type="button" id="startLater" aria-pressed="false">Später</button>
+        </div>
+        <input type="datetime-local" id="startAt" hidden>
+      </div>
+      <div class="field">
+        <label class="note" for="who">Für wen – steht als „Hallo …“ auf dem Display</label>
+        <input type="text" id="who" maxlength="27" placeholder="z. B. Spedition, Catering, Techniker" autocomplete="off">
+      </div>
+      <label class="toggle" for="codeDoor">
+        <span><b>Auch die Tür zum Lager</b><br><span class="note">Mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist.</span></span>
+        <input type="checkbox" id="codeDoor"><span class="sw"></span>
+      </label>
+      <button class="btn" id="make" type="button">Code erzeugen</button>
+    </div>
+
+    <div class="codes" id="codes"></div>
+
+    <div class="card">
+      <span class="label">Mastercode · gilt immer</span>
+      <div class="master-row">
+        <div class="pins" id="pins"><span>•</span><span>•</span><span>•</span><span>•</span></div>
+        <button class="btn ghost small" id="masterShow" type="button">Anzeigen</button>
+      </div>
+      <div class="field">
+        <label class="note" for="masterIn">Neuer Mastercode</label>
+        <input type="text" id="masterIn" class="pin-in" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" autocomplete="off">
+      </div>
+      <button class="btn ghost" id="masterSave" type="button">Mastercode speichern</button>
+      <p class="note" id="masterMsg">Bitte keine leicht zu ratenden Zahlen wie 1234 oder 0000.</p>
+    </div>
+
+  </section>
+
+  <!-- CHIPS -->
+  <section class="view" id="v-chips" hidden>
+    <h2>Chips</h2>
+    <div class="card" id="learnCard">
+      <span class="label">Neuen Chip anlernen</span>
+      <div class="field">
+        <label class="note" for="chipName">Name</label>
+        <input type="text" id="chipName" maxlength="23" placeholder="z. B. Fabian, Lager-Team" autocomplete="off">
+      </div>
+      <button class="btn" id="learnBtn" type="button">Chip hinzufügen</button>
+    </div>
+    <div class="card learn" id="learnWait" hidden>
+      <div class="pulse"><i></i><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="12" r="5"></circle><path d="M8 12h.01" stroke-width="2.6"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9.5 9.5 0 0 1 0 13"></path></svg></div>
+      <b>Jetzt den Chip an die Tastatur halten</b>
+      <span class="note" id="learnTxt" aria-live="polite">Die Blackbox wartet 30 Sekunden.</span>
+      <button class="btn ghost small" id="learnCancel" type="button">Abbrechen</button>
+    </div>
+    <div class="codes" id="chips"></div>
+    <p class="note">Geht ein Chip verloren, sperre ihn hier sofort. Ein gesperrter oder unbekannter Chip öffnet das Tor nicht. „Tür“ heißt: Nach dem Chip begrüßt das Display an der Lagertür mit dem Namen des Chips und zeigt den Knopf „Tür öffnen“.</p>
+  </section>
+
+  <!-- VERLAUF -->
+  <section class="view" id="v-log" hidden>
+    <h2>Verlauf</h2>
+    <p class="sub">Die letzten 30 Ereignisse der Blackbox.</p>
+    <div class="card" id="log"></div>
+  </section>
+
+  <!-- EINSTELLUNGEN -->
+  <section class="view" id="v-settings" hidden>
+    <h2>Verbindung</h2>
+    <div class="card wifi" id="wifiCard" hidden>
+      <svg class="wbars" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="15" width="4" height="6" rx="1"></rect><rect x="10" y="10" width="4" height="11" rx="1"></rect><rect x="17" y="4" width="4" height="17" rx="1"></rect></svg>
+      <div><b id="wifiTxt">WLAN-Empfang</b><p class="note" id="wifiSub"></p></div>
+    </div>
+    <div class="card" id="authCard">
+      <span class="label">Tür · Berechtigung am Display</span>
+      <p class="note">So lange zeigt das Display nach Code oder Chip „Du bist berechtigt“ mit dem Knopf „Tür öffnen“. Jedes Öffnen startet die Zeit neu.</p>
+      <div class="auth-row">
+        <input type="number" id="authMin" min="0.25" max="60" step="0.25" inputmode="decimal" aria-label="Minuten">
+        <span class="note">Minuten</span>
+        <button class="btn ghost small" id="authSave" type="button">Speichern</button>
+      </div>
+    </div>
+    <h2>Mitteilungen</h2>
+    <div class="card" id="pushCard">
+      <span class="label">Auf diesem Handy</span>
+      <p class="note" id="pushNote">Mitteilungen der Blackbox direkt aufs Handy, ohne weitere App.</p>
+      <div class="push-list" id="pushOn" hidden>
+        <div class="field"><label class="note" for="pushName">Name dieses Handys</label><input type="text" id="pushName" maxlength="23" placeholder="z. B. iPhone Fabian"></div>
+        <div class="push-list" id="pushToggles"></div>
+        <div class="push-row">
+          <button class="btn ghost small" id="pushTest" type="button">Test senden</button>
+          <button class="btn ghost small" id="pushOff" type="button">Ausschalten</button>
+        </div>
+      </div>
+      <button class="btn" id="pushEnable" type="button">Mitteilungen einschalten</button>
+      <div id="pushDevs" hidden>
+        <span class="label">Angemeldete Handys</span>
+        <ul class="devs" id="pushDevList"></ul>
+      </div>
+    </div>
+
+    <h2>Verbindung zur Blackbox</h2>
+    <p class="sub">Die Daten vom MQTT-Broker (EMQX Serverless). Sie bleiben nur auf diesem Gerät.</p>
+    <form class="card" id="cfgForm" autocomplete="off">
+      <div class="field"><label class="note" for="cHost">Broker-Adresse</label><input type="text" id="cHost" placeholder="xxxx.ala.eu-central-1.emqxsl.com" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label class="note" for="cPort">WebSocket-Port (EMQX: 8084)</label><input type="number" id="cPort" value="8084" inputmode="numeric"></div>
+      <div class="field"><label class="note" for="cUser">Benutzer</label><input type="text" id="cUser" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label class="note" for="cPass">Passwort</label><input type="password" id="cPass"></div>
+      <div class="field"><label class="note" for="cBase">Themen-Präfix</label><input type="text" id="cBase" value="vtk/tor" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label class="note" for="cKey">Zugangsschlüssel der Blackbox</label><input type="password" id="cKey"></div>
+      <button class="btn" type="submit">Speichern und verbinden</button>
+      <p class="err" id="cfgErr" hidden></p>
+    </form>
+    <button class="btn ghost" id="cfgClear" type="button">Verbindungsdaten löschen</button>
+  </section>
+</div>
+
+<div id="sheet" hidden>
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" role="dialog" aria-label="Neuer Code">
+    <div class="grab"></div>
+    <span class="label" style="text-align:center">Neuer Einmalcode</span>
+    <div class="digits" id="digits"><span>0</span><span>0</span><span>0</span><span>0</span></div>
+    <div class="valid" id="valid"></div>
+    <div class="row">
+      <button class="btn" type="button" id="copyMsg">Nachricht kopieren</button>
+      <button class="btn ghost" type="button" id="copyCode">Nur Code</button>
+    </div>
+    <textarea id="fallback" rows="4" hidden readonly></textarea>
+    <button class="btn ghost" type="button" id="sheetClose">Fertig</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<button class="notif" id="notif" type="button" aria-live="polite">
+  <span class="ico">VTK</span><b id="notifTitle">Tor geöffnet</b><small>jetzt</small>
+  <p id="notifTxt"></p>
+</button>
+
+<div class="tabs">
+  <nav>
+    <button type="button" data-go="gate" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 21V8l9-5 9 5v13"></path><path d="M7 21v-9h10v9M7 15h10M7 18h10"></path></svg>Tor</button>
+    <button type="button" data-go="codes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8.5 8h.01M12 8h.01M15.5 8h.01M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" stroke-width="2.6"></path></svg>Codes</button>
+    <button type="button" data-go="chips">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="12" r="5"></circle><path d="M8 12h.01" stroke-width="2.6"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9.5 9.5 0 0 1 0 13"></path></svg>Chips</button>
+    <button type="button" data-go="log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Verlauf</button>
+    <button type="button" data-go="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Verbindung</button>
+  </nav>
+</div>
+
+<script>
+const DUR = [30, 60, 120, 240, 480, 720, 1440, 2880, 4320, 10080];
+const DUR_LABEL = ["30 Min", "1 Std", "2 Std", "4 Std", "8 Std", "12 Std", "1 Tag", "2 Tage", "3 Tage", "7 Tage"];
+const $ = id => document.getElementById(id);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+let cfg = null;
+try { cfg = JSON.parse(store.get("torcode.cfg") || "null"); } catch (e) {}
+let mode = cfg ? "connecting" : "demo";
+let client = null, online = false, state = null, master = null;
+const pending = new Map();
+let durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", optimisticGate = null;
+
+// ---------- Beispieldaten ----------
+function demoState() {
+  const n = Math.floor(Date.now() / 1000), h = 3600;
+  return {
+    now: n, gate: "closed", canClose: true, lockedFor: 0, rssi: -63, disp: true, door: "locked", authSec: 120, authFor: 0,
+    vapid: "demo", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 }],
+    codes: [
+      { code: "0427", from: n - 2 * h, to: n + 6 * h, used: 0, usedAt: 0, label: "Beispiel: Catering Aufbau", door: true },
+      { code: "5913", from: n + 20 * h, to: n + 44 * h, used: 0, usedAt: 0, label: "Beispiel: Bühnenbau Samstag" },
+      { code: "3390", from: n - 26 * h, to: n - 2 * h, used: 1, usedAt: n - 20 * h, label: "Beispiel: Spedition" }
+    ],
+    learning: 0,
+    chips: [
+      { id: "04A1B2C3", label: "Beispiel: Fabian", enabled: true, last: n - 3 * h, door: true },
+      { id: "04D4E5F6", label: "Beispiel: Lager-Team", enabled: true, last: n - 27 * h },
+      { id: "0477AA10", label: "Beispiel: Aushilfe", enabled: false, last: n - 9 * 24 * h }
+    ],
+    log: [
+      { t: n - 600, ok: true, text: "Tor per App geöffnet" },
+      { t: n - 2400, ok: false, text: "Falscher Code (1/5)" },
+      { t: n - 3 * h, ok: true, text: "Chip Beispiel: Fabian – geöffnet" },
+      { t: n - 20 * h, ok: true, text: "Code 3390 · Beispiel: Spedition – geöffnet" },
+      { t: n - 23 * h, ok: true, text: "Mastercode – Tor geöffnet" }
+    ]
+  };
+}
+
+// ---------- Verbindung ----------
+function setConn(kind, txt) { $("conn").className = "conn " + kind; $("connTxt").textContent = txt; }
+
+function connect() {
+  if (client) { try { client.end(true); } catch (e) {} client = null; }
+  if (!cfg) { mode = "demo"; state = demoState(); master = "8264"; render(); setConn("demo", "Vorschau"); return; }
+  if (typeof mqtt === "undefined") { setConn("warn", "Keine Verbindung möglich"); return; }
+  mode = "connecting"; setConn("warn", "Verbinde …"); render();
+  const b = cfg.base;
+  try {
+    client = mqtt.connect(`wss://${cfg.host}:${cfg.port || 8084}/mqtt`, {
+      username: cfg.user, password: cfg.pass, clientId: "vtk-app-" + Math.random().toString(16).slice(2, 10),
+      reconnectPeriod: 4000, connectTimeout: 10000, clean: true
+    });
+  } catch (e) { setConn("warn", "Adresse ungültig"); return; }
+  client.on("connect", () => {
+    mode = "live";
+    client.subscribe([b + "/state", b + "/resp", b + "/online"], { qos: 1 });
+    send("state").then(r => { master = r.master; render(); }).catch(() => {});
+    updateConn();
+  });
+  client.on("message", (topic, msg) => {
+    const s = msg.toString();
+    if (topic === b + "/online") { online = s === "1"; updateConn(); return; }
+    let j; try { j = JSON.parse(s); } catch (e) { return; }
+    if (topic === b + "/state") { state = j; optimisticGate = null; online = true; render(); updateConn(); }
+    else if (topic === b + "/resp" && pending.has(j.id)) { const p = pending.get(j.id); pending.delete(j.id); j.ok ? p.res(j) : p.rej(new Error(j.error || "Abgelehnt")); }
+  });
+  client.on("error", e => { setConn("warn", /auth|Not authorized/i.test(e.message) ? "Zugangsdaten falsch" : "Verbindungsfehler"); });
+  client.on("offline", () => setConn("warn", "Keine Internetverbindung"));
+}
+function updateConn() {
+  if (mode === "demo") return setConn("demo", "Vorschau");
+  if (mode !== "live") return;
+  setConn(online ? "live" : "warn", online ? "Blackbox online" : "Blackbox offline");
+}
+
+function send(op, params = {}) {
+  if (mode === "demo") return demoSend(op, params);
+  return new Promise((res, rej) => {
+    if (!client || !client.connected) return rej(new Error("Keine Verbindung zum Server."));
+    const id = Math.random().toString(36).slice(2, 10);
+    pending.set(id, { res, rej });
+    client.publish(cfg.base + "/cmd", JSON.stringify({ id, k: cfg.key, op, ...params }), { qos: 1 });
+    setTimeout(() => { if (pending.has(id)) { pending.delete(id); rej(new Error("Die Blackbox antwortet nicht.")); } }, 10000);
+  });
+}
+
+function demoSend(op, p) {
+  return new Promise((res, rej) => setTimeout(() => {
+    const n = Math.floor(Date.now() / 1000);
+    const log = (ok, text) => state.log.unshift({ t: n, ok, text });
+    if (op === "open" || op === "close") {
+      state.gate = "between"; log(true, op === "open" ? "Tor per App geöffnet" : "Tor per App geschlossen"); render();
+      setTimeout(() => { state.gate = op === "open" ? "open" : "closed"; render(); }, 2400);
+      return res({ ok: true });
+    }
+    if (op === "stop") { log(true, "Tor per App gestoppt"); return res({ ok: true }); }
+    if (op === "door") {
+      state.door = "unlocked"; log(true, "Tür entriegelt – per App"); render();
+      setTimeout(() => { state.door = "locked"; render(); }, 6000);
+      return res({ ok: true });
+    }
+    if (op === "pushSub") { state.push.push({ id: 1, name: p.name, mask: p.mask }); return res({ ok: true, pid: 1 }); }
+    if (op === "pushSet") { const d = state.push.find(x => x.id === p.pid); if (d) { if (p.mask !== undefined) d.mask = p.mask; if (p.name !== undefined) d.name = p.name; } return res({ ok: true }); }
+    if (op === "pushDel") { state.push = state.push.filter(x => x.id !== p.pid); return res({ ok: true }); }
+    if (op === "pushTest") { showNotif("Test von der Blackbox", "Mitteilungen kommen an."); return res({ ok: true }); }
+    if (op === "settings") { state.authSec = p.authSec; log(true, `Freigabezeit der Tür: ${p.authSec} s`); return res({ ok: true }); }
+    if (op === "unlock") { state.lockedFor = 0; return res({ ok: true }); }
+    if (op === "master") { master = p.code; log(true, "Mastercode geändert"); return res({ ok: true, master }); }
+    if (op === "delete") { state.codes = state.codes.filter(c => !(c.code === p.code && c.from === p.from)); return res({ ok: true }); }
+    if (op === "create") {
+      let code; do { code = String(Math.floor(Math.random() * 10000)).padStart(4, "0"); } while (code === master || state.codes.some(c => c.code === code && !c.used));
+      const f = Math.max(p.from || 0, n);
+      const c = { code, from: f, to: f + p.dur * 60, used: 0, usedAt: 0, label: p.label, door: !!p.door };
+      state.codes.unshift(c); log(true, `Code ${code} erstellt` + (p.label ? " · " + p.label : ""));
+      return res({ ok: true, code, from: c.from, to: c.to, door: c.door });
+    }
+    if (op === "learn") {
+      state.learning = 30;
+      setTimeout(() => {
+        if (!state.learning) return;
+        state.learning = 0;
+        const id = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, "0")).join("").toUpperCase();
+        state.chips.unshift({ id, label: p.label, enabled: true, last: 0 });
+        state.log.unshift({ t: Math.floor(Date.now() / 1000), ok: true, text: "Chip angelernt: " + p.label });
+        render();
+      }, 2800);
+      return res({ ok: true });
+    }
+    if (op === "learnCancel") { state.learning = 0; return res({ ok: true }); }
+    if (op === "chipSet") {
+      const c = state.chips.find(x => x.id === p.chip); if (!c) return rej(new Error("Chip nicht gefunden."));
+      if (typeof p.door === "boolean") { c.door = p.door; log(true, `Chip ${c.label}: Tür ${p.door ? "erlaubt" : "nicht erlaubt"}`); }
+      if (typeof p.enabled === "boolean") { c.enabled = p.enabled; log(true, `Chip ${p.enabled ? "freigegeben" : "gesperrt"}: ${c.label}`); }
+      return res({ ok: true });
+    }
+    if (op === "chipDelete") {
+      const c = state.chips.find(x => x.id === p.chip);
+      state.chips = state.chips.filter(x => x.id !== p.chip); if (c) log(true, "Chip gelöscht: " + c.label);
+      return res({ ok: true });
+    }
+    rej(new Error("Unbekannter Befehl"));
+  }, 350));
+}
+
+// ---------- Hilfen ----------
+const fmt = new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+const fmtTime = new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit" });
+const fmtDay = new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "2-digit", month: "long" });
+function range(a, b) {
+  a = new Date(a * 1000); b = new Date(b * 1000);
+  return fmt.format(a) + " bis " + (a.toDateString() === b.toDateString() ? fmtTime.format(b) : fmt.format(b)) + " Uhr";
+}
+function left(sec) {
+  if (sec < 3600) return Math.max(1, Math.round(sec / 60)) + " Min. übrig";
+  if (sec < 86400) return Math.round(sec / 3600) + " Std. übrig";
+  return Math.round(sec / 86400) + " Tage übrig";
+}
+let toastTimer;
+function toast(msg, bad) {
+  const t = $("toast"); t.textContent = msg; t.className = "toast" + (bad ? " bad" : ""); t.hidden = false;
+  t.style.animation = "none"; t.offsetHeight; t.style.animation = "";
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 2600);
+}
+
+// ---------- Ansichten ----------
+function go(view) {
+  ["gate", "codes", "chips", "log", "settings"].forEach(v => $("v-" + v).hidden = v !== view);
+  document.querySelectorAll(".tabs button").forEach(b => b.toggleAttribute("aria-current", b.dataset.go === view));
+  document.querySelectorAll(".tabs button[aria-current]").forEach(b => b.setAttribute("aria-current", "page"));
+  window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  if (view === "settings") fillCfg();
+}
+document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
+
+function renderWifi() {
+  const r = state && state.rssi, card = $("wifiCard");
+  card.hidden = !((online || mode === "demo") && typeof r === "number");
+  if (card.hidden) return;
+  const q = r >= -60 ? 3 : r >= -70 ? 2 : 1;
+  card.dataset.q = q;
+  $("wifiTxt").textContent = "WLAN-Empfang: " + ["", "schwach", "mittel", "gut"][q];
+  $("wifiSub").textContent = r + " dBm" + (q === 1 ? " · Box näher an den Router oder einen WLAN-Verstärker setzen" : "");
+}
+function render() {
+  $("demoBanner").hidden = mode !== "demo";
+  renderWifi();
+  if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
+  renderGate(); renderDoor(); renderCodes(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush();
+}
+
+// ---------- Tür ----------
+let authEnd = 0, authTimer = null;
+function renderDoor() {
+  const d = state.door || "unknown";
+  const dm = $("dmini");
+  dm.classList.toggle("unlocked", d === "unlocked"); dm.classList.toggle("locked", d === "locked"); dm.classList.toggle("off", state.disp === false);
+  $("dispState").textContent = state.disp === false ? "Display antwortet nicht – Kabel prüfen" : "";
+  $("doorState").textContent = d === "locked" ? "Verriegelt" : d === "unlocked" ? "Entriegelt" : "Status unbekannt";
+  authEnd = state.authFor > 0 ? Date.now() + state.authFor * 1000 : 0;
+  tickAuth();
+}
+function tickAuth() {
+  clearTimeout(authTimer);
+  const left = Math.max(0, Math.ceil((authEnd - Date.now()) / 1000));
+  $("dmini").classList.toggle("auth", left > 0);
+  $("doorAuth").textContent = left > 0
+    ? `Berechtigt · ${state.authWho || ""} · noch ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`
+    : "Niemand berechtigt";
+  if (left > 0) authTimer = setTimeout(tickAuth, 1000);
+}
+function renderAuthCfg() {
+  if (document.activeElement !== $("authMin")) $("authMin").value = +((state.authSec || 120) / 60).toFixed(2);
+}
+$("authSave").onclick = async () => {
+  const sec = Math.round(parseFloat(String($("authMin").value).replace(",", ".")) * 60);
+  if (!(sec >= 15 && sec <= 3600)) { toast("Bitte zwischen 0,25 und 60 Minuten", true); return; }
+  try { await send("settings", { authSec: sec }); toast("Freigabezeit gespeichert"); if (mode === "demo") render(); }
+  catch (e) { toast(e.message, true); }
+};
+
+const GATE = {
+  closed: ["Geschlossen", 0, 0],
+  open: ["Offen", -142, 1],
+  between: ["Halb offen oder in Fahrt", -70, .6],
+  unknown: ["Status unbekannt", 0, 0]
+};
+function renderGate() {
+  const g = optimisticGate || state.gate || "unknown";
+  const [txt, y, glow] = GATE[g] || GATE.unknown;
+  $("door").style.transform = `translateY(${y}px)`;
+  $("glow").setAttribute("opacity", glow);
+  $("gateState").textContent = optimisticGate ? (optimisticGate === "open" ? "Öffnet …" : "Schließt …") : txt;
+  $("gateHint").textContent = g === "unknown" ? "Ohne Endschalter keine Rückmeldung" : (state.now ? "Stand " + fmtTime.format(new Date(state.now * 1000)) + " Uhr" : "");
+  $("lockChip").hidden = !(state.lockedFor > 0);
+  if (state.lockedFor > 0) $("lockChip").textContent = `Tastatur gesperrt · ${Math.ceil(state.lockedFor / 60)} Min.`;
+  $("unlockBtn").hidden = !(state.lockedFor > 0);
+  $("btnClose").disabled = state.canClose === false;
+
+  const now = Date.now() / 1000, today = new Date().toDateString();
+  $("stActive").textContent = state.codes.filter(c => !c.used && now >= c.from && now < c.to).length;
+  const todays = state.log.filter(e => e.t && new Date(e.t * 1000).toDateString() === today);
+  $("stToday").textContent = todays.filter(e => e.ok && /geöffnet/.test(e.text) && !/erstellt/.test(e.text)).length;
+  $("stFails").textContent = todays.filter(e => !e.ok && /Falscher/.test(e.text)).length;
+}
+
+function renderCodes() {
+  const box = $("codes"); box.innerHTML = "";
+  if (!state.codes.length) { box.innerHTML = '<div class="empty">Noch keine Einmalcodes. Erzeuge oben den ersten.</div>'; return; }
+  const now = Date.now() / 1000;
+  state.codes.forEach((c, i) => {
+    let st = "on", txt = "Aktiv";
+    if (c.used) { st = "off"; txt = "Benutzt"; } else if (now >= c.to) { st = "off"; txt = "Abgelaufen"; } else if (now < c.from) { st = "wait"; txt = "Geplant"; }
+    const el = document.createElement("div");
+    el.className = "code" + (st === "off" ? " off" : "");
+    el.style.animationDelay = Math.min(i * 40, 240) + "ms";
+    el.innerHTML = `<span class="num"></span><span class="who"></span>
+      <span class="side">${c.door ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${st}">${txt}</span><button class="del" type="button">Löschen</button></span>
+      <span class="when"></span>${st === "on" ? '<span class="bar"><span></span></span>' : ""}`;
+    el.querySelector(".num").textContent = c.code;
+    el.querySelector(".who").textContent = c.label || "Ohne Namen";
+    el.querySelector(".when").textContent = c.used ? "Benutzt " + fmt.format(new Date(c.usedAt * 1000)) + " Uhr"
+      : st === "on" ? left(c.to - now) + " · bis " + fmt.format(new Date(c.to * 1000)) : range(c.from, c.to);
+    if (st === "on") el.querySelector(".bar span").style.width = Math.max(2, (c.to - now) / (c.to - c.from) * 100) + "%";
+    const del = el.querySelector(".del");
+    del.onclick = async () => {
+      if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.textContent = "Wirklich löschen?"; setTimeout(() => { del.classList.remove("confirm"); del.textContent = "Löschen"; }, 4000); return; }
+      try { await send("delete", { code: c.code, from: c.from }); toast("Code gelöscht"); if (mode === "demo") render(); }
+      catch (e) { toast(e.message, true); }
+    };
+    box.appendChild(el);
+  });
+}
+
+function renderLog() {
+  const box = $("log"); box.innerHTML = "";
+  if (!state.log.length) { box.innerHTML = '<div class="empty">Noch keine Ereignisse.</div>'; return; }
+  let day = null, wrap = null;
+  state.log.forEach((e, i) => {
+    const d = e.t ? new Date(e.t * 1000) : null;
+    const key = d ? d.toDateString() : "–";
+    if (key !== day) {
+      day = key; wrap = document.createElement("div"); wrap.className = "day";
+      const h = document.createElement("h3");
+      h.textContent = !d ? "Ohne Uhrzeit" : key === new Date().toDateString() ? "Heute" : key === new Date(Date.now() - 864e5).toDateString() ? "Gestern" : fmtDay.format(d);
+      wrap.appendChild(h); box.appendChild(wrap);
+    }
+    const ev = document.createElement("div");
+    ev.className = "ev" + (e.ok ? "" : " bad");
+    ev.style.animationDelay = Math.min(i * 30, 300) + "ms";
+    ev.innerHTML = "<time></time><i></i><span></span>";
+    ev.querySelector("time").textContent = d ? fmtTime.format(d) : "–";
+    ev.querySelector("span").textContent = e.text;
+    wrap.appendChild(ev);
+  });
+}
+
+function renderMaster() {
+  const spans = $("pins").children;
+  for (let i = 0; i < 4; i++) spans[i].textContent = masterVisible && master ? master[i] : "•";
+  $("masterShow").textContent = masterVisible ? "Verbergen" : "Anzeigen";
+}
+$("masterShow").onclick = () => {
+  masterVisible = !masterVisible;
+  $("pins").classList.remove("reveal"); void $("pins").offsetWidth; if (masterVisible) $("pins").classList.add("reveal");
+  renderMaster();
+};
+$("masterIn").oninput = e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4); };
+$("masterSave").onclick = async () => {
+  const v = $("masterIn").value, msg = $("masterMsg");
+  msg.className = "note";
+  if (!/^\d{4}$/.test(v)) { msg.className = "err"; msg.textContent = "Der Mastercode braucht genau 4 Ziffern."; return; }
+  try {
+    const r = await send("master", { code: v });
+    master = r.master || v; $("masterIn").value = "";
+    msg.textContent = "Der alte Mastercode gilt ab sofort nicht mehr."; toast("Mastercode gespeichert"); render();
+  } catch (e) { msg.className = "err"; msg.textContent = e.message; }
+};
+
+// ---------- Tor-Steuerung (gedrückt halten) ----------
+function holdButton(btn, onDone) {
+  const ms = +btn.dataset.ms || 0;
+  let raf, start;
+  const reset = () => { cancelAnimationFrame(raf); btn.style.setProperty("--p", 0); start = null; };
+  const tick = t => {
+    if (!start) start = t;
+    const p = Math.min(1, (t - start) / ms);
+    btn.style.setProperty("--p", p);
+    if (p < 1) raf = requestAnimationFrame(tick);
+    else { reset(); btn.classList.remove("done"); void btn.offsetWidth; btn.classList.add("done"); onDone(); }
+  };
+  btn.addEventListener("pointerdown", e => {
+    if (btn.disabled) return;
+    if (!ms) { btn.classList.remove("done"); void btn.offsetWidth; btn.classList.add("done"); onDone(); return; }
+    e.preventDefault(); raf = requestAnimationFrame(tick);
+  });
+  ["pointerup", "pointerleave", "pointercancel"].forEach(ev => btn.addEventListener(ev, reset));
+  btn.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); onDone(); } });
+  btn.addEventListener("contextmenu", e => e.preventDefault());
+}
+async function gateCmd(op, label) {
+  if (op !== "stop") { optimisticGate = op === "open" ? "open" : "closed"; renderGate(); }
+  try { await send(op); toast(label); }
+  catch (e) { optimisticGate = null; renderGate(); toast(e.message, true); }
+  setTimeout(() => { if (optimisticGate) { optimisticGate = null; render(); } }, 4000);
+}
+holdButton($("btnOpen"), () => gateCmd("open", "Tor wird geöffnet"));
+holdButton($("btnClose"), () => gateCmd("close", "Tor wird geschlossen"));
+holdButton($("btnStop"), () => gateCmd("stop", "Stopp gesendet"));
+holdButton($("btnDoor"), async () => {
+  try { await send("door"); toast("Tür wird entriegelt"); if (mode === "demo") render(); }
+  catch (e) { toast(e.message, true); }
+});
+$("unlockBtn").onclick = async () => { try { await send("unlock"); toast("Sperre aufgehoben"); if (mode === "demo") render(); } catch (e) { toast(e.message, true); } };
+
+// ---------- Neuer Code ----------
+function renderDurs() {
+  $("durs").innerHTML = "";
+  DUR_LABEL.forEach((l, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = l; b.setAttribute("aria-pressed", String(i === durIdx));
+    b.onclick = () => { durIdx = i; renderDurs(); };
+    $("durs").appendChild(b);
+  });
+}
+function toLocalInput(d) {
+  const p = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function setLater(v) {
+  later = v;
+  $("seg").classList.toggle("right", v);
+  $("startNow").setAttribute("aria-pressed", String(!v));
+  $("startLater").setAttribute("aria-pressed", String(v));
+  $("startAt").hidden = !v;
+  if (v && !$("startAt").value) { const d = new Date(Date.now() + 864e5); d.setHours(8, 0, 0, 0); $("startAt").value = toLocalInput(d); }
+}
+$("startNow").onclick = () => setLater(false);
+$("startLater").onclick = () => setLater(true);
+
+$("make").onclick = async () => {
+  let from = 0;
+  if (later) { const v = new Date($("startAt").value).getTime(); if (isNaN(v)) { $("startAt").focus(); return; } from = Math.floor(v / 1000); }
+  const label = fitBytes($("who").value.trim(), 27);
+  $("make").disabled = true; $("make").textContent = "Erzeuge …";
+  try {
+    const door = $("codeDoor").checked;
+    const r = await send("create", { dur: DUR[durIdx], from, label, door });
+    $("who").value = ""; $("codeDoor").checked = false;
+    r.door = r.door ?? door;
+    openSheet(r, label);
+    if (mode === "demo") render();
+  } catch (e) { toast(e.message, true); }
+  finally { $("make").disabled = false; $("make").textContent = "Code erzeugen"; }
+};
+
+function openSheet(r, label) {
+  lastCode = r.code;
+  lastMsg = `Dein Code für das Tor bei VTK Veranstaltungstechnik Koch: ${r.code}\nEinfach am Tastenfeld eintippen, das Tor öffnet sich.` +
+    (r.door ? `\nAm Display neben der Lagertür kannst du danach einmal „Tür öffnen“ antippen.` : "") +
+    `\nGültig ${range(r.from, r.to)} – nur einmal nutzbar.`;
+  const v = $("valid"); v.innerHTML = "";
+  const s = document.createElement("strong"); s.textContent = range(r.from, r.to);
+  v.append("Gültig ", s, document.createElement("br"), "Einmal nutzbar" + (r.door ? " · mit Tür" : "") + (label ? " · " + label : ""));
+  $("fallback").hidden = true;
+  $("sheet").hidden = false;
+  const spans = [...$("digits").children];
+  spans.forEach(sp => { sp.classList.remove("set"); sp.textContent = "·"; });
+  spans.forEach((sp, i) => {
+    if (reduced) { sp.textContent = r.code[i]; sp.classList.add("set"); return; }
+    const end = performance.now() + 450 + i * 180;
+    const roll = () => {
+      if (performance.now() < end) { sp.textContent = Math.floor(Math.random() * 10); setTimeout(roll, 55); }
+      else { sp.textContent = r.code[i]; sp.classList.add("set"); }
+    };
+    roll();
+  });
+}
+function closeSheet() { $("sheet").hidden = true; }
+$("sheetBg").onclick = closeSheet;
+$("sheetClose").onclick = closeSheet;
+async function copy(text, msg) {
+  try { await navigator.clipboard.writeText(text); toast(msg); $("fallback").hidden = true; }
+  catch (e) { const f = $("fallback"); f.hidden = false; f.value = text; f.focus(); f.select(); toast("Text markiert – bitte selbst kopieren"); }
+}
+$("copyMsg").onclick = () => copy(lastMsg, "Kopiert – jetzt in WhatsApp einfügen");
+$("copyCode").onclick = () => copy(lastCode, "Code kopiert");
+
+// ---------- Einstellungen ----------
+function fillCfg() {
+  const c = cfg || {};
+  $("cHost").value = c.host || ""; $("cUser").value = c.user || ""; $("cPass").value = c.pass || "";
+  $("cBase").value = c.base || "vtk/tor"; $("cKey").value = c.key || ""; $("cPort").value = c.port || 8084;
+  $("cfgErr").hidden = true;
+}
+$("cfgForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const hostRaw = $("cHost").value.trim().replace(/^wss?:\/\//, ""), portIn = (hostRaw.match(/:(\d+)/) || [])[1];
+  const c = { host: hostRaw.replace(/[:/].*$/, ""), port: +(portIn || $("cPort").value) || 8084, user: $("cUser").value.trim(), pass: $("cPass").value,
+    base: $("cBase").value.trim().replace(/\/+$/, "") || "vtk/tor", key: $("cKey").value };
+  if (!c.host || !c.user || !c.pass || !c.key) { $("cfgErr").hidden = false; $("cfgErr").textContent = "Bitte alle Felder ausfüllen."; return; }
+  cfg = c; store.set("torcode.cfg", JSON.stringify(c));
+  state = null; master = null; online = false;
+  connect(); go("gate"); toast("Verbindung gespeichert");
+});
+$("cfgClear").onclick = () => { store.del("torcode.cfg"); cfg = null; connect(); fillCfg(); toast("Verbindungsdaten gelöscht"); };
+
+
+// ---------- Beispiel-Mitteilung ----------
+let notifTimer;
+function showNotif(title, text) {
+  $("notifTitle").textContent = title; $("notifTxt").textContent = text;
+  $("notif").classList.add("show");
+  clearTimeout(notifTimer); notifTimer = setTimeout(() => $("notif").classList.remove("show"), 6000);
+}
+$("testNotif").onclick = () => {
+  const c = state && state.codes.find(x => !x.used && Date.now() / 1000 >= x.from && Date.now() / 1000 < x.to);
+  const code = c ? c.code : "0427", who = c ? c.label : "Catering Aufbau";
+  showNotif("Tor geöffnet", `Code ${code} · ${who}. Tippen für den Verlauf.`);
+  if (state && c) { c.used = 1; c.usedAt = Math.floor(Date.now() / 1000); state.log.unshift({ t: c.usedAt, ok: true, text: `Code ${code} · ${who} – geöffnet` }); state.gate = "between"; render();
+    setTimeout(() => { state.gate = "open"; render(); }, 2400); }
+};
+$("notif").onclick = () => {
+  $("notif").classList.remove("show");
+  go("log");
+};
+
+// ---------- Chips ----------
+// Namen auf die Speichergröße der Blackbox kürzen (Umlaute zählen doppelt)
+function fitBytes(str, max) { const enc = new TextEncoder(); while (enc.encode(str).length > max) str = str.slice(0, -1); return str; }
+
+function renderChips() {
+  const box = $("chips"); box.innerHTML = "";
+  const list = state.chips || [];
+  if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Chips. Lerne oben den ersten an.</div>'; return; }
+  list.forEach((c, i) => {
+    const el = document.createElement("div");
+    el.className = "tagrow" + (c.enabled ? "" : " off");
+    el.style.animationDelay = Math.min(i * 40, 240) + "ms";
+    el.innerHTML = `<span class="ico"></span><span class="who"></span>
+      <span class="side">${c.door && c.enabled ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${c.enabled ? "on" : "off"}">${c.enabled ? "Aktiv" : "Gesperrt"}</span></span>
+      <span class="when"></span>
+      <span class="acts"><button class="del dr" type="button">${c.door ? "Tür verbieten" : "Tür erlauben"}</button><button class="del tog" type="button">${c.enabled ? "Sperren" : "Freigeben"}</button><button class="del rm" type="button">Löschen</button></span>`;
+    const name = c.label || "Ohne Namen";
+    el.querySelector(".ico").textContent = (name.replace(/^Beispiel: /, "").trim()[0] || "?").toUpperCase();
+    el.querySelector(".who").textContent = name;
+    el.querySelector(".when").textContent = (c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt") + " · Nr. …" + String(c.id).slice(-4);
+    el.querySelector(".dr").onclick = async () => {
+      try { await send("chipSet", { chip: c.id, door: !c.door }); toast(c.door ? "Tür für diesen Chip verboten" : "Tür für diesen Chip erlaubt"); if (mode === "demo") render(); }
+      catch (e) { toast(e.message, true); }
+    };
+    el.querySelector(".tog").onclick = async () => {
+      try { await send("chipSet", { chip: c.id, enabled: !c.enabled }); toast(c.enabled ? "Chip gesperrt" : "Chip freigegeben"); if (mode === "demo") render(); }
+      catch (e) { toast(e.message, true); }
+    };
+    const rm = el.querySelector(".rm");
+    rm.onclick = async () => {
+      if (!rm.classList.contains("confirm")) { rm.classList.add("confirm"); rm.textContent = "Wirklich löschen?"; setTimeout(() => { rm.classList.remove("confirm"); rm.textContent = "Löschen"; }, 4000); return; }
+      try { await send("chipDelete", { chip: c.id }); toast("Chip gelöscht"); if (mode === "demo") render(); }
+      catch (e) { toast(e.message, true); }
+    };
+    box.appendChild(el);
+  });
+}
+
+// Anlernen: Die App schickt den Namen, die Blackbox wartet auf den nächsten Chip an der Tastatur
+let learnPending = null;
+function renderLearn() {
+  if (learnPending && state) {
+    if (state.learning > 0) {
+      if (!learnPending.seen) { learnPending.seen = true; learnPending.end = Date.now() + state.learning * 1000; }
+    } else if (learnPending.seen || Date.now() > learnPending.end + 4000) {
+      const added = (state.chips || []).length > learnPending.count;
+      const last = state.log[0];
+      toast(added ? "Chip angelernt: " + learnPending.label : (last && !last.ok ? last.text : "Kein Chip erkannt"), !added);
+      if (added) $("chipName").value = "";
+      learnPending = null;
+    }
+  }
+  $("learnWait").hidden = !learnPending; $("learnCard").hidden = !!learnPending;
+  if (learnPending) $("learnTxt").textContent = `Die Blackbox wartet noch ${Math.max(0, Math.ceil((learnPending.end - Date.now()) / 1000))} Sekunden.`;
+}
+$("learnBtn").onclick = async () => {
+  const label = fitBytes($("chipName").value.trim(), 23);
+  if (!label) { $("chipName").focus(); toast("Bitte erst einen Namen eintragen", true); return; }
+  if (!state) { toast("Die Blackbox ist nicht verbunden.", true); return; }
+  try {
+    await send("learn", { label });
+    learnPending = { count: (state.chips || []).length, label, seen: false, end: Date.now() + 30000 };
+    renderLearn();
+  } catch (e) { toast(e.message, true); }
+};
+$("learnCancel").onclick = async () => { learnPending = null; renderLearn(); try { await send("learnCancel"); } catch (e) {} };
+setInterval(() => { if (learnPending) renderLearn(); }, 1000);
+
+// ---------- Direktlink aus der Push-Nachricht (#log) ----------
+
+// ---------- Mitteilungen (Web Push, direkt von der Blackbox) ----------
+const EVENTS = [[1, "Einmalcode benutzt"], [4, "Tor per Chip geöffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip vorgehalten"], [16, "Tastatur nach Fehlversuchen gesperrt"]];
+const PUSH_DEFAULT = 1 | 8 | 16;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const canPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+let swReg = null, demoPid = 0;
+if (canPush() && location.protocol === "https:") navigator.serviceWorker.register("sw.js").then(r => { swReg = r; if (state) renderPush(); }).catch(() => {});
+const myPid = () => mode === "demo" ? demoPid : +(store.get("torcode.pid") || 0);
+const setPid = v => { if (mode === "demo") demoPid = v; else if (v) store.set("torcode.pid", String(v)); else store.del("torcode.pid"); };
+function b64uBytes(s) { s = s.replace(/-/g, "+").replace(/_/g, "/"); const b = atob(s + "=".repeat((4 - s.length % 4) % 4)); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+function renderPush() {
+  const list = (state && state.push) || [], me = list.find(x => x.id === myPid());
+  const note = $("pushNote"), demo = mode === "demo";
+  let why = "";
+  if (!demo) {
+    if (!canPush()) why = isIOS && !standalone()
+      ? "Auf dem iPhone gehen Mitteilungen nur, wenn die App über Teilen → „Zum Home-Bildschirm“ installiert ist. Dann die App vom Home-Bildschirm öffnen und hier einschalten."
+      : "Dieser Browser kann keine Mitteilungen empfangen.";
+    else if (!state || !state.vapid) why = "Die Blackbox braucht dafür die neue Firmware oder ist gerade nicht erreichbar.";
+    else if (Notification.permission === "denied") why = "Mitteilungen sind für diese App in den Einstellungen des Handys ausgeschaltet.";
+  }
+  $("pushOn").hidden = !me;
+  $("pushEnable").hidden = !!me || !!why;
+  note.textContent = why || (me ? "Wähle, wobei dieses Handy eine Mitteilung bekommt." : "Mitteilungen der Blackbox direkt aufs Handy, ohne weitere App.");
+  if (me) {
+    if (document.activeElement !== $("pushName")) $("pushName").value = me.name;
+    const box = $("pushToggles");
+    if (box.dataset.mask !== String(me.mask)) {
+      box.dataset.mask = me.mask; box.innerHTML = "";
+      EVENTS.forEach(([bit, txt]) => {
+        const l = document.createElement("label"); l.className = "toggle";
+        l.innerHTML = `<span><b></b></span><input type="checkbox"><span class="sw"></span>`;
+        l.querySelector("b").textContent = txt;
+        const cb = l.querySelector("input"); cb.checked = (me.mask & bit) !== 0;
+        cb.onchange = async () => {
+          const m = cb.checked ? (me.mask | bit) : (me.mask & ~bit);
+          try { await send("pushSet", { pid: me.id, mask: m }); me.mask = m; box.dataset.mask = m; toast("Gespeichert"); }
+          catch (e) { cb.checked = !cb.checked; toast(e.message, true); }
+        };
+        box.appendChild(l);
+      });
+    }
+  }
+  $("pushDevs").hidden = !list.length;
+  $("pushDevList").innerHTML = "";
+  list.forEach(d => { const li = document.createElement("li"); li.innerHTML = "<b></b><span></span>"; li.querySelector("b").textContent = d.name + (d.id === myPid() ? " (dieses)" : "");
+    li.querySelector("span").textContent = EVENTS.filter(([b]) => d.mask & b).length + " von " + EVENTS.length; $("pushDevList").appendChild(li); });
+}
+$("pushEnable").onclick = async () => {
+  const btn = $("pushEnable");
+  if (mode === "demo") { const r = await send("pushSub", { name: "Dieses Handy", mask: PUSH_DEFAULT }); setPid(r.pid); renderPush(); toast("Mitteilungen eingeschaltet (nur Beispiel)"); return; }
+  try {
+    btn.disabled = true;
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { toast("Mitteilungen wurden nicht erlaubt", true); return; }
+    const reg = swReg || await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (sub) { try { await sub.unsubscribe(); } catch (e) {} }
+    sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uBytes(state.vapid) });
+    const j = sub.toJSON();
+    const name = isIOS ? "iPhone" : "Handy";
+    const r = await send("pushSub", { ep: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, mask: PUSH_DEFAULT, name });
+    setPid(r.pid); toast("Mitteilungen eingeschaltet");
+    if (state && state.push && !state.push.some(x => x.id === r.pid)) state.push.push({ id: r.pid, name, mask: PUSH_DEFAULT });
+    renderPush(); $("pushName").focus();
+  } catch (e) { toast(e.message || "Einschalten hat nicht geklappt", true); }
+  finally { btn.disabled = false; }
+};
+$("pushName").addEventListener("change", async () => {
+  const v = $("pushName").value.trim().slice(0, 23); if (!v) return;
+  try { await send("pushSet", { pid: myPid(), name: v }); toast("Name gespeichert"); if (mode === "demo") render(); } catch (e) { toast(e.message, true); }
+});
+$("pushTest").onclick = async () => { try { await send("pushTest", { pid: myPid() }); if (mode !== "demo") toast("Test geschickt – kommt gleich an"); } catch (e) { toast(e.message, true); } };
+$("pushOff").onclick = async () => {
+  try {
+    if (mode !== "demo" && canPush()) { const reg = swReg || await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); }
+    await send("pushDel", { pid: myPid() });
+    if (state && state.push) state.push = state.push.filter(x => x.id !== myPid());
+    setPid(0); renderPush(); toast("Mitteilungen ausgeschaltet");
+  } catch (e) { toast(e.message, true); }
+};
+
+function handleHash() { const v = location.hash.slice(1); if (["gate", "codes", "chips", "log", "settings"].includes(v)) go(v); }
+window.addEventListener("hashchange", handleHash);
+
+renderDurs(); setLater(false); connect(); handleHash();
+setInterval(() => { if (state) { renderCodes(); renderGate(); } }, 30000);
+</script>
+
+</body>
+</html>
