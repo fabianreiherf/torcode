@@ -201,9 +201,9 @@ input:focus { border-color: var(--brand); outline: none; }
 .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--surface-2); margin: 0 auto; }
 @keyframes up { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-.digits { display: flex; justify-content: center; gap: 10px; }
-.digits span { width: min(19vw, 76px); height: min(24vw, 96px); border-radius: 16px; background: var(--surface-2); border: 1px solid var(--line);
-  display: grid; place-items: center; font-family: var(--font-num); font-weight: 600; font-size: min(12vw, 52px); font-variant-numeric: tabular-nums; }
+.digits { display: flex; justify-content: center; gap: min(2.4vw, 10px); width: 100%; min-width: 0; }
+.digits span { flex: 1 1 0; min-width: 0; max-width: 76px; height: min(24vw, 96px); border-radius: 16px; background: var(--surface-2); border: 1px solid var(--line);
+  display: grid; place-items: center; font-family: var(--font-num); font-weight: 600; font-size: min(10vw, 52px); font-variant-numeric: tabular-nums; }
 .digits span.set { border-color: rgba(47,95,255,.7); box-shadow: 0 0 24px rgba(47,95,255,.35); animation: pop .3s var(--ease); }
 @keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.06); } 100% { transform: none; } }
 .sheet .valid { text-align: center; color: var(--muted); font-size: 15px; }
@@ -353,6 +353,10 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <div class="field">
         <span class="note">Gültig für</span>
         <div class="durs" id="durs"></div>
+      </div>
+      <div class="field">
+        <span class="note">Länge des Codes</span>
+        <div class="durs" id="lens"></div>
       </div>
       <div class="field">
         <span class="note">Gültig ab</span>
@@ -624,7 +628,9 @@ function demoSend(op, p) {
     if (op === "master") { master = p.code; log(true, "Mastercode geändert"); return res({ ok: true, master }); }
     if (op === "delete") { state.codes = state.codes.filter(c => !(c.code === p.code && c.from === p.from)); return res({ ok: true }); }
     if (op === "create") {
-      let code; do { code = String(Math.floor(Math.random() * 10000)).padStart(4, "0"); } while (code === master || state.codes.some(c => c.code === code && !c.used));
+      const len = [4, 5, 6].includes(p.len) ? p.len : 4;
+      const clash = (a, b) => a.startsWith(b) || b.startsWith(a);
+      let code; do { code = String(Math.floor(Math.random() * 10 ** len)).padStart(len, "0"); } while (clash(code, master) || state.codes.some(c => !c.used && clash(code, c.code)));
       const f = Math.max(p.from || 0, n);
       const c = { code, from: f, to: f + p.dur * 60, used: 0, usedAt: 0, label: p.label, door: !!p.door };
       state.codes.unshift(c); log(true, `Code ${code} erstellt` + (p.label ? " · " + p.label : ""));
@@ -878,6 +884,18 @@ function renderDurs() {
     $("durs").appendChild(b);
   });
 }
+let codeLen = 4;
+try { const v = +localStorage.getItem("codeLen"); if ([4, 5, 6].includes(v)) codeLen = v; } catch (e) {}
+function renderLens() {
+  $("lens").innerHTML = "";
+  [4, 5, 6].forEach(l => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = l + " Ziffern"; b.setAttribute("aria-pressed", String(l === codeLen));
+    b.onclick = () => { codeLen = l; try { localStorage.setItem("codeLen", String(l)); } catch (e) {} renderLens(); };
+    $("lens").appendChild(b);
+  });
+}
+renderLens();
 function toLocalInput(d) {
   const p = n => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
@@ -900,7 +918,7 @@ $("make").onclick = async () => {
   $("make").disabled = true; $("make").textContent = "Erzeuge …";
   try {
     const door = $("codeDoor").checked;
-    const r = await send("create", { dur: DUR[durIdx], from, label, door });
+    const r = await send("create", { dur: DUR[durIdx], from, label, door, len: codeLen });
     $("who").value = ""; $("codeDoor").checked = false;
     r.door = r.door ?? door;
     openSheet(r, label);
@@ -919,6 +937,8 @@ function openSheet(r, label) {
   v.append("Gültig ", s, document.createElement("br"), "Einmal nutzbar" + (r.door ? " · mit Tür" : "") + (label ? " · " + label : ""));
   $("fallback").hidden = true;
   $("sheet").hidden = false;
+  $("digits").innerHTML = "";
+  for (let i = 0; i < r.code.length; i++) $("digits").appendChild(document.createElement("span"));
   const spans = [...$("digits").children];
   spans.forEach(sp => { sp.classList.remove("set"); sp.textContent = "·"; });
   spans.forEach((sp, i) => {
