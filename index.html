@@ -725,7 +725,7 @@ try { cfg = JSON.parse(store.get("torcode.cfg") || "null"); } catch (e) {}
 let mode = cfg ? "connecting" : "demo";
 let client = null, online = false, state = null, master = null;
 const pending = new Map();
-let durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", gLocal = null, gateRaf = 0;
+let durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", gLocal = null, gFrozen = null, gateRaf = 0;
 
 // ---------- Beispieldaten ----------
 function demoState() {
@@ -992,12 +992,18 @@ $("authSave").onclick = async () => {
 const OPEN_H = 162;
 function gateModel() {
   const gm = state && state.gm;
+  if (gFrozen) {                                                     // nach Stopp: stehen bleiben
+    if (state && state.gate !== gFrozen.gate) gFrozen = null;          // Endlage erreicht oder neu losgefahren
+    else if (gm && gm.mv && (state._rx || 0) - (gm.age || 0) > gFrozen.at + 300) gFrozen = null;   // neue Fahrt nach dem Stopp
+    else return null;                                                 // alte Meldung von vor dem Stopp: ignorieren
+  }
   if (gm && gm.mv) return { mv: gm.mv, start: (state._rx || Date.now()) - (gm.age || 0), dur: gm.dur || 12000, sp: gm.sp ?? (gm.mv === 1 ? 0 : 100) };
   if (gLocal && Date.now() - gLocal.start < 4000) return gLocal;     // gerade getippt, die Box meldet sich gleich
   return null;
 }
 function curPos() {
   const m = gateModel();
+  if (!m && gFrozen) return gFrozen.pos;
   if (m) { const d = (Date.now() - m.start) / m.dur * 100; return Math.max(0, Math.min(100, m.mv === 1 ? m.sp + d : m.sp - d)); }
   const g = state && state.gate;
   if (g === "open") return 100;
@@ -1009,7 +1015,7 @@ const secs = ms => (ms / 1000).toLocaleString("de-DE", { minimumFractionDigits: 
 function renderGate() {
   const g = state.gate || "unknown", m = gateModel(), pos = curPos(), gm = state.gm || {};
   const door = $("door");
-  door.style.transition = m ? "none" : "";
+  door.style.transition = m || gFrozen ? "none" : "";
   door.style.transform = `translateY(${-pos / 100 * OPEN_H}px)`;
   let txt, hint = "", warn = false;
   if (m) {
@@ -1167,6 +1173,12 @@ function holdButton(btn, onDone) {
 }
 function myName() { const me = state && (state.push || []).find(x => x.id === myPid()); return me ? me.name : ""; }
 async function gateCmd(op, label) {
+  if (op === "stop" && state) {                                        // sofort an der aktuellen Stelle anhalten
+    const p = curPos(); gLocal = null; gFrozen = { pos: p, at: Date.now(), gate: state.gate };
+    if (state.gm) { state.gm.mv = 0; state.gm.pos = Math.round(p); }
+    if (state.gate === "open" && p < 100 || state.gate === "closed" && p > 0) { state.gate = "between"; gFrozen.gate = "between"; }
+    renderGate();
+  } else gFrozen = null;
   if (op !== "stop" && state && state.gm && mode !== "demo") {          // sofort loslaufen lassen, die Box bestätigt gleich
     const up = op === "open", sp = curPos(), t = state.travel || {};
     if ((up && sp < 100) || (!up && sp > 0)) { gLocal = { mv: up ? 1 : 2, start: Date.now(), dur: (up ? t.o : t.c) || 12000, sp }; renderGate(); }
