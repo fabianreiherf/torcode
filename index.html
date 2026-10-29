@@ -94,6 +94,10 @@ h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4
 @keyframes flash { 0% { box-shadow: 0 0 0 0 rgba(47,95,255,.7); } 100% { box-shadow: 0 0 0 16px rgba(47,95,255,0); } }
 .hold.stop b { color: var(--danger); }
 .hold:disabled { opacity: .45; cursor: not-allowed; }
+.gate svg { cursor: pointer; }
+.gate-state.warn { color: var(--warn); }
+.gate-times { padding: 0 18px 14px; display: flex; gap: 8px 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.gate-times b { color: var(--fg); font-family: var(--font-num); font-weight: 600; }
 
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 /* Tür mit Elektroschloss: kleines Abbild des Displays an der Tür */
@@ -111,6 +115,7 @@ h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4
 .door-info b { font-size: 19px; }
 .door-info .note { overflow-wrap: anywhere; }
 .door-card .hold { grid-column: 1 / -1; }
+.door-card .hold.big { background: var(--brand); border-color: var(--brand); }
 .toggle { display: flex; align-items: center; justify-content: space-between; gap: 14px; cursor: pointer; }
 .toggle input { position: absolute; opacity: 0; pointer-events: none; }
 .toggle .sw { flex: none; width: 46px; height: 28px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); position: relative; transition: background .25s; }
@@ -120,7 +125,7 @@ h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4
 .toggle input:focus-visible + .sw { outline: 2px solid var(--brand); outline-offset: 2px; }
 .pill.door { color: #ffd166; background: rgba(255,197,49,.12); }
 .auth-row { display: flex; gap: 10px; align-items: center; }
-.auth-row input { width: 90px; }
+.auth-row input { width: 96px; font: 16px var(--font-ui); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); }
 .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
 .stat b { font-family: var(--font-num); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .stat span { font-size: 12px; color: var(--muted); }
@@ -224,9 +229,11 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 /* ---------- Tabs & Toast ---------- */
 .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
   background: rgba(11,13,18,.82); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border-top: 1px solid var(--line); }
-.tabs nav { max-width: 540px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
-.tabs button { background: none; border: 0; padding: 6px 0; display: grid; justify-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; transition: color .2s; }
+.tabs nav { max-width: 540px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, 1fr); }
+.tabs button { background: none; border: 0; padding: 6px 0; display: grid; justify-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: var(--muted); cursor: pointer; transition: color .2s; min-width: 0; white-space: nowrap; }
 .tabs button svg { width: 24px; height: 24px; transition: transform .25s var(--ease); }
+.tabs .t-lg { display: none; }
+@media (min-width: 760px) { .tabs .t-lg { display: inline; } .tabs .t-sm { display: none; } }
 .tabs button[aria-current="page"] { color: var(--fg); }
 .tabs button[aria-current="page"] svg { transform: translateY(-2px); color: var(--brand); }
 .toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40;
@@ -254,6 +261,91 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 .devs li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); }
 .devs li b { color: var(--fg); font-weight: 600; }
 
+
+/* ---------- Einstellungen ---------- */
+.set-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.set-row input[type="time"] { width: 132px; }
+.set-row input[type="number"], .set-row input[type="time"], .auth-row input { min-width: 96px; font: 16px var(--font-ui); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); }
+.set-row.off { opacity: .45; pointer-events: none; }
+.kv { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kv div { background: var(--surface-2); border-radius: 14px; padding: 12px 14px; display: grid; gap: 2px; }
+.kv b { font-family: var(--font-num); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kv span { font-size: 12px; color: var(--muted); }
+.hint { border-radius: 14px; padding: 12px 14px; font-size: 14px; background: rgba(255,181,71,.12); color: #ffd28a; display: flex; gap: 10px; align-items: start; }
+.hint svg { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+.hint.ok { background: rgba(61,220,151,.1); color: #9ff0c9; }
+.vac-on { border-color: rgba(255,181,71,.55); }
+
+/* ---------- Mastercode ---------- */
+.pins { flex-wrap: wrap; }
+.pins.n6 span { width: 38px; } .pins.n8 span { width: 32px; font-size: 20px; }
+
+/* ---------- Chip-Optionen ---------- */
+.tagrow { cursor: pointer; }
+.tagrow .more { color: var(--muted); font-size: 22px; line-height: 1; padding-left: 4px; }
+.pill.win { color: #c7b8ff; background: rgba(140,110,255,.14); }
+.acts-big { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.act { display: grid; gap: 6px; justify-items: start; text-align: left; border: 1px solid var(--line); background: var(--surface-2); border-radius: 16px; padding: 14px; cursor: pointer; font: inherit; color: inherit; }
+.act svg { width: 26px; height: 26px; color: #9db4ff; }
+.act b { font-size: 16px; } .act small { color: var(--muted); font-size: 13px; }
+.act.on { border-color: rgba(47,95,255,.7); background: var(--brand-soft); }
+.act.danger svg, .act.danger b { color: var(--danger); }
+.act.danger.confirm { background: rgba(255,93,93,.14); border-color: rgba(255,93,93,.6); }
+.days { display: flex; gap: 6px; flex-wrap: wrap; }
+.days button { width: 42px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); font: 600 14px var(--font-ui); cursor: pointer; }
+.days button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); }
+.sheet { max-height: 92vh; overflow-y: auto; }
+.sheet h3 { margin: 0; font-size: 20px; text-align: center; overflow-wrap: anywhere; }
+
+/* ---------- Statistik ---------- */
+.week-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.week-nav b { font-size: 17px; text-align: center; flex: 1; }
+.week-nav button { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 20px; cursor: pointer; }
+.week-nav button:disabled { opacity: .35; cursor: default; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.chart { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; height: 170px; padding-top: 18px; }
+.chart .col { display: grid; grid-template-rows: 1fr auto; height: 100%; gap: 6px; position: relative; }
+.chart .bars { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 100%; }
+.chart .bars i { display: block; width: min(14px, 40%); border-radius: 4px 4px 0 0; min-height: 0; }
+.chart .bars i.o { background: #5b82ff; } .chart .bars i.d { background: #b97a22; }
+.chart .col span { font-size: 12px; color: var(--muted); text-align: center; }
+.chart .col:hover .tip, .chart .col:focus .tip { display: block; }
+.chart .tip { display: none; position: absolute; bottom: calc(100% - 10px); left: 50%; transform: translateX(-50%); background: #f2f4f9; color: #0b0d12; font-size: 12px; padding: 6px 8px; border-radius: 8px; white-space: nowrap; z-index: 2; }
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.toplist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.toplist li { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 15px; }
+.toplist li i { grid-column: 1 / -1; height: 4px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.toplist li i span { display: block; height: 100%; background: #5b82ff; border-radius: 4px; }
+.toplist b { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+/* ---------- iPad: hochkant zwei Spalten, quer Seitenleiste ---------- */
+.cols { display: grid; gap: 14px; }
+.cols > div { display: grid; gap: 14px; align-content: start; min-width: 0; }
+@media (min-width: 760px) {
+  body { font-size: 17px; }
+  .app { max-width: 1060px; padding-inline: 28px; }
+  .cols { grid-template-columns: 1fr 1fr; gap: 22px; }
+  .cols > div { gap: 16px; }
+  .tabs nav { max-width: 760px; }
+  .tabs button { font-size: 12.5px; }
+  .sheet { max-width: 620px; border-radius: 24px; bottom: 50%; transform: translateY(50%); animation: fade .3s; }
+  .settings-grid { column-count: 2; column-gap: 22px; }
+  .settings-grid > * { break-inside: avoid; margin-bottom: 16px; }
+  .chart { height: 220px; }
+}
+@media (min-width: 1020px) and (orientation: landscape) {
+  .app { max-width: none; margin-left: 232px; margin-right: 0; padding: 0 32px 40px; }
+  .tabs { left: 0; top: 0; bottom: 0; right: auto; width: 216px; padding: calc(24px + env(safe-area-inset-top, 0px)) 14px 24px; border-top: 0; border-right: 1px solid var(--line); }
+  .tabs nav { grid-template-columns: 1fr; gap: 4px; max-width: none; }
+  .tabs button { display: flex; align-items: center; gap: 12px; justify-items: start; font-size: 16px; padding: 12px 14px; border-radius: 12px; }
+  .tabs button[aria-current="page"] { background: var(--surface); }
+  .tabs button[aria-current="page"] svg { transform: none; }
+  .toast { bottom: 28px; margin-left: 116px; }
+  .codes-grid { grid-template-columns: repeat(2, 1fr); }
+  .settings-grid { column-count: 3; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
@@ -270,45 +362,42 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 
   <div class="banner" id="demoBanner" hidden>
     <span>Vorschau mit Beispieldaten</span>
-    <span class="row" style="flex:0 1 auto;gap:16px"><button type="button" id="testNotif">Mitteilung testen</button><button type="button" data-go="settings">Verbindung einrichten</button></span>
+    <span class="row" style="flex:0 1 auto;gap:16px"><button type="button" id="testNotif">Mitteilung testen</button><button type="button" data-go="settings">Blackbox verbinden</button></span>
   </div>
 
   <!-- TOR -->
   <section class="view" id="v-gate">
+    <div class="cols">
+    <div>
     <h2>Tor</h2>
     <div class="card gate">
-      <svg viewBox="0 0 320 200" role="img" aria-label="Torzustand">
+      <svg viewBox="0 0 320 226" role="img" aria-label="Torzustand – antippen für die Fahrzeiten" id="gateSvg">
         <defs>
-          <radialGradient id="g1" cx="50%" cy="100%" r="80%">
-            <stop offset="0" stop-color="#2f5fff" stop-opacity=".55"></stop>
-            <stop offset="1" stop-color="#2f5fff" stop-opacity="0"></stop>
-          </radialGradient>
           <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#2b3246"></stop>
             <stop offset="1" stop-color="#20263a"></stop>
           </linearGradient>
-          <clipPath id="clip"><rect x="60" y="28" width="200" height="146"></rect></clipPath>
+          <clipPath id="clip"><rect x="78" y="24" width="164" height="162"></rect></clipPath>
         </defs>
-        <rect x="0" y="0" width="320" height="200" fill="#11141c"></rect>
-        <rect x="60" y="28" width="200" height="146" fill="#07080c"></rect>
-        <rect class="glow" id="glow" x="60" y="28" width="200" height="146" fill="url(#g1)" opacity="0"></rect>
+        <rect x="0" y="0" width="320" height="226" fill="#11141c"></rect>
         <g clip-path="url(#clip)">
+          <image href="data:image/webp;base64,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" x="78" y="24" width="164" height="162" preserveAspectRatio="xMidYMid slice"></image>
           <g class="door" id="door">
-            <rect x="60" y="28" width="200" height="146" fill="url(#g2)"></rect>
+            <rect x="78" y="24" width="164" height="162" fill="url(#g2)"></rect>
             <g stroke="#0e1118" stroke-width="2">
-              <line x1="60" y1="57" x2="260" y2="57"></line>
-              <line x1="60" y1="86" x2="260" y2="86"></line>
-              <line x1="60" y1="115" x2="260" y2="115"></line>
-              <line x1="60" y1="144" x2="260" y2="144"></line>
+              <line x1="78" y1="56.4" x2="242" y2="56.4"></line>
+              <line x1="78" y1="88.8" x2="242" y2="88.8"></line>
+              <line x1="78" y1="121.2" x2="242" y2="121.2"></line>
+              <line x1="78" y1="153.6" x2="242" y2="153.6"></line>
             </g>
             <g fill="#3a4360" opacity=".55">
-              <rect x="78" y="38" width="38" height="10" rx="2"></rect><rect x="141" y="38" width="38" height="10" rx="2"></rect><rect x="204" y="38" width="38" height="10" rx="2"></rect>
+              <rect x="92" y="33" width="36" height="10" rx="2"></rect><rect x="142" y="33" width="36" height="10" rx="2"></rect><rect x="192" y="33" width="36" height="10" rx="2"></rect>
             </g>
-            <rect x="60" y="170" width="200" height="4" fill="#2f5fff"></rect>
+            <rect x="78" y="182" width="164" height="4" fill="#2f5fff"></rect>
           </g>
         </g>
-        <rect x="54" y="22" width="212" height="156" fill="none" stroke="#2a3042" stroke-width="6" rx="3"></rect>
-        <rect x="0" y="178" width="320" height="22" fill="#0d1017"></rect>
+        <rect x="72" y="18" width="176" height="171" fill="none" stroke="#2a3042" stroke-width="6" rx="3"></rect>
+        <rect x="0" y="189" width="320" height="37" fill="#0d1017"></rect>
       </svg>
       <div class="gate-info">
         <div>
@@ -317,6 +406,7 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
         </div>
         <span class="chip" id="lockChip" hidden>Tastatur gesperrt</span>
       </div>
+      <div class="gate-times" id="gateTimes" hidden></div>
     </div>
 
     <div class="controls">
@@ -325,7 +415,8 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <button class="hold stop" id="btnStop" type="button"><span class="fill"></span><b>Stopp</b><small>Sofort</small></button>
     </div>
     <p class="note">Schließen aus der Ferne nur, wenn niemand im Torbereich ist. Die Schließkantensicherung muss aktiv sein.</p>
-
+    </div>
+    <div>
     <h2>Tür zum Lager</h2>
     <div class="card door-card">
       <div class="dmini" id="dmini" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path class="cl" d="M7 10V8a5 5 0 0 1 10 0v2h-2.2V8a2.8 2.8 0 0 0-5.6 0v2z"/><path class="op" d="M7 10V8a5 5 0 0 1 9.6-2l-2 .9A2.8 2.8 0 0 0 9.2 8v2z"/><rect x="5" y="10" width="14" height="11" rx="2"/></svg></div>
@@ -334,7 +425,7 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
         <span class="note" id="doorAuth">Niemand berechtigt</span>
         <span class="note" id="dispState"></span>
       </div>
-      <button class="hold" id="btnDoor" type="button" data-ms="600"><span class="fill"></span><b>Tür entriegeln</b><small>Gedrückt halten</small></button>
+      <button class="hold big" id="btnDoor" type="button" data-ms="600"><span class="fill"></span><b>Tür entriegeln</b><small>Gedrückt halten</small></button>
     </div>
 
     <div class="stats">
@@ -342,12 +433,16 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <div class="stat"><b id="stToday">0</b><span>Heute geöffnet</span></div>
       <div class="stat"><b id="stFails">0</b><span>Fehlversuche heute</span></div>
     </div>
+    <div class="hint" id="vacHint" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><span>Urlaubsmodus ist an: Nur der Mastercode öffnet. Ausschalten unter Einstellungen.</span></div>
     <button class="btn ghost" id="unlockBtn" type="button" hidden>Tastatur-Sperre aufheben</button>
+    </div>
+    </div>
   </section>
 
   <!-- CODES -->
   <section class="view" id="v-codes" hidden>
     <h2>Codes</h2>
+    <div class="cols"><div>
     <div class="card">
       <span class="label">Neuer Einmalcode</span>
       <div class="field">
@@ -377,27 +472,33 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <button class="btn" id="make" type="button">Code erzeugen</button>
     </div>
 
-    <div class="codes" id="codes"></div>
-
     <div class="card">
       <span class="label">Mastercode · gilt immer</span>
       <div class="master-row">
-        <div class="pins" id="pins"><span>•</span><span>•</span><span>•</span><span>•</span></div>
+        <div class="pins" id="pins"></div>
         <button class="btn ghost small" id="masterShow" type="button">Anzeigen</button>
       </div>
       <div class="field">
-        <label class="note" for="masterIn">Neuer Mastercode</label>
+        <span class="note">Länge</span>
+        <div class="durs" id="mlens"></div>
+      </div>
+      <button class="btn" id="masterGen" type="button">Neuen Mastercode erzeugen</button>
+      <div class="field">
+        <label class="note" for="masterIn">… oder selbst eintippen</label>
         <input type="text" id="masterIn" class="pin-in" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" autocomplete="off">
       </div>
-      <button class="btn ghost" id="masterSave" type="button">Mastercode speichern</button>
-      <p class="note" id="masterMsg">Bitte keine leicht zu ratenden Zahlen wie 1234 oder 0000.</p>
+      <button class="btn ghost" id="masterSave" type="button">Eingetippten Code speichern</button>
+      <p class="note" id="masterMsg">Der neue Code gilt sofort an Tastatur und Display. Keine leicht zu ratenden Zahlen wie 1234.</p>
     </div>
-
+    </div><div>
+    <div class="codes" id="codes"></div>
+    </div></div>
   </section>
 
   <!-- CHIPS -->
   <section class="view" id="v-chips" hidden>
     <h2>Chips</h2>
+    <div class="cols"><div>
     <div class="card" id="learnCard">
       <span class="label">Neuen Chip anlernen</span>
       <div class="field">
@@ -412,8 +513,10 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <span class="note" id="learnTxt" aria-live="polite">Die Blackbox wartet 30 Sekunden.</span>
       <button class="btn ghost small" id="learnCancel" type="button">Abbrechen</button>
     </div>
+    <p class="note">Tippe auf einen Chip für alle Möglichkeiten: Tür erlauben, sperren, Zeitfenster, umbenennen, löschen. Geht ein Chip verloren, sperre ihn sofort.</p>
+    </div><div>
     <div class="codes" id="chips"></div>
-    <p class="note">Geht ein Chip verloren, sperre ihn hier sofort. Ein gesperrter oder unbekannter Chip öffnet das Tor nicht. „Tür“ heißt: Nach dem Chip begrüßt das Display an der Lagertür mit dem Namen des Chips und zeigt den Knopf „Tür öffnen“.</p>
+    </div></div>
   </section>
 
   <!-- VERLAUF -->
@@ -423,9 +526,33 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     <div class="card" id="log"></div>
   </section>
 
+  <!-- STATISTIK -->
+  <section class="view" id="v-stats" hidden>
+    <h2>Statistik</h2>
+    <div class="week-nav"><button type="button" id="wkPrev" aria-label="Woche davor">‹</button><b id="wkTitle">Diese Woche</b><button type="button" id="wkNext" aria-label="Woche danach">›</button></div>
+    <div class="tiles" id="wkTiles"></div>
+    <div class="cols"><div>
+    <div class="card">
+      <span class="label">Pro Tag</span>
+      <div class="legend"><span><i style="background:#5b82ff"></i>Tor auf</span><span><i style="background:#b97a22"></i>Tür entriegelt</span></div>
+      <div class="chart" id="wkChart" role="img" aria-label="Öffnungen pro Tag"></div>
+    </div>
+    <div class="card">
+      <span class="label">Am häufigsten</span>
+      <ul class="toplist" id="wkTop"></ul>
+    </div>
+    </div><div>
+    <div class="card">
+      <span class="label">Alle Ereignisse der Woche</span>
+      <div id="wkEvents"></div>
+    </div>
+    </div></div>
+  </section>
+
   <!-- EINSTELLUNGEN -->
   <section class="view" id="v-settings" hidden>
-    <h2>Verbindung</h2>
+    <h2>Einstellungen</h2>
+    <div class="settings-grid">
     <div class="card wifi" id="wifiCard" hidden>
       <svg class="wbars" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="15" width="4" height="6" rx="1"></rect><rect x="10" y="10" width="4" height="11" rx="1"></rect><rect x="17" y="4" width="4" height="17" rx="1"></rect></svg>
       <div><b id="wifiTxt">WLAN-Empfang</b><p class="note" id="wifiSub"></p></div>
@@ -439,6 +566,48 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
         <button class="btn ghost small" id="authSave" type="button">Speichern</button>
       </div>
     </div>
+
+    <div class="card" id="travelCard">
+      <span class="label">Tor &amp; Fahrzeiten</span>
+      <div class="kv" id="travelKv"></div>
+      <p class="note" id="travelNote"></p>
+      <div class="hint" id="travelHint" hidden></div>
+      <button class="btn ghost small" id="relearn" type="button">Zeiten neu lernen</button>
+    </div>
+
+    <div class="card">
+      <span class="label">Tor-Warnungen</span>
+      <label class="toggle" for="sOw"><span><b>Tor steht zu lange offen</b><br><span class="note">Mitteilung, wenn das Tor länger offen ist als:</span></span><input type="checkbox" id="sOw" data-k="ow"><span class="sw"></span></label>
+      <div class="set-row" id="rowOw"><input type="number" id="sOwm" data-k="owm" min="1" max="720" inputmode="numeric" aria-label="Minuten"><span class="note">Minuten</span></div>
+      <label class="toggle" for="sTw"><span><b>Abends noch offen</b><br><span class="note">Mitteilung, wenn das Tor ab dieser Uhrzeit noch offen ist (einmal am Tag):</span></span><input type="checkbox" id="sTw" data-k="tw"><span class="sw"></span></label>
+      <div class="set-row" id="rowTw"><input type="time" id="sTwt" data-k="twt" aria-label="Uhrzeit"><span class="note">Uhr</span></div>
+    </div>
+
+    <div class="card">
+      <span class="label">Automatisch schließen</span>
+      <label class="toggle" for="sAc"><span><b>Tor von selbst schließen</b><br><span class="note">Nur mit aktiver Lichtschranke. Steht das Tor so lange offen, fährt es zu:</span></span><input type="checkbox" id="sAc" data-k="ac"><span class="sw"></span></label>
+      <div class="set-row" id="rowAc"><input type="number" id="sAcm" data-k="acm" min="1" max="240" inputmode="numeric" aria-label="Minuten"><span class="note">Minuten</span></div>
+    </div>
+
+    <div class="card">
+      <span class="label">Taster innen</span>
+      <p class="note">Einmal drücken entriegelt die Tür. Zusätzlich:</p>
+      <label class="toggle" for="sB2"><span><b>2× drücken: Tor auf</b></span><input type="checkbox" id="sB2" data-k="b2"><span class="sw"></span></label>
+      <label class="toggle" for="sB3"><span><b>3× drücken: Tor zu</b></span><input type="checkbox" id="sB3" data-k="b3"><span class="sw"></span></label>
+      <p class="note">Ist eins davon an, wartet die Box nach dem Drücken eine knappe Sekunde, wie oft gedrückt wird. Sind beide aus, öffnet die Tür sofort.</p>
+    </div>
+
+    <div class="card" id="vacCard">
+      <span class="label">Urlaubsmodus</span>
+      <label class="toggle" for="sVac"><span><b>Nur der Mastercode öffnet</b><br><span class="note">Einmalcodes und Chips sind gesperrt, bis du es wieder ausschaltest. Die App funktioniert weiter.</span></span><input type="checkbox" id="sVac" data-k="vac"><span class="sw"></span></label>
+    </div>
+
+    <div class="card">
+      <span class="label">Wochenbericht</span>
+      <label class="toggle" for="sWk"><span><b>Montags als Mitteilung</b><br><span class="note">Kurze Zusammenfassung der letzten Woche. Alles Weitere unter „Statistik“.</span></span><input type="checkbox" id="sWk" data-k="wk"><span class="sw"></span></label>
+    </div>
+    </div>
+
     <h2>Mitteilungen</h2>
     <div class="card" id="pushCard">
       <span class="label">Auf diesem Handy</span>
@@ -490,6 +659,33 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
   </div>
 </div>
 
+<div id="chipSheet" hidden>
+  <div class="sheet-bg" id="chipBg"></div>
+  <div class="sheet" role="dialog" aria-labelledby="csName">
+    <div class="grab"></div>
+    <h3 id="csName">Chip</h3>
+    <p class="note" style="text-align:center" id="csSub"></p>
+    <div class="acts-big">
+      <button class="act" type="button" id="csDoor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M15 12h.01" stroke-width="2.6"/></svg><b></b><small></small></button>
+      <button class="act" type="button" id="csLock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b></b><small></small></button>
+      <button class="act" type="button" id="csWinBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Zeitfenster</b><small></small></button>
+      <button class="act" type="button" id="csRenBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><b>Umbenennen</b><small>Name am Display</small></button>
+    </div>
+    <div class="card" id="csWin" hidden>
+      <label class="toggle" for="csWinOn"><span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Chip nicht, z. B. für Gäste.</span></span><input type="checkbox" id="csWinOn"><span class="sw"></span></label>
+      <div class="days" id="csDays"></div>
+      <div class="set-row"><span class="note">von</span><input type="time" id="csFrom" aria-label="von"><span class="note">bis</span><input type="time" id="csTo" aria-label="bis"></div>
+      <button class="btn" id="csWinSave" type="button">Zeitfenster speichern</button>
+    </div>
+    <div class="card" id="csRen" hidden>
+      <div class="field"><label class="note" for="csNameIn">Neuer Name</label><input type="text" id="csNameIn" maxlength="23" autocomplete="off"></div>
+      <button class="btn" id="csRenSave" type="button">Namen speichern</button>
+    </div>
+    <button class="act danger" type="button" id="csDel" style="justify-items:center;text-align:center"><b>Chip löschen</b></button>
+    <button class="btn ghost" type="button" id="csClose">Fertig</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 <button class="notif" id="notif" type="button" aria-live="polite">
   <span class="ico">VTK</span><b id="notifTitle">Tor geöffnet</b><small>jetzt</small>
@@ -506,8 +702,10 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="12" r="5"></circle><path d="M8 12h.01" stroke-width="2.6"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9.5 9.5 0 0 1 0 13"></path></svg>Chips</button>
     <button type="button" data-go="log">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Verlauf</button>
+    <button type="button" data-go="stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16"></path><path d="M7 16v-5M12 16V7M17 16v-8"></path></svg>Statistik</button>
     <button type="button" data-go="settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Verbindung</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span class="t-lg">Einstellungen</span><span class="t-sm">Einstellung</span></button>
   </nav>
 </div>
 
@@ -527,13 +725,16 @@ try { cfg = JSON.parse(store.get("torcode.cfg") || "null"); } catch (e) {}
 let mode = cfg ? "connecting" : "demo";
 let client = null, online = false, state = null, master = null;
 const pending = new Map();
-let durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", optimisticGate = null;
+let durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", gLocal = null, gateRaf = 0;
 
 // ---------- Beispieldaten ----------
 function demoState() {
   const n = Math.floor(Date.now() / 1000), h = 3600;
   return {
-    now: n, gate: "closed", canClose: true, lockedFor: 0, rssi: -63, disp: true, door: "locked", authSec: 120, authFor: 0,
+    now: n, gate: "closed", canClose: true, lockedFor: 0, rssi: -63, disp: true, door: "locked", authSec: 120, authFor: 0, ml: 6, stats: true,
+    gm: { mv: 0, sp: 0, pos: 0 },
+    travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
+    cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true },
     vapid: "demo", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 }],
     codes: [
       { code: "0427", from: n - 2 * h, to: n + 6 * h, used: 0, usedAt: 0, label: "Beispiel: Catering Aufbau", door: true },
@@ -542,9 +743,9 @@ function demoState() {
     ],
     learning: 0,
     chips: [
-      { id: "04A1B2C3", label: "Beispiel: Fabian", enabled: true, last: n - 3 * h, door: true },
-      { id: "04D4E5F6", label: "Beispiel: Lager-Team", enabled: true, last: n - 27 * h },
-      { id: "0477AA10", label: "Beispiel: Aushilfe", enabled: false, last: n - 9 * 24 * h }
+      { id: "04A1B2C3", label: "Beispiel: Fabian", enabled: true, last: n - 3 * h, door: true, win: false, days: 31, fm: 420, tm: 1080 },
+      { id: "04D4E5F6", label: "Beispiel: Lager-Team", enabled: true, last: n - 27 * h, win: true, days: 31, fm: 420, tm: 1080 },
+      { id: "0477AA10", label: "Beispiel: Aushilfe", enabled: false, last: n - 9 * 24 * h, win: false, days: 31, fm: 420, tm: 1080 }
     ],
     log: [
       { t: n - 600, ok: true, text: "Tor per App geöffnet" },
@@ -561,7 +762,7 @@ function setConn(kind, txt) { $("conn").className = "conn " + kind; $("connTxt")
 
 function connect() {
   if (client) { try { client.end(true); } catch (e) {} client = null; }
-  if (!cfg) { mode = "demo"; state = demoState(); master = "8264"; render(); setConn("demo", "Vorschau"); return; }
+  if (!cfg) { mode = "demo"; state = demoState(); state._rx = Date.now(); master = "826417"; render(); setConn("demo", "Vorschau"); return; }
   if (typeof mqtt === "undefined") { setConn("warn", "Keine Verbindung möglich"); return; }
   mode = "connecting"; setConn("warn", "Verbinde …"); render();
   const b = cfg.base;
@@ -581,7 +782,7 @@ function connect() {
     const s = msg.toString();
     if (topic === b + "/online") { online = s === "1"; updateConn(); return; }
     let j; try { j = JSON.parse(s); } catch (e) { return; }
-    if (topic === b + "/state") { state = j; optimisticGate = null; online = true; render(); updateConn(); }
+    if (topic === b + "/state") { j._rx = Date.now(); state = j; if (j.gm && j.gm.mv) gLocal = null; online = true; render(); updateConn(); }
     else if (topic === b + "/resp" && pending.has(j.id)) { const p = pending.get(j.id); pending.delete(j.id); j.ok ? p.res(j) : p.rej(new Error(j.error || "Abgelehnt")); }
   });
   client.on("error", e => { setConn("warn", /auth|Not authorized/i.test(e.message) ? "Zugangsdaten falsch" : "Verbindungsfehler"); });
@@ -609,11 +810,22 @@ function demoSend(op, p) {
     const n = Math.floor(Date.now() / 1000);
     const log = (ok, text) => state.log.unshift({ t: n, ok, text });
     if (op === "open" || op === "close") {
-      state.gate = "between"; log(true, op === "open" ? "Tor per App geöffnet" : "Tor per App geschlossen"); render();
-      setTimeout(() => { state.gate = op === "open" ? "open" : "closed"; render(); }, 2400);
+      const up = op === "open", sp = Math.round(curPos());
+      if ((up && sp >= 100) || (!up && sp <= 0)) { log(true, `Tor ${up ? "geöffnet" : "geschlossen"} – App`); return res({ ok: true }); }
+      const dur = up ? state.travel.o : state.travel.c, full = Math.round(dur * (up ? 100 - sp : sp) / 100);
+      state.gm = { mv: up ? 1 : 2, sp, age: 0, dur, pos: sp }; state._rx = Date.now(); state.gate = "between"; gLocal = null;
+      log(true, `Tor ${up ? "geöffnet" : "geschlossen"} – App`); render();
+      clearTimeout(demoGateT);
+      demoGateT = setTimeout(() => { state.gate = up ? "open" : "closed"; state.gm = { mv: 0, sp: 0, pos: up ? 100 : 0 }; state._rx = Date.now(); render(); }, full);
       return res({ ok: true });
     }
-    if (op === "stop") { log(true, "Tor per App gestoppt"); return res({ ok: true }); }
+    if (op === "stop") {
+      clearTimeout(demoGateT);
+      const p = Math.round(curPos()); state.gm = { mv: 0, sp: 0, pos: p }; state.gate = p >= 100 ? "open" : p <= 0 ? "closed" : "between"; gLocal = null; render();
+      log(true, "Tor gestoppt – App"); return res({ ok: true });
+    }
+    if (op === "relearn") { state.travel = { o: 12000, c: 12000, lo: 0, lc: 0, no: 0, nc: 0, bo: 0, bc: 0, bat: 0 }; log(true, "Fahrzeiten werden neu gelernt"); return res({ ok: true }); }
+    if (op === "stats") return res({ ok: true, ...demoStats(p.week || 0) });
     if (op === "door") {
       state.door = "unlocked"; log(true, "Tür entriegelt – per App"); render();
       setTimeout(() => { state.door = "locked"; render(); }, 6000);
@@ -623,9 +835,17 @@ function demoSend(op, p) {
     if (op === "pushSet") { const d = state.push.find(x => x.id === p.pid); if (d) { if (p.mask !== undefined) d.mask = p.mask; if (p.name !== undefined) d.name = p.name; } return res({ ok: true }); }
     if (op === "pushDel") { state.push = state.push.filter(x => x.id !== p.pid); return res({ ok: true }); }
     if (op === "pushTest") { showNotif("Test von der Blackbox", "Mitteilungen kommen an."); return res({ ok: true }); }
-    if (op === "settings") { state.authSec = p.authSec; log(true, `Freigabezeit der Tür: ${p.authSec} s`); return res({ ok: true }); }
+    if (op === "settings") {
+      if (p.authSec !== undefined) { state.authSec = p.authSec; log(true, `Freigabezeit der Tür: ${p.authSec} s`); }
+      for (const k of Object.keys(p)) if (k in state.cfg) state.cfg[k] = p[k];
+      if ("vac" in p) log(true, p.vac ? "Urlaubsmodus an – nur der Mastercode öffnet" : "Urlaubsmodus aus");
+      return res({ ok: true });
+    }
     if (op === "unlock") { state.lockedFor = 0; return res({ ok: true }); }
-    if (op === "master") { master = p.code; log(true, "Mastercode geändert"); return res({ ok: true, master }); }
+    if (op === "master") {
+      master = p.code || Array.from({ length: p.gen || 6 }, () => Math.floor(Math.random() * 10)).join("");
+      state.ml = master.length; log(true, "Mastercode geändert"); return res({ ok: true, master });
+    }
     if (op === "delete") { state.codes = state.codes.filter(c => !(c.code === p.code && c.from === p.from)); return res({ ok: true }); }
     if (op === "create") {
       const len = [4, 5, 6].includes(p.len) ? p.len : 4;
@@ -642,7 +862,7 @@ function demoSend(op, p) {
         if (!state.learning) return;
         state.learning = 0;
         const id = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, "0")).join("").toUpperCase();
-        state.chips.unshift({ id, label: p.label, enabled: true, last: 0 });
+        state.chips.unshift({ id, label: p.label, enabled: true, last: 0, win: false, days: 31, fm: 420, tm: 1080 });
         state.log.unshift({ t: Math.floor(Date.now() / 1000), ok: true, text: "Chip angelernt: " + p.label });
         render();
       }, 2800);
@@ -653,6 +873,8 @@ function demoSend(op, p) {
       const c = state.chips.find(x => x.id === p.chip); if (!c) return rej(new Error("Chip nicht gefunden."));
       if (typeof p.door === "boolean") { c.door = p.door; log(true, `Chip ${c.label}: Tür ${p.door ? "erlaubt" : "nicht erlaubt"}`); }
       if (typeof p.enabled === "boolean") { c.enabled = p.enabled; log(true, `Chip ${p.enabled ? "freigegeben" : "gesperrt"}: ${c.label}`); }
+      if (typeof p.label === "string") c.label = p.label;
+      if (typeof p.win === "boolean") { Object.assign(c, { win: p.win, days: p.days, fm: p.fm, tm: p.tm }); log(true, `Chip ${c.label}: Zeitfenster ${p.win ? "an" : "aus"}`); }
       return res({ ok: true });
     }
     if (op === "chipDelete") {
@@ -662,6 +884,30 @@ function demoSend(op, p) {
     }
     rej(new Error("Unbekannter Befehl"));
   }, 350));
+}
+
+let demoGateT = 0;
+function demoStats(week) {                 // Beispielwoche, gleichbleibend pro Woche
+  let seed = 7 + week * 13; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const now = new Date(), ws = new Date(now); ws.setHours(0, 0, 0, 0); ws.setDate(ws.getDate() - ((ws.getDay() + 6) % 7) - 7 * week);
+  const names = ["Beispiel: Fabian", "Beispiel: Lager-Team", "Mastercode", "App iPhone", "Beispiel: Spedition", "Taster innen", "Handsender / Taster am Tor"];
+  const days = [], ev = [];
+  for (let d = 0; d < 7; d++) {
+    const day = new Date(ws); day.setDate(ws.getDate() + d);
+    if (day > now) { days.push([0, 0, 0, 0, 0, 0]); continue; }
+    const c = [0, 0, 0, 0, 0, 0], we = d >= 5, n = we ? Math.floor(rnd() * 3) : 4 + Math.floor(rnd() * 7);
+    for (let i = 0; i < n; i++) {
+      const k = rnd() < .62 ? 1 : rnd() < .7 ? 4 : rnd() < .8 ? 2 : 5;
+      c[k - 1]++;
+      const t = new Date(day); t.setHours(7 + Math.floor(rnd() * 11), Math.floor(rnd() * 60));
+      if (t <= now) ev.push({ t: Math.floor(t / 1000), k, w: k === 5 ? "Falscher Code" : names[Math.floor(rnd() * names.length)] });
+    }
+    days.push(c);
+  }
+  ev.sort((a, b) => b.t - a.t);
+  const cnt = {}; ev.filter(e => e.k === 1 || e.k === 4).forEach(e => cnt[e.w] = (cnt[e.w] || 0) + 1);
+  const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([w, n]) => ({ w, n }));
+  return { from: Math.floor(ws / 1000), to: Math.floor(ws / 1000) + 7 * 86400, days, top, ev, total: ev.length, first: Math.floor(ws / 1000) - 10 * 7 * 86400 };
 }
 
 // ---------- Hilfen ----------
@@ -686,12 +932,14 @@ function toast(msg, bad) {
 
 // ---------- Ansichten ----------
 function go(view) {
-  ["gate", "codes", "chips", "log", "settings"].forEach(v => $("v-" + v).hidden = v !== view);
+  VIEWS.forEach(v => $("v-" + v).hidden = v !== view);
   document.querySelectorAll(".tabs button").forEach(b => b.toggleAttribute("aria-current", b.dataset.go === view));
   document.querySelectorAll(".tabs button[aria-current]").forEach(b => b.setAttribute("aria-current", "page"));
   window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   if (view === "settings") fillCfg();
+  if (view === "stats") loadStats();
 }
+const VIEWS = ["gate", "codes", "chips", "log", "stats", "settings"];
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
 
 function renderWifi() {
@@ -707,7 +955,7 @@ function render() {
   $("demoBanner").hidden = mode !== "demo";
   renderWifi();
   if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
-  renderGate(); renderDoor(); renderCodes(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush();
+  renderGate(); renderDoor(); renderCodes(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderTravel(); renderCfg(); renderChipSheet();
 }
 
 // ---------- Tür ----------
@@ -740,23 +988,51 @@ $("authSave").onclick = async () => {
   catch (e) { toast(e.message, true); }
 };
 
-const GATE = {
-  closed: ["Geschlossen", 0, 0],
-  open: ["Offen", -142, 1],
-  between: ["Halb offen oder in Fahrt", -70, .6],
-  unknown: ["Status unbekannt", 0, 0]
-};
+// ---------- Tor: Stellung aus der gemeldeten Fahrt berechnen und flüssig bewegen ----------
+const OPEN_H = 162;
+function gateModel() {
+  const gm = state && state.gm;
+  if (gm && gm.mv) return { mv: gm.mv, start: (state._rx || Date.now()) - (gm.age || 0), dur: gm.dur || 12000, sp: gm.sp ?? (gm.mv === 1 ? 0 : 100) };
+  if (gLocal && Date.now() - gLocal.start < 4000) return gLocal;     // gerade getippt, die Box meldet sich gleich
+  return null;
+}
+function curPos() {
+  const m = gateModel();
+  if (m) { const d = (Date.now() - m.start) / m.dur * 100; return Math.max(0, Math.min(100, m.mv === 1 ? m.sp + d : m.sp - d)); }
+  const g = state && state.gate;
+  if (g === "open") return 100;
+  if (g === "closed") return 0;
+  if (state && state.gm && typeof state.gm.pos === "number") return state.gm.pos;
+  return g === "between" ? 50 : 0;
+}
+const secs = ms => (ms / 1000).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " s";
 function renderGate() {
-  const g = optimisticGate || state.gate || "unknown";
-  const [txt, y, glow] = GATE[g] || GATE.unknown;
-  $("door").style.transform = `translateY(${y}px)`;
-  $("glow").setAttribute("opacity", glow);
-  $("gateState").textContent = optimisticGate ? (optimisticGate === "open" ? "Öffnet …" : "Schließt …") : txt;
-  $("gateHint").textContent = g === "unknown" ? "Ohne Endschalter keine Rückmeldung" : (state.now ? "Stand " + fmtTime.format(new Date(state.now * 1000)) + " Uhr" : "");
+  const g = state.gate || "unknown", m = gateModel(), pos = curPos(), gm = state.gm || {};
+  const door = $("door");
+  door.style.transition = m ? "none" : "";
+  door.style.transform = `translateY(${-pos / 100 * OPEN_H}px)`;
+  let txt, hint = "", warn = false;
+  if (m) {
+    const left = Math.max(0, Math.ceil((m.mv === 1 ? 100 - pos : pos) / 100 * m.dur / 1000));
+    txt = m.mv === 1 ? "Öffnet …" : "Schließt …"; hint = left > 0 ? `noch etwa ${left} s` : "gleich da";
+  } else if (gm.fault === "timeout") { txt = "Endlage nicht erreicht"; hint = "Bitte am Tor nachsehen"; warn = true; }
+  else if (gm.fault === "reverse") { txt = "Wieder aufgefahren"; hint = "z. B. Lichtschranke unterbrochen"; warn = true; }
+  else if (g === "open") txt = "Offen";
+  else if (g === "closed") txt = "Geschlossen";
+  else if (g === "between") { txt = state.gm ? `Steht halb offen` : "Halb offen oder in Fahrt"; if (state.gm) hint = `etwa ${Math.round(pos / 10) * 10} % offen`; }
+  else { txt = "Status unbekannt"; hint = "Ohne Endschalter keine Rückmeldung"; }
+  if (!hint && state.now) hint = "Stand " + fmtTime.format(new Date(state.now * 1000)) + " Uhr";
+  $("gateState").textContent = txt; $("gateState").classList.toggle("warn", warn);
+  $("gateHint").textContent = hint;
+  cancelAnimationFrame(gateRaf);
+  if (m) gateRaf = requestAnimationFrame(renderGateLoop);
   $("lockChip").hidden = !(state.lockedFor > 0);
   if (state.lockedFor > 0) $("lockChip").textContent = `Tastatur gesperrt · ${Math.ceil(state.lockedFor / 60)} Min.`;
   $("unlockBtn").hidden = !(state.lockedFor > 0);
   $("btnClose").disabled = state.canClose === false;
+  $("vacHint").hidden = !(state.cfg && state.cfg.vac);
+  const t = state.travel;
+  $("gateTimes").innerHTML = t ? `<span>Ø Öffnen <b>${secs(t.o)}</b></span><span>Ø Schließen <b>${secs(t.c)}</b></span><span>${t.no + t.nc ? `gelernt aus ${t.no + t.nc} Fahrten` : "Startwert, lernt noch"}</span>` : "";
 
   const now = Date.now() / 1000, today = new Date().toDateString();
   $("stActive").textContent = state.codes.filter(c => !c.used && now >= c.from && now < c.to).length;
@@ -764,6 +1040,15 @@ function renderGate() {
   $("stToday").textContent = todays.filter(e => e.ok && /geöffnet/.test(e.text) && !/erstellt/.test(e.text)).length;
   $("stFails").textContent = todays.filter(e => !e.ok && /Falscher/.test(e.text)).length;
 }
+let lastGateTxt = 0;
+function renderGateLoop() {
+  const m = gateModel();
+  if (!m) { renderGate(); return; }
+  $("door").style.transform = `translateY(${-curPos() / 100 * OPEN_H}px)`;
+  if (Date.now() - lastGateTxt > 250) { lastGateTxt = Date.now(); const pos = curPos(), left = Math.max(0, Math.ceil((m.mv === 1 ? 100 - pos : pos) / 100 * m.dur / 1000)); $("gateHint").textContent = left > 0 ? `noch etwa ${left} s` : "gleich da"; }
+  gateRaf = requestAnimationFrame(renderGateLoop);
+}
+$("gateSvg").addEventListener("click", () => { $("gateTimes").hidden = !$("gateTimes").hidden; });
 
 function renderCodes() {
   const box = $("codes"); box.innerHTML = "";
@@ -816,9 +1101,25 @@ function renderLog() {
   });
 }
 
+let masterLen = 6;
+try { const v = +localStorage.getItem("masterLen"); if ([4, 6, 8].includes(v)) masterLen = v; } catch (e) {}
+function renderMLens() {
+  $("mlens").innerHTML = "";
+  [4, 6, 8].forEach(l => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = l + " Ziffern"; b.setAttribute("aria-pressed", String(l === masterLen));
+    b.onclick = () => { masterLen = l; try { localStorage.setItem("masterLen", String(l)); } catch (e) {} renderMLens(); };
+    $("mlens").appendChild(b);
+  });
+  $("masterIn").maxLength = masterLen; $("masterIn").placeholder = "·".repeat(masterLen);
+  $("masterIn").value = $("masterIn").value.slice(0, masterLen);
+}
+renderMLens();
 function renderMaster() {
-  const spans = $("pins").children;
-  for (let i = 0; i < 4; i++) spans[i].textContent = masterVisible && master ? master[i] : "•";
+  const n = (master && master.length) || (state && state.ml) || 4, box = $("pins");
+  if (box.children.length !== n) { box.innerHTML = ""; for (let i = 0; i < n; i++) box.appendChild(document.createElement("span")); }
+  box.className = "pins n" + n + (box.classList.contains("reveal") ? " reveal" : "");
+  [...box.children].forEach((sp, i) => sp.textContent = masterVisible && master ? master[i] : "•");
   $("masterShow").textContent = masterVisible ? "Verbergen" : "Anzeigen";
 }
 $("masterShow").onclick = () => {
@@ -826,17 +1127,22 @@ $("masterShow").onclick = () => {
   $("pins").classList.remove("reveal"); void $("pins").offsetWidth; if (masterVisible) $("pins").classList.add("reveal");
   renderMaster();
 };
-$("masterIn").oninput = e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4); };
-$("masterSave").onclick = async () => {
-  const v = $("masterIn").value, msg = $("masterMsg");
-  msg.className = "note";
-  if (!/^\d{4}$/.test(v)) { msg.className = "err"; msg.textContent = "Der Mastercode braucht genau 4 Ziffern."; return; }
+$("masterIn").oninput = e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, masterLen); };
+async function saveMaster(params, okMsg) {
+  const msg = $("masterMsg"); msg.className = "note";
   try {
-    const r = await send("master", { code: v });
-    master = r.master || v; $("masterIn").value = "";
-    msg.textContent = "Der alte Mastercode gilt ab sofort nicht mehr."; toast("Mastercode gespeichert"); render();
+    const r = await send("master", params);
+    master = r.master || params.code; $("masterIn").value = "";
+    masterVisible = true; $("pins").classList.remove("reveal"); void $("pins").offsetWidth; $("pins").classList.add("reveal");
+    msg.textContent = okMsg; toast("Mastercode gespeichert"); render();
   } catch (e) { msg.className = "err"; msg.textContent = e.message; }
+}
+$("masterSave").onclick = () => {
+  const v = $("masterIn").value, msg = $("masterMsg");
+  if (!new RegExp(`^\\d{${masterLen}}$`).test(v)) { msg.className = "err"; msg.textContent = `Bitte genau ${masterLen} Ziffern eintippen – oder oben die Länge ändern.`; return; }
+  saveMaster({ code: v }, "Gespeichert. Der alte Mastercode gilt ab sofort nicht mehr.");
 };
+$("masterGen").onclick = () => saveMaster({ gen: masterLen }, `Neuer ${masterLen}-stelliger Mastercode – gut merken! Der alte gilt nicht mehr.`);
 
 // ---------- Tor-Steuerung (gedrückt halten) ----------
 function holdButton(btn, onDone) {
@@ -859,11 +1165,14 @@ function holdButton(btn, onDone) {
   btn.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); onDone(); } });
   btn.addEventListener("contextmenu", e => e.preventDefault());
 }
+function myName() { const me = state && (state.push || []).find(x => x.id === myPid()); return me ? me.name : ""; }
 async function gateCmd(op, label) {
-  if (op !== "stop") { optimisticGate = op === "open" ? "open" : "closed"; renderGate(); }
-  try { await send(op); toast(label); }
-  catch (e) { optimisticGate = null; renderGate(); toast(e.message, true); }
-  setTimeout(() => { if (optimisticGate) { optimisticGate = null; render(); } }, 4000);
+  if (op !== "stop" && state && state.gm && mode !== "demo") {          // sofort loslaufen lassen, die Box bestätigt gleich
+    const up = op === "open", sp = curPos(), t = state.travel || {};
+    if ((up && sp < 100) || (!up && sp > 0)) { gLocal = { mv: up ? 1 : 2, start: Date.now(), dur: (up ? t.o : t.c) || 12000, sp }; renderGate(); }
+  }
+  try { await send(op, { by: myName() }); toast(label); }
+  catch (e) { gLocal = null; renderGate(); toast(e.message, true); }
 }
 holdButton($("btnOpen"), () => gateCmd("open", "Tor wird geöffnet"));
 holdButton($("btnClose"), () => gateCmd("close", "Tor wird geschlossen"));
@@ -961,6 +1270,102 @@ async function copy(text, msg) {
 $("copyMsg").onclick = () => copy(lastMsg, "Kopiert – jetzt in WhatsApp einfügen");
 $("copyCode").onclick = () => copy(lastCode, "Code kopiert");
 
+// ---------- Einstellungen: Fahrzeiten ----------
+function renderTravel() {
+  const t = state.travel; $("travelCard").hidden = !t || !state.gm;
+  if (!t) return;
+  const n = (t.no || 0) + (t.nc || 0);
+  $("travelKv").innerHTML = `<div><b>${secs(t.o)}</b><span>Ø Öffnen${t.lo ? " · zuletzt " + secs(t.lo) : ""}</span></div><div><b>${secs(t.c)}</b><span>Ø Schließen${t.lc ? " · zuletzt " + secs(t.lc) : ""}</span></div>`;
+  const lim = Math.max(t.o, t.c), extra = Math.max(lim / 2, 6000);
+  $("travelNote").textContent = (n ? `Gelernt aus ${n} Fahrten. ` : "Startwert 12 s – die Box lernt mit jeder vollen Fahrt dazu. ") + `Kommt das Tor nach etwa ${Math.round((lim + extra) / 1000)} s nicht in der Endlage an, gibt es eine Mitteilung.`;
+  const h = $("travelHint");
+  const slow = (avg, base) => base && avg ? Math.round((avg / base - 1) * 100) : 0;
+  const pct = Math.max(slow(t.o, t.bo), slow(t.c, t.bc));
+  if (n >= 20 && t.bat && pct >= 15) {
+    const mon = Math.max(1, Math.round((Date.now() / 1000 - t.bat) / (30 * 86400)));
+    h.className = "hint"; h.hidden = false;
+    h.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a4 4 0 0 0 5 5L12 19l-4 1 1-4z"/></svg><span>Das Tor fährt ${pct} % langsamer als vor ${mon} Monat${mon > 1 ? "en" : ""}. Eine Wartung (Rollen, Federn, Führungen) könnte sinnvoll sein.</span>`;
+  } else if (n >= 20 && t.bat) { h.className = "hint ok"; h.hidden = false; h.textContent = "Das Tor fährt so schnell wie zu Beginn – alles in Ordnung."; }
+  else h.hidden = true;
+}
+$("relearn").onclick = async () => {
+  const b = $("relearn");
+  if (!b.dataset.c) { b.dataset.c = 1; b.textContent = "Wirklich neu lernen? Nochmal tippen"; setTimeout(() => { delete b.dataset.c; b.textContent = "Zeiten neu lernen"; }, 4000); return; }
+  delete b.dataset.c; b.textContent = "Zeiten neu lernen";
+  try { await send("relearn"); toast("Fahrzeiten werden neu gelernt"); if (mode === "demo") render(); } catch (e) { toast(e.message, true); }
+};
+// ---------- Einstellungen: Schalter und Zeiten ----------
+const CFG_IN = [...document.querySelectorAll("[data-k]")];
+function renderCfg() {
+  const c = state.cfg; if (!c) return;
+  CFG_IN.forEach(el => {
+    if (document.activeElement === el) return;
+    const v = c[el.dataset.k];
+    if (el.type === "checkbox") el.checked = !!v;
+    else if (el.type === "time") el.value = hhmm(v || 0);
+    else el.value = v;
+  });
+  $("rowOw").classList.toggle("off", !c.ow); $("rowTw").classList.toggle("off", !c.tw); $("rowAc").classList.toggle("off", !c.ac);
+  $("vacCard").classList.toggle("vac-on", !!c.vac);
+}
+CFG_IN.forEach(el => el.addEventListener("change", async () => {
+  const k = el.dataset.k;
+  let v = el.type === "checkbox" ? el.checked : el.type === "time" ? toMin(el.value) : Math.round(+el.value);
+  if (el.type === "number") { const lo = +el.min, hi = +el.max; if (!(v >= lo && v <= hi)) { toast(`Bitte ${lo} bis ${hi}`, true); renderCfg(); return; } }
+  if (k === "ac" && v && !confirmAc()) { el.checked = false; return; }
+  try { await send("settings", { [k]: v }); if (state.cfg) state.cfg[k] = v; renderCfg(); renderGate(); toast("Gespeichert"); }
+  catch (e) { toast(e.message, true); renderCfg(); }
+}));
+function confirmAc() { return true; }   // Hinweis steht direkt am Schalter (nur mit aktiver Lichtschranke)
+
+// ---------- Statistik ----------
+let wkBack = 0, wkData = null, wkBusy = false;
+const KIND = { 1: ["Tor auf", ""], 2: ["Tor zu", ""], 3: ["Stopp", ""], 4: ["Tür entriegelt", ""], 5: ["Fehlversuch", "bad"], 6: ["Warnung", "bad"] };
+const fmtD = new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" });
+async function loadStats() {
+  if (wkBusy) return;
+  if (state && state.stats === false) { $("wkEvents").innerHTML = '<div class="empty">Die Blackbox speichert noch keine Statistik. Beim Hochladen der Firmware „Partition Scheme: Huge APP (3MB No OTA/1MB SPIFFS)“ wählen.</div>'; return; }
+  wkBusy = true; $("wkTitle").textContent = "Lade …";
+  try { wkData = await send("stats", { week: wkBack }); renderStats(); }
+  catch (e) { $("wkTitle").textContent = "Keine Daten"; toast(e.message, true); }
+  finally { wkBusy = false; }
+}
+function renderStats() {
+  const d = wkData; if (!d) return;
+  const from = new Date(d.from * 1000), to = new Date((d.to - 1) * 1000);
+  $("wkTitle").textContent = wkBack === 0 ? "Diese Woche" : wkBack === 1 ? "Letzte Woche" : `${fmtD.format(from)} – ${fmtD.format(to)}`;
+  $("wkNext").disabled = wkBack === 0;
+  $("wkPrev").disabled = !d.first || d.first >= d.from;
+  const sum = k => d.days.reduce((a, x) => a + (x[k - 1] || 0), 0);
+  $("wkTiles").innerHTML = [[sum(1), "Tor auf"], [sum(4), "Tür"], [sum(5), "Fehlversuche"], [sum(6), "Warnungen"]]
+    .map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
+  const max = Math.max(1, ...d.days.map(x => Math.max(x[0], x[3])));
+  $("wkChart").innerHTML = d.days.map((x, i) => {
+    const day = new Date(from); day.setDate(from.getDate() + i);
+    const h = v => v ? Math.max(4, v / max * 100) : 0;
+    return `<div class="col" tabindex="0"><div class="bars"><i class="o" style="height:${h(x[0])}%"></i><i class="d" style="height:${h(x[3])}%"></i></div><span>${WD[i]}</span>
+      <div class="tip">${fmtD.format(day)}: ${x[0]}× Tor auf, ${x[3]}× Tür${x[4] ? `, ${x[4]} Fehlversuch${x[4] > 1 ? "e" : ""}` : ""}</div></div>`;
+  }).join("");
+  const topMax = Math.max(1, ...d.top.map(t => t.n));
+  $("wkTop").innerHTML = d.top.length ? "" : '<li class="empty">Diese Woche noch niemand.</li>';
+  d.top.forEach(t => { const li = document.createElement("li"); li.innerHTML = `<span></span><b>${t.n}×</b><i><span style="width:${t.n / topMax * 100}%"></span></i>`; li.querySelector("span").textContent = t.w; $("wkTop").appendChild(li); });
+  const box = $("wkEvents"); box.innerHTML = "";
+  if (!d.ev.length) { box.innerHTML = '<div class="empty">Keine Ereignisse in dieser Woche.</div>'; return; }
+  let day = null, wrap = null;
+  d.ev.forEach(e => {
+    const dt = new Date(e.t * 1000), key = dt.toDateString();
+    if (key !== day) { day = key; wrap = document.createElement("div"); wrap.className = "day"; const h = document.createElement("h3"); h.textContent = fmtDay.format(dt); wrap.appendChild(h); box.appendChild(wrap); }
+    const [lbl, cls] = KIND[e.k] || ["Ereignis", ""];
+    const ev = document.createElement("div"); ev.className = "ev" + (cls ? " bad" : "");
+    ev.innerHTML = "<time></time><i></i><span></span>";
+    ev.querySelector("time").textContent = fmtTime.format(dt);
+    ev.querySelector("span").textContent = lbl + (e.w ? " – " + e.w : "");
+    wrap.appendChild(ev);
+  });
+}
+$("wkPrev").onclick = () => { wkBack++; loadStats(); };
+$("wkNext").onclick = () => { if (wkBack > 0) { wkBack--; loadStats(); } };
+
 // ---------- Einstellungen ----------
 function fillCfg() {
   const c = cfg || {};
@@ -1004,39 +1409,81 @@ $("notif").onclick = () => {
 // Namen auf die Speichergröße der Blackbox kürzen (Umlaute zählen doppelt)
 function fitBytes(str, max) { const enc = new TextEncoder(); while (enc.encode(str).length > max) str = str.slice(0, -1); return str; }
 
+const WD = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+const toMin = v => { const [h, m] = String(v || "0:0").split(":").map(Number); return (h || 0) * 60 + (m || 0); };
+function winText(c) {
+  const d = c.days & 127, days = d === 127 ? "täglich" : d === 31 ? "Mo–Fr" : d === 96 ? "Sa–So" : WD.filter((_, i) => d >> i & 1).join(", ");
+  return `${days} ${hhmm(c.fm)}–${c.tm >= 1440 ? "24:00" : hhmm(c.tm)} Uhr`;
+}
 function renderChips() {
   const box = $("chips"); box.innerHTML = "";
   const list = state.chips || [];
-  if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Chips. Lerne oben den ersten an.</div>'; return; }
+  if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Chips. Lerne den ersten an.</div>'; return; }
   list.forEach((c, i) => {
     const el = document.createElement("div");
     el.className = "tagrow" + (c.enabled ? "" : " off");
     el.style.animationDelay = Math.min(i * 40, 240) + "ms";
+    el.tabIndex = 0; el.setAttribute("role", "button");
     el.innerHTML = `<span class="ico"></span><span class="who"></span>
-      <span class="side">${c.door && c.enabled ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${c.enabled ? "on" : "off"}">${c.enabled ? "Aktiv" : "Gesperrt"}</span></span>
-      <span class="when"></span>
-      <span class="acts"><button class="del dr" type="button">${c.door ? "Tür verbieten" : "Tür erlauben"}</button><button class="del tog" type="button">${c.enabled ? "Sperren" : "Freigeben"}</button><button class="del rm" type="button">Löschen</button></span>`;
+      <span class="side">${c.win && c.enabled ? '<span class="pill win">Zeit</span> ' : ""}${c.door && c.enabled ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${c.enabled ? "on" : "off"}">${c.enabled ? "Aktiv" : "Gesperrt"}</span><span class="more">›</span></span>
+      <span class="when"></span>`;
     const name = c.label || "Ohne Namen";
     el.querySelector(".ico").textContent = (name.replace(/^Beispiel: /, "").trim()[0] || "?").toUpperCase();
     el.querySelector(".who").textContent = name;
-    el.querySelector(".when").textContent = (c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt") + " · Nr. …" + String(c.id).slice(-4);
-    el.querySelector(".dr").onclick = async () => {
-      try { await send("chipSet", { chip: c.id, door: !c.door }); toast(c.door ? "Tür für diesen Chip verboten" : "Tür für diesen Chip erlaubt"); if (mode === "demo") render(); }
-      catch (e) { toast(e.message, true); }
-    };
-    el.querySelector(".tog").onclick = async () => {
-      try { await send("chipSet", { chip: c.id, enabled: !c.enabled }); toast(c.enabled ? "Chip gesperrt" : "Chip freigegeben"); if (mode === "demo") render(); }
-      catch (e) { toast(e.message, true); }
-    };
-    const rm = el.querySelector(".rm");
-    rm.onclick = async () => {
-      if (!rm.classList.contains("confirm")) { rm.classList.add("confirm"); rm.textContent = "Wirklich löschen?"; setTimeout(() => { rm.classList.remove("confirm"); rm.textContent = "Löschen"; }, 4000); return; }
-      try { await send("chipDelete", { chip: c.id }); toast("Chip gelöscht"); if (mode === "demo") render(); }
-      catch (e) { toast(e.message, true); }
-    };
+    el.querySelector(".when").textContent = (c.win ? winText(c) + " · " : "") + (c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt");
+    el.onclick = () => openChip(c.id);
+    el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openChip(c.id); } };
     box.appendChild(el);
   });
 }
+// ---------- Chip-Blatt: alle Möglichkeiten groß und übersichtlich ----------
+let csId = null, csDays = 31;
+function openChip(id) { csId = id; $("csWin").hidden = true; $("csRen").hidden = true; const c = curChip(); csDays = c ? c.days ?? 31 : 31; $("chipSheet").hidden = false; renderChipSheet(true); }
+function closeChip() { csId = null; $("chipSheet").hidden = true; }
+const curChip = () => state && (state.chips || []).find(x => x.id === csId);
+function renderChipSheet(fill) {
+  if (!csId) return;
+  const c = curChip(); if (!c) { closeChip(); return; }
+  $("csName").textContent = c.label || "Ohne Namen";
+  $("csSub").textContent = (c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt") + " · Nr. …" + String(c.id).slice(-4);
+  const set = (id, on, b, sm) => { const el = $(id); el.classList.toggle("on", on); el.querySelector("b").textContent = b; el.querySelector("small").textContent = sm; };
+  set("csDoor", !!c.door, c.door ? "Tür erlaubt" : "Tür nicht erlaubt", c.door ? "Antippen zum Verbieten" : "Antippen zum Erlauben");
+  set("csLock", !c.enabled, c.enabled ? "Aktiv" : "Gesperrt", c.enabled ? "Antippen zum Sperren" : "Antippen zum Freigeben");
+  set("csWinBtn", !!c.win, "Zeitfenster", c.win ? winText(c) : "Aus – gilt immer");
+  if (fill) {
+    $("csWinOn").checked = !!c.win; $("csFrom").value = hhmm(c.fm ?? 420); $("csTo").value = c.tm >= 1440 ? "23:59" : hhmm(c.tm ?? 1080);
+    $("csNameIn").value = c.label || ""; renderDays();
+    const del = $("csDel"); del.classList.remove("confirm"); del.querySelector("b").textContent = "Chip löschen";
+  }
+}
+function renderDays() {
+  $("csDays").innerHTML = "";
+  WD.forEach((d, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = d; b.setAttribute("aria-pressed", String(!!(csDays >> i & 1)));
+    b.onclick = () => { csDays ^= 1 << i; renderDays(); }; $("csDays").appendChild(b); });
+}
+async function chipCmd(params, msg) {
+  try { await send("chipSet", { chip: csId, ...params }); toast(msg); if (mode === "demo") render(); }
+  catch (e) { toast(e.message, true); }
+}
+$("csDoor").onclick = () => { const c = curChip(); if (c) chipCmd({ door: !c.door }, c.door ? "Tür für diesen Chip verboten" : "Tür für diesen Chip erlaubt"); };
+$("csLock").onclick = () => { const c = curChip(); if (c) chipCmd({ enabled: !c.enabled }, c.enabled ? "Chip gesperrt" : "Chip freigegeben"); };
+$("csWinBtn").onclick = () => { $("csWin").hidden = !$("csWin").hidden; $("csRen").hidden = true; };
+$("csRenBtn").onclick = () => { $("csRen").hidden = !$("csRen").hidden; $("csWin").hidden = true; if (!$("csRen").hidden) $("csNameIn").focus(); };
+$("csWinSave").onclick = () => {
+  const on = $("csWinOn").checked, fm = toMin($("csFrom").value); let tm = toMin($("csTo").value); if (tm === 1439) tm = 1440;
+  if (on && !(csDays & 127)) { toast("Bitte mindestens einen Tag wählen", true); return; }
+  if (on && fm === tm) { toast("Von und bis dürfen nicht gleich sein", true); return; }
+  chipCmd({ win: on, days: csDays & 127, fm, tm: tm || 1440 }, on ? "Zeitfenster gespeichert" : "Zeitfenster aus – Chip gilt immer").then(() => { $("csWin").hidden = true; });
+};
+$("csRenSave").onclick = () => { const v = fitBytes($("csNameIn").value.trim(), 23); if (!v) { $("csNameIn").focus(); return; } chipCmd({ label: v }, "Name gespeichert").then(() => { $("csRen").hidden = true; }); };
+$("csDel").onclick = async () => {
+  const del = $("csDel");
+  if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.querySelector("b").textContent = "Wirklich löschen? Nochmal tippen"; setTimeout(() => { del.classList.remove("confirm"); del.querySelector("b").textContent = "Chip löschen"; }, 4000); return; }
+  try { await send("chipDelete", { chip: csId }); toast("Chip gelöscht"); closeChip(); if (mode === "demo") render(); }
+  catch (e) { toast(e.message, true); }
+};
+$("chipBg").onclick = closeChip; $("csClose").onclick = closeChip;
 
 // Anlernen: Die App schickt den Namen, die Blackbox wartet auf den nächsten Chip an der Tastatur
 let learnPending = null;
@@ -1071,8 +1518,8 @@ setInterval(() => { if (learnPending) renderLearn(); }, 1000);
 // ---------- Direktlink aus der Push-Nachricht (#log) ----------
 
 // ---------- Mitteilungen (Web Push, direkt von der Blackbox) ----------
-const EVENTS = [[1, "Einmalcode benutzt"], [4, "Tor per Chip geöffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip vorgehalten"], [16, "Tastatur nach Fehlversuchen gesperrt"]];
-const PUSH_DEFAULT = 1 | 8 | 16;
+const EVENTS = [[1, "Einmalcode benutzt"], [4, "Tor per Chip geöffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip vorgehalten"], [16, "Tastatur nach Fehlversuchen gesperrt"], [128, "Tor-Warnungen und Störungen"], [64, "Wochenbericht"]];
+const PUSH_DEFAULT = 1 | 8 | 16 | 64 | 128;
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 const canPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
@@ -1153,7 +1600,7 @@ $("pushOff").onclick = async () => {
   } catch (e) { toast(e.message, true); }
 };
 
-function handleHash() { const v = location.hash.slice(1); if (["gate", "codes", "chips", "log", "settings"].includes(v)) go(v); }
+function handleHash() { const v = location.hash.slice(1); if (VIEWS.includes(v)) go(v); }
 window.addEventListener("hashchange", handleHash);
 
 renderDurs(); setLater(false); connect(); handleHash();
