@@ -530,6 +530,10 @@ h3.grp:has(+ .card[hidden]) { display: none; }
           <span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Code nicht. Das zählt nicht als Fehlversuch.</span></span>
           <input type="checkbox" id="mWinOn"><span class="sw"></span>
         </label>
+        <label class="toggle" for="mGf">
+          <span><b>Tor auch bei offener Schiebetür</b><br><span class="note" id="mGfNote">„Tor auf“ und „Tor zu“ am Display gehen auch, wenn die Schiebetür nicht verriegelt ist.</span></span>
+          <input type="checkbox" id="mGf"><span class="sw"></span>
+        </label>
         <div id="mWin" class="mwin" hidden>
           <div class="days" id="mDays"></div>
           <div class="set-row"><span class="note">von</span><input type="time" id="mFrom" value="07:00" aria-label="von"><span class="note">bis</span><input type="time" id="mTo" value="18:00" aria-label="bis"></div>
@@ -771,6 +775,9 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       <button class="act" type="button" id="csWinBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Zeitfenster</b><small></small></button>
       <button class="act" type="button" id="csRenBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><b>Umbenennen</b><small>Name am Display</small></button>
     </div>
+    <div class="card" id="csGateCard" style="background:none;border:0;padding:0;box-shadow:none">
+      <label class="toggle" for="csGf"><span><b>Tor auch bei offener Schiebetür</b><br><span class="note" id="csGfNote">Mit diesem Chip lassen sich „Tor auf“ und „Tor zu“ am Display bedienen, auch wenn die Schiebetür nicht verriegelt ist.</span></span><input type="checkbox" id="csGf"><span class="sw"></span></label>
+    </div>
     <div class="card" id="csWin" hidden>
       <label class="toggle" for="csWinOn"><span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Chip nicht, z. B. für Gäste.</span></span><input type="checkbox" id="csWinOn"><span class="sw"></span></label>
       <div class="days" id="csDays"></div>
@@ -835,7 +842,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "12.3", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
+    vapid: "demo", fw: "12.4", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
     codes: [
       { code: "0427", from: n - 2 * h, to: n + 6 * h, used: 0, usedAt: 0, label: "Beispiel: Catering Aufbau", door: true },
       { code: "5913", from: n + 20 * h, to: n + 44 * h, used: 0, usedAt: 0, label: "Beispiel: Bühnenbau Samstag" },
@@ -955,7 +962,7 @@ function demoSend(op, p) {
       const f = Math.max(p.from || 0, n);
       const c = { code, from: f, to: f + p.dur * 60, used: 0, usedAt: 0, label: p.label, door: !!p.door };
       if (p.multi) {
-        Object.assign(c, { multi: true, uses: 0, unl: !p.until, to: p.until || 4294967295 });
+        Object.assign(c, { multi: true, uses: 0, unl: !p.until, to: p.until || 4294967295, gf: !!p.gf });
         if (p.win) Object.assign(c, { win: true, days: p.days, fm: p.fm, tm: p.tm });
       }
       state.codes.unshift(c); log(true, (p.multi ? "Mehrfachcode " : "Code ") + `${code} erstellt` + (p.label ? " · " + p.label : ""));
@@ -977,6 +984,7 @@ function demoSend(op, p) {
     if (op === "chipSet") {
       const c = state.chips.find(x => x.id === p.chip); if (!c) return rej(new Error("Chip nicht gefunden."));
       if (typeof p.door === "boolean") { c.door = p.door; log(true, `Chip ${c.label}: Tür ${p.door ? "erlaubt" : "nicht erlaubt"}`); }
+      if (typeof p.gf === "boolean") { c.gf = p.gf; log(true, `Chip ${c.label}: Tor bei offener Tür ${p.gf ? "erlaubt" : "nicht erlaubt"}`); }
       if (typeof p.enabled === "boolean") { c.enabled = p.enabled; log(true, `Chip ${p.enabled ? "freigegeben" : "gesperrt"}: ${c.label}`); }
       if (typeof p.label === "string") c.label = p.label;
       if (typeof p.win === "boolean") { Object.assign(c, { win: p.win, days: p.days, fm: p.fm, tm: p.tm }); log(true, `Chip ${c.label}: Zeitfenster ${p.win ? "an" : "aus"}`); }
@@ -1061,6 +1069,8 @@ function render() {
   renderWifi();
   if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
   const mOk = fwVer() >= 12.2; $("codeMulti").disabled = !mOk; $("multiOld").hidden = mOk;
+  { const ok = fwVer() >= 12.4; $("mGf").disabled = !ok; if (!ok) $("mGf").checked = false; $("mGf").closest(".toggle").style.opacity = ok ? "" : ".5";
+    $("mGfNote").textContent = ok ? "„Tor auf“ und „Tor zu“ am Display gehen auch, wenn die Schiebetür nicht verriegelt ist." : "Erst mit Blackbox-Firmware 12.4 oder neuer."; }
   if (!mOk && $("codeMulti").checked) { $("codeMulti").checked = false; setMulti(false); }
   renderGate(); renderDoor(); renderCodes(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderTravel(); renderCfg(); renderChipSheet();
 }
@@ -1200,6 +1210,7 @@ function multiText(c, st) {
   const parts = [];
   parts.push(st === "wait" ? "ab " + fmt.format(new Date(c.from * 1000)) + " Uhr, " + untilText(c) : st === "off" ? "abgelaufen am " + fmtDate.format(new Date(c.to * 1000)) : untilText(c));
   if (c.win) parts.push(winText(c));
+  if (c.gf) parts.push("Tor auch bei offener Tür");
   parts.push((c.uses || 0) + "× benutzt" + (c.usedAt ? ", zuletzt " + fmt.format(new Date(c.usedAt * 1000)) + " Uhr" : ""));
   return parts.join(" · ");
 }
@@ -1396,7 +1407,7 @@ $("make").onclick = async () => {
       const start = from || Math.floor(Date.now() / 1000);
       if (until <= start) { toast("Das Datum liegt vor dem Beginn", true); return; }
     }
-    Object.assign(params, { multi: true, until });
+    Object.assign(params, { multi: true, until, gf: $("mGf").checked });
     if ($("mWinOn").checked) {
       const fm = toMin($("mFrom").value); let tm = toMin($("mTo").value); if (tm === 1439) tm = 1440;
       if (!(mDays & 127)) { toast("Bitte mindestens einen Tag wählen", true); return; }
@@ -1705,6 +1716,9 @@ function renderChipSheet(fill) {
   set("csDoor", !!c.door, c.door ? "Tür erlaubt" : "Tür nicht erlaubt", c.door ? "Antippen zum Verbieten" : "Antippen zum Erlauben");
   set("csLock", !c.enabled, c.enabled ? "Aktiv" : "Gesperrt", c.enabled ? "Antippen zum Sperren" : "Antippen zum Freigeben");
   set("csWinBtn", !!c.win, "Zeitfenster", c.win ? winText(c) : "Aus – gilt immer");
+  { const ok = fwVer() >= 12.4, g = $("csGf"); g.checked = !!c.gf; g.disabled = !ok; $("csGateCard").style.opacity = ok ? "" : ".5";
+    $("csGfNote").textContent = ok ? "Mit diesem Chip lassen sich „Tor auf“ und „Tor zu“ am Display bedienen, auch wenn die Schiebetür nicht verriegelt ist."
+      : "Erst mit Blackbox-Firmware 12.4 oder neuer."; }
   if (fill) {
     $("csWinOn").checked = !!c.win; $("csFrom").value = hhmm(c.fm ?? 420); $("csTo").value = c.tm >= 1440 ? "23:59" : hhmm(c.tm ?? 1080);
     $("csNameIn").value = c.label || ""; renderDays();
@@ -1722,6 +1736,7 @@ async function chipCmd(params, msg) {
 }
 renderMDays();
 $("csDoor").onclick = () => { const c = curChip(); if (c) chipCmd({ door: !c.door }, c.door ? "Tür für diesen Chip verboten" : "Tür für diesen Chip erlaubt"); };
+$("csGf").onchange = e => { const v = e.target.checked; chipCmd({ gf: v }, v ? "Tor bei offener Schiebetür erlaubt" : "Tor nur bei verriegelter Schiebetür"); };
 $("csLock").onclick = () => { const c = curChip(); if (c) chipCmd({ enabled: !c.enabled }, c.enabled ? "Chip gesperrt" : "Chip freigegeben"); };
 $("csWinBtn").onclick = () => { $("csWin").hidden = !$("csWin").hidden; $("csRen").hidden = true; };
 $("csRenBtn").onclick = () => { $("csRen").hidden = !$("csRen").hidden; $("csWin").hidden = true; if (!$("csRen").hidden) $("csNameIn").focus(); };
