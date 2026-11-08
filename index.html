@@ -308,6 +308,9 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 .sched-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .sched-top input[type="time"] { width: auto; flex: 0 0 auto; }
 .sched-top .sp { flex: 1 1 auto; }
+.sched-item.draft { box-shadow: inset 0 0 0 1px #a78bfa !important; }
+.sched-btns { display: flex; gap: 10px; }
+.sched-btns .btn { flex: 1; }
 .sched-item .days { gap: 5px; }
 .sched-item .days button { background: var(--surface); width: 38px; }
 .sched-item .days button[aria-pressed="true"] { background: var(--brand); }
@@ -506,7 +509,7 @@ h3.grp:has(+ .card[hidden]) { display: none; }
     <div class="card">
       <span class="label" style="--acc:#2f5fff">Neuer Code</span>
       <label class="toggle" for="codeMulti">
-        <span><b>Mehrfach nutzbar</b><br><span class="note">Bleibt nach dem Benutzen gültig – bis zu einem Datum oder unbegrenzt.</span></span>
+        <span><b>Mehrfach nutzbar</b><br><span class="note">Bleibt nach dem Benutzen gültig – bis zu einem Datum oder unbegrenzt.</span><span class="note" id="multiOld" hidden><br>Erst mit Blackbox-Firmware 12.2 oder neuer.</span></span>
         <input type="checkbox" id="codeMulti"><span class="sw"></span>
       </label>
       <div class="field" id="durField">
@@ -680,6 +683,7 @@ h3.grp:has(+ .card[hidden]) { display: none; }
     <div class="card" id="schedCard">
       <span class="label" style="--acc:#a78bfa">Zeitplan: Tor schließen</span>
       <p class="note">Das Tor fährt an den gewählten Tagen zur eingestellten Uhrzeit zu. Eine Minute vorher warnt das Display und lässt sich mit „Heute nicht schließen“ abbrechen. Ist das Tor schon zu, passiert nichts. Nur mit aktiver Lichtschranke.</p>
+      <p class="note infobox" id="schedOld" hidden>Der Zeitplan braucht die Blackbox-Firmware 12.2 oder neuer. Bitte zuerst die Blackbox aktualisieren.</p>
       <div class="sched-list" id="schedList"></div>
       <button class="btn ghost small" id="schedAdd" type="button">+ Uhrzeit hinzufügen</button>
     </div>
@@ -831,7 +835,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
+    vapid: "demo", fw: "12.3", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
     codes: [
       { code: "0427", from: n - 2 * h, to: n + 6 * h, used: 0, usedAt: 0, label: "Beispiel: Catering Aufbau", door: true },
       { code: "5913", from: n + 20 * h, to: n + 44 * h, used: 0, usedAt: 0, label: "Beispiel: Bühnenbau Samstag" },
@@ -1056,6 +1060,8 @@ function render() {
   $("demoBanner").hidden = mode !== "demo";
   renderWifi();
   if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
+  const mOk = fwVer() >= 12.2; $("codeMulti").disabled = !mOk; $("multiOld").hidden = mOk;
+  if (!mOk && $("codeMulti").checked) { $("codeMulti").checked = false; setMulti(false); }
   renderGate(); renderDoor(); renderCodes(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderTravel(); renderCfg(); renderChipSheet();
 }
 
@@ -1501,40 +1507,61 @@ function renderCfg() {
 // ---------- Zeitplan "Tor schließen": mehrere Einträge mit Tagen + Uhrzeit ----------
 let schedEdit = null;                       // Arbeitskopie, solange jemand daran ändert
 function schedNow() { return schedEdit || (state.cfg && state.cfg.sched) || []; }
-function renderSched() {
-  const box = $("schedList"); if (!box || box.contains(document.activeElement)) return;
+// Firmware-Stand der Blackbox: ab 12.3 meldet sie ihn selbst, 12.2 erkennt man am Zeitplan
+function fwVer() { if (!state) return 0; if (state.fw) return parseFloat(state.fw) || 0; return state.cfg && Array.isArray(state.cfg.sched) ? 12.2 : 12.1; }
+let schedDraft = null;                      // neuer Eintrag, der noch nicht gespeichert ist
+function schedItem(e, onChange, draft) {
+  const it = document.createElement("div"); it.className = "sched-item" + (e.on || draft ? "" : " off") + (draft ? " draft" : "");
+  it.innerHTML = `<div class="sched-top">
+      <input type="time" aria-label="Uhrzeit" value="${hhmm(e.min)}">
+      <span class="note">Uhr</span><span class="sp"></span>
+      ${draft ? "" : `<label class="minisw"><input type="checkbox" ${e.on ? "checked" : ""}><span class="sw"></span><span>${e.on ? "an" : "aus"}</span></label>
+      <button class="del" type="button">Löschen</button>`}
+    </div><div class="days"></div>`;
+  const days = it.querySelector(".days");
+  ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].forEach((d, k) => { const b = document.createElement("button"); b.type = "button"; b.textContent = d; b.setAttribute("aria-pressed", String(!!(e.days >> k & 1)));
+    b.onclick = () => { const n = e.days ^ (1 << k); if (!(n & 127)) { toast("Mindestens ein Tag", true); return; } onChange({ days: n }); };
+    days.appendChild(b); });
+  const t = it.querySelector('input[type="time"]');
+  t.onchange = () => { if (t.value) onChange({ min: toMin(t.value) }); };
+  return it;
+}
+function renderSched(force) {
+  const box = $("schedList"); if (!box || (!force && box.contains(document.activeElement))) return;
+  const ok = fwVer() >= 12.2;
+  $("schedOld").hidden = ok; box.hidden = !ok;
+  if (!ok) { $("schedAdd").hidden = true; return; }
   const list = schedNow();
   box.innerHTML = "";
-  if (!list.length) { box.innerHTML = '<p class="note">Noch keine Uhrzeit eingetragen.</p>'; }
+  if (!list.length && !schedDraft) { box.innerHTML = '<p class="note">Noch keine Uhrzeit eingetragen.</p>'; }
   list.forEach((e, i) => {
-    const it = document.createElement("div"); it.className = "sched-item" + (e.on ? "" : " off");
-    it.innerHTML = `<div class="sched-top">
-        <input type="time" aria-label="Uhrzeit" value="${hhmm(e.min)}">
-        <span class="note">Uhr</span><span class="sp"></span>
-        <label class="minisw"><input type="checkbox" ${e.on ? "checked" : ""}><span class="sw"></span><span>${e.on ? "an" : "aus"}</span></label>
-        <button class="del" type="button">Löschen</button>
-      </div><div class="days"></div>`;
-    const days = it.querySelector(".days");
-    ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].forEach((d, k) => { const b = document.createElement("button"); b.type = "button"; b.textContent = d; b.setAttribute("aria-pressed", String(!!(e.days >> k & 1)));
-      b.onclick = () => { const n = e.days ^ (1 << k); if (!(n & 127)) { toast("Mindestens ein Tag", true); return; } saveSched(list.map((x, j) => j === i ? { ...x, days: n } : x)); };
-      days.appendChild(b); });
-    it.querySelector('input[type="time"]').onchange = ev => saveSched(list.map((x, j) => j === i ? { ...x, min: toMin(ev.target.value) } : x));
-    it.querySelector('input[type="checkbox"]').onchange = ev => saveSched(list.map((x, j) => j === i ? { ...x, on: ev.target.checked } : x));
+    const it = schedItem(e, ch => saveSched(list.map((x, j) => j === i ? { ...x, ...ch } : x)), false);
+    it.querySelector('.minisw input').onchange = ev => saveSched(list.map((x, j) => j === i ? { ...x, on: ev.target.checked } : x));
     it.querySelector(".del").onclick = ev => {
       const b = ev.target; if (!b.dataset.c) { b.dataset.c = 1; b.textContent = "Wirklich?"; setTimeout(() => { delete b.dataset.c; b.textContent = "Löschen"; }, 3000); return; }
       saveSched(list.filter((x, j) => j !== i));
     };
     box.appendChild(it);
   });
-  $("schedAdd").hidden = list.length >= 6;
+  if (schedDraft) {                          // neuer Eintrag: erst Uhrzeit und Tage wählen, dann speichern
+    const it = schedItem(schedDraft, ch => { const t = it.querySelector('input[type="time"]').value; Object.assign(schedDraft, t ? { min: toMin(t) } : {}, ch); if (ch.days !== undefined) renderSched(true); }, true);
+    const row = document.createElement("div"); row.className = "sched-btns";
+    row.innerHTML = '<button class="btn small" type="button">Speichern</button><button class="btn ghost small" type="button">Abbrechen</button>';
+    const [bS, bA] = row.querySelectorAll("button");
+    bS.onclick = () => { const t = it.querySelector('input[type="time"]').value; if (!t) { toast("Bitte eine Uhrzeit eingeben", true); return; }
+      const e = { on: true, days: schedDraft.days, min: toMin(t) }; schedDraft = null; saveSched([...list, e]); };
+    bA.onclick = () => { schedDraft = null; renderSched(true); };
+    it.appendChild(row); box.appendChild(it);
+  }
+  $("schedAdd").hidden = !!schedDraft || list.length >= 6;
 }
 async function saveSched(list) {
-  schedEdit = list; renderSched();
+  schedEdit = list; renderSched(true);
   try { await send("settings", { sched: list }); if (state.cfg) state.cfg.sched = list; toast("Zeitplan gespeichert"); }
   catch (e) { toast(e.message, true); }
-  schedEdit = null; document.activeElement && document.activeElement.blur && $("schedList").contains(document.activeElement) && document.activeElement.blur(); renderSched();
+  schedEdit = null; document.activeElement && document.activeElement.blur && $("schedList").contains(document.activeElement) && document.activeElement.blur(); renderSched(true);
 }
-$("schedAdd").onclick = () => saveSched([...schedNow(), { on: true, days: 31, min: 1080 }]);
+$("schedAdd").onclick = () => { schedDraft = { on: true, days: 31, min: 1080 }; renderSched(true); const t = $("schedList").querySelector(".draft input[type=time]"); if (t) t.focus(); };
 CFG_IN.forEach(el => el.addEventListener("change", async () => {
   const k = el.dataset.k;
   let v = el.type === "checkbox" ? el.checked : el.type === "time" ? toMin(el.value) : Math.round(+el.value);
@@ -1752,6 +1779,8 @@ const EVENTS = [[1, "Code benutzt (Einmal- und Mehrfachcodes)"], [4, "Tor per Ch
 const PUSH_DEFAULT = 1 | 8 | 16 | 64 | 128 | 256 | 512 | 1024 | 2048;
 function warnInfo(bit) {             // Text und ob die Warnung in den Einstellungen eingeschaltet ist
   const c = (state && state.cfg) || {};
+  if (bit !== 128 && fwVer() < 12.3) return { t: { 256: "Tor zu lange offen", 512: "Tor abends noch offen", 1024: "Tor automatisch geschlossen", 2048: "Zeitplan" }[bit],
+    on: false, note: "Erst mit Blackbox 12.3 – bis dahin kommen alle Tor-Warnungen über „Störung“" };
   if (bit === 256) return { t: "Tor länger als " + (c.owm || 15) + " Min. offen", on: !!c.ow };
   if (bit === 512) return { t: "Tor um " + hhmm(c.twt ?? 1200) + " Uhr noch offen", on: !!c.tw };
   if (bit === 1024) return { t: "Tor automatisch geschlossen (nach " + (c.acm || 10) + " Min.)", on: !!c.ac };
@@ -1794,7 +1823,7 @@ function renderPush() {
         l.innerHTML = `<span><b></b></span><input type="checkbox"><span class="sw"></span>`;
         if (txt === "warn") {
           const w = warnInfo(bit); txt = w.t;
-          if (!w.on) { l.style.opacity = ".5"; l.querySelector("span").insertAdjacentHTML("beforeend", '<br><span class="note">In den Einstellungen ausgeschaltet</span>'); }
+          if (!w.on) { l.style.opacity = ".5"; l.querySelector("span").insertAdjacentHTML("beforeend", '<br><span class="note"></span>'); l.querySelector(".note").textContent = w.note || "In den Einstellungen ausgeschaltet"; }
         }
         l.querySelector("b").textContent = txt;
         const cb = l.querySelector("input"); cb.checked = (me.mask & bit) !== 0;
