@@ -143,7 +143,7 @@ h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4
 .seg.right::before { transform: translateX(100%); }
 .seg button { position: relative; border: 0; background: none; padding: 9px; font-size: 15px; font-weight: 600; cursor: pointer; color: var(--muted); transition: color .2s; }
 .seg button[aria-pressed="true"] { color: var(--fg); }
-input[type="text"], input[type="password"], input[type="datetime-local"] { width: 100%; font: 16px var(--font-ui); padding: 13px 14px; border-radius: 12px;
+input[type="text"], input[type="password"], input[type="datetime-local"], input[type="date"] { width: 100%; font: 16px var(--font-ui); padding: 13px 14px; border-radius: 12px;
   border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); transition: border-color .2s; }
 input:focus { border-color: var(--brand); outline: none; }
 .field { display: grid; gap: 8px; }
@@ -284,6 +284,14 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 .tagrow { cursor: pointer; }
 .tagrow .more { color: var(--muted); font-size: 22px; line-height: 1; padding-left: 4px; }
 .pill.win { color: #c7b8ff; background: rgba(140,110,255,.14); }
+.pill.multi { color: #8fd3ff; background: rgba(60,170,255,.14); }
+.multi-box { display: grid; gap: 14px; padding: 14px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
+.mwin { display: grid; gap: 10px; }
+.multi-box[hidden], .mwin[hidden], #durField[hidden] { display: none; }
+.multi-box .set-row input[type="time"], .multi-box input[type="date"] { background: var(--surface); }
+.multi-box .days button { background: var(--surface); }
+.multi-box .days button[aria-pressed="true"] { background: var(--brand); }
+.multi-box .seg { background: var(--surface); }
 .acts-big { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .act { display: grid; gap: 6px; justify-items: start; text-align: left; border: 1px solid var(--line); background: var(--surface-2); border-radius: 16px; padding: 14px; cursor: pointer; font: inherit; color: inherit; }
 .act svg { width: 26px; height: 26px; color: #9db4ff; }
@@ -294,6 +302,22 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 .days { display: flex; gap: 6px; flex-wrap: wrap; }
 .days button { width: 42px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); font: 600 14px var(--font-ui); cursor: pointer; }
 .days button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); }
+.sched-list { display: grid; gap: 10px; }
+.sched-item { display: grid; gap: 10px; padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+.sched-item.off { opacity: .55; }
+.sched-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sched-top input[type="time"] { width: auto; flex: 0 0 auto; }
+.sched-top .sp { flex: 1 1 auto; }
+.sched-item .days { gap: 5px; }
+.sched-item .days button { background: var(--surface); width: 38px; }
+.sched-item .days button[aria-pressed="true"] { background: var(--brand); }
+.minisw { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--muted); }
+.minisw input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.minisw .sw { flex: none; width: 46px; height: 28px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); position: relative; transition: background .25s; }
+.minisw .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #c9d0dd; transition: transform .25s var(--ease), background .25s; }
+.minisw input:checked + .sw { background: var(--brand); }
+.minisw input:checked + .sw::after { transform: translateX(18px); background: #fff; }
+.minisw input:focus-visible + .sw { outline: 2px solid var(--brand); outline-offset: 2px; }
 .sheet { max-height: 92vh; overflow-y: auto; }
 .sheet h3 { margin: 0; font-size: 20px; text-align: center; overflow-wrap: anywhere; }
 
@@ -349,6 +373,42 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- Übersichtlichkeit (ab 12.3): Gruppen, farbige Kartenköpfe, helle Unterpunkte ---------- */
+:root { --tile: #1b2131; --tile-line: rgba(255,255,255,.06); --tile-in: #11151e; }
+.settings-grid, .cols > div { display: grid; gap: 14px; align-content: start; }
+.card { background: #121620; border-color: rgba(255,255,255,.07); gap: 12px; }
+.card > .label { position: relative; display: flex; align-items: center; gap: 10px; color: #e6eaf5; font-size: 13px; letter-spacing: .07em;
+  padding-bottom: 12px; margin-bottom: 2px; border-bottom: 1px solid var(--tile-line); }
+.card > .label::before { content: ""; flex: none; width: 26px; height: 26px; border-radius: 8px;
+  background: color-mix(in srgb, var(--acc, #2f5fff) 18%, transparent); box-shadow: inset 0 0 0 1px var(--acc, #2f5fff); }
+.card > .label::after { content: ""; position: absolute; left: 9px; top: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--acc, #2f5fff); }
+.card > .note { color: #7f889b; }
+.card .toggle { background: var(--tile); border: 1px solid var(--tile-line); border-radius: 14px; padding: 13px 14px; }
+.card .toggle + .set-row { background: var(--tile); border: 1px solid var(--tile-line); border-top: 1px dashed rgba(255,255,255,.08);
+  border-radius: 0 0 14px 14px; padding: 10px 14px 12px; margin-top: -13px; }
+.card .toggle:has(+ .set-row) { border-radius: 14px 14px 0 0; border-bottom: 0; }
+.card .set-row input, .auth-row input { background: var(--tile-in) !important; }
+.card .set-row.off { opacity: .45; }
+.kv div { background: var(--tile); border: 1px solid var(--tile-line); }
+.auth-row { background: var(--tile); border: 1px solid var(--tile-line); border-radius: 14px; padding: 10px 12px; }
+.sched-list > * { background: var(--tile) !important; border: 1px solid var(--tile-line) !important; }
+.card .field input:not([type="checkbox"]) { background: var(--tile); }
+h3.grp { margin: 18px 2px 0; font-size: 15px; font-weight: 700; color: #8f9bb8; display: flex; align-items: center; gap: 8px; }
+h3.grp::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.08); margin-left: 4px; }
+h3.grp:first-child { margin-top: 4px; }
+h3.grp span { color: #5f6880; font-weight: 500; }
+.tagrow, .code { --row: #3ddc97; background: #161b27; border-color: rgba(255,255,255,.07); box-shadow: inset 4px 0 0 var(--row); padding-left: 18px; }
+.tagrow:nth-child(even), .code:nth-child(even) { background: #181e2b; }
+.code.wait { --row: #2f5fff; }
+.tagrow.off, .code.off { --row: #4a5266; background: #12161f; }
+.tagrow .when, .code .when { color: #7f889b; }
+.tagrow .who, .code .who { font-size: 17px; }
+.infobox { display: flex; gap: 12px; align-items: flex-start; background: rgba(47,95,255,.08); border: 1px solid rgba(47,95,255,.22);
+  border-radius: 14px; padding: 12px 14px; color: #b7c3e6; font-size: 14px; }
+.infobox::before { content: "i"; flex: none; width: 22px; height: 22px; border-radius: 50%; background: rgba(47,95,255,.35); color: #fff; font: 700 13px/22px var(--font-ui); text-align: center; }
+.push-list > .label { color: #8f9bb8; margin-top: 8px; }
+h3.grp:has(+ .card[hidden]) { display: none; }
 </style>
 
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
@@ -444,10 +504,33 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     <h2>Codes</h2>
     <div class="cols"><div>
     <div class="card">
-      <span class="label">Neuer Einmalcode</span>
-      <div class="field">
+      <span class="label" style="--acc:#2f5fff">Neuer Code</span>
+      <label class="toggle" for="codeMulti">
+        <span><b>Mehrfach nutzbar</b><br><span class="note">Bleibt nach dem Benutzen gültig – bis zu einem Datum oder unbegrenzt.</span></span>
+        <input type="checkbox" id="codeMulti"><span class="sw"></span>
+      </label>
+      <div class="field" id="durField">
         <span class="note">Gültig für</span>
         <div class="durs" id="durs"></div>
+      </div>
+      <div class="multi-box" id="multiBox" hidden>
+        <div class="field">
+          <span class="note">Gültig bis</span>
+          <div class="seg" id="useg">
+            <button type="button" id="untilDateBtn" aria-pressed="true">Datum</button>
+            <button type="button" id="untilUnlBtn" aria-pressed="false">Unbegrenzt</button>
+          </div>
+          <input type="date" id="untilDate" aria-label="Gültig bis einschließlich">
+          <span class="note" id="untilNote">gilt bis einschließlich diesem Tag, 23:59 Uhr</span>
+        </div>
+        <label class="toggle" for="mWinOn">
+          <span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Code nicht. Das zählt nicht als Fehlversuch.</span></span>
+          <input type="checkbox" id="mWinOn"><span class="sw"></span>
+        </label>
+        <div id="mWin" class="mwin" hidden>
+          <div class="days" id="mDays"></div>
+          <div class="set-row"><span class="note">von</span><input type="time" id="mFrom" value="07:00" aria-label="von"><span class="note">bis</span><input type="time" id="mTo" value="18:00" aria-label="bis"></div>
+        </div>
       </div>
       <div class="field">
         <span class="note">Länge des Codes</span>
@@ -466,14 +549,14 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
         <input type="text" id="who" maxlength="27" placeholder="z. B. Spedition, Catering, Techniker" autocomplete="off">
       </div>
       <label class="toggle" for="codeDoor">
-        <span><b>Auch die Tür zum Lager</b><br><span class="note">Mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist.</span></span>
+        <span><b>Auch die Tür zum Lager</b><br><span class="note" id="doorNote">Mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist.</span></span>
         <input type="checkbox" id="codeDoor"><span class="sw"></span>
       </label>
       <button class="btn" id="make" type="button">Code erzeugen</button>
     </div>
 
     <div class="card">
-      <span class="label">Mastercode · gilt immer</span>
+      <span class="label" style="--acc:#ffc531">Mastercode · gilt immer</span>
       <div class="master-row">
         <div class="pins" id="pins"></div>
         <button class="btn ghost small" id="masterShow" type="button">Anzeigen</button>
@@ -491,6 +574,7 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <p class="note" id="masterMsg">Der neue Code gilt sofort an Tastatur und Display. Keine leicht zu ratenden Zahlen wie 1234.</p>
     </div>
     </div><div>
+    <h3 class="grp">Codes <span id="codeCnt"></span></h3>
     <div class="codes" id="codes"></div>
     </div></div>
   </section>
@@ -500,7 +584,7 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     <h2>Chips</h2>
     <div class="cols"><div>
     <div class="card" id="learnCard">
-      <span class="label">Neuen Chip anlernen</span>
+      <span class="label" style="--acc:#2f5fff">Neuen Chip anlernen</span>
       <div class="field">
         <label class="note" for="chipName">Name</label>
         <input type="text" id="chipName" maxlength="23" placeholder="z. B. Fabian, Lager-Team" autocomplete="off">
@@ -513,8 +597,9 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
       <span class="note" id="learnTxt" aria-live="polite">Die Blackbox wartet 30 Sekunden.</span>
       <button class="btn ghost small" id="learnCancel" type="button">Abbrechen</button>
     </div>
-    <p class="note">Tippe auf einen Chip für alle Möglichkeiten: Tür erlauben, sperren, Zeitfenster, umbenennen, löschen. Geht ein Chip verloren, sperre ihn sofort.</p>
+    <p class="note infobox">Tippe auf einen Chip für alle Möglichkeiten: Tür erlauben, sperren, Zeitfenster, umbenennen, löschen. Geht ein Chip verloren, sperre ihn sofort.</p>
     </div><div>
+    <h3 class="grp">Angelernte Chips <span id="chipCnt"></span></h3>
     <div class="codes" id="chips"></div>
     </div></div>
   </section>
@@ -533,17 +618,17 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     <div class="tiles" id="wkTiles"></div>
     <div class="cols"><div>
     <div class="card">
-      <span class="label">Pro Tag</span>
+      <span class="label" style="--acc:#5b82ff">Pro Tag</span>
       <div class="legend"><span><i style="background:#5b82ff"></i>Tor auf</span><span><i style="background:#b97a22"></i>Tür entriegelt</span></div>
       <div class="chart" id="wkChart" role="img" aria-label="Öffnungen pro Tag"></div>
     </div>
     <div class="card">
-      <span class="label">Am häufigsten</span>
+      <span class="label" style="--acc:#3ddc97">Am häufigsten</span>
       <ul class="toplist" id="wkTop"></ul>
     </div>
     </div><div>
     <div class="card">
-      <span class="label">Alle Ereignisse der Woche</span>
+      <span class="label" style="--acc:#94a3b8">Alle Ereignisse der Woche</span>
       <div id="wkEvents"></div>
     </div>
     </div></div>
@@ -553,12 +638,14 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
   <section class="view" id="v-settings" hidden>
     <h2>Einstellungen</h2>
     <div class="settings-grid">
+    <h3 class="grp">Verbindung</h3>
     <div class="card wifi" id="wifiCard" hidden>
       <svg class="wbars" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="15" width="4" height="6" rx="1"></rect><rect x="10" y="10" width="4" height="11" rx="1"></rect><rect x="17" y="4" width="4" height="17" rx="1"></rect></svg>
       <div><b id="wifiTxt">WLAN-Empfang</b><p class="note" id="wifiSub"></p></div>
     </div>
+    <h3 class="grp">Tür &amp; Tor</h3>
     <div class="card" id="authCard">
-      <span class="label">Tür · Berechtigung am Display</span>
+      <span class="label" style="--acc:#ffc531">Tür · Berechtigung am Display</span>
       <p class="note">So lange zeigt das Display nach Code oder Chip „Du bist berechtigt“ mit dem Knopf „Tür öffnen“. Jedes Öffnen startet die Zeit neu.</p>
       <div class="auth-row">
         <input type="number" id="authMin" min="0.25" max="60" step="0.25" inputmode="decimal" aria-label="Minuten">
@@ -568,15 +655,16 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     </div>
 
     <div class="card" id="travelCard">
-      <span class="label">Tor &amp; Fahrzeiten</span>
+      <span class="label" style="--acc:#2f5fff">Tor &amp; Fahrzeiten</span>
       <div class="kv" id="travelKv"></div>
       <p class="note" id="travelNote"></p>
       <div class="hint" id="travelHint" hidden></div>
       <button class="btn ghost small" id="relearn" type="button">Zeiten neu lernen</button>
     </div>
 
+    <h3 class="grp">Warnungen &amp; Automatik</h3>
     <div class="card">
-      <span class="label">Tor-Warnungen</span>
+      <span class="label" style="--acc:#ff9f43">Tor-Warnungen</span>
       <label class="toggle" for="sOw"><span><b>Tor steht zu lange offen</b><br><span class="note">Mitteilung, wenn das Tor länger offen ist als:</span></span><input type="checkbox" id="sOw" data-k="ow"><span class="sw"></span></label>
       <div class="set-row" id="rowOw"><input type="number" id="sOwm" data-k="owm" min="1" max="720" inputmode="numeric" aria-label="Minuten"><span class="note">Minuten</span></div>
       <label class="toggle" for="sTw"><span><b>Abends noch offen</b><br><span class="note">Mitteilung, wenn das Tor ab dieser Uhrzeit noch offen ist (einmal am Tag):</span></span><input type="checkbox" id="sTw" data-k="tw"><span class="sw"></span></label>
@@ -584,13 +672,21 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     </div>
 
     <div class="card">
-      <span class="label">Automatisch schließen</span>
+      <span class="label" style="--acc:#3ddc97">Automatisch schließen</span>
       <label class="toggle" for="sAc"><span><b>Tor von selbst schließen</b><br><span class="note">Nur mit aktiver Lichtschranke. Steht das Tor so lange offen, fährt es zu:</span></span><input type="checkbox" id="sAc" data-k="ac"><span class="sw"></span></label>
       <div class="set-row" id="rowAc"><input type="number" id="sAcm" data-k="acm" min="1" max="240" inputmode="numeric" aria-label="Minuten"><span class="note">Minuten</span></div>
     </div>
 
+    <div class="card" id="schedCard">
+      <span class="label" style="--acc:#a78bfa">Zeitplan: Tor schließen</span>
+      <p class="note">Das Tor fährt an den gewählten Tagen zur eingestellten Uhrzeit zu. Eine Minute vorher warnt das Display und lässt sich mit „Heute nicht schließen“ abbrechen. Ist das Tor schon zu, passiert nichts. Nur mit aktiver Lichtschranke.</p>
+      <div class="sched-list" id="schedList"></div>
+      <button class="btn ghost small" id="schedAdd" type="button">+ Uhrzeit hinzufügen</button>
+    </div>
+
+    <h3 class="grp">Bedienung</h3>
     <div class="card">
-      <span class="label">Taster innen</span>
+      <span class="label" style="--acc:#38bdf8">Taster innen</span>
       <p class="note">Einmal drücken entriegelt die Tür. Zusätzlich:</p>
       <label class="toggle" for="sB2"><span><b>2× drücken: Tor auf</b></span><input type="checkbox" id="sB2" data-k="b2"><span class="sw"></span></label>
       <label class="toggle" for="sB3"><span><b>3× drücken: Tor zu</b></span><input type="checkbox" id="sB3" data-k="b3"><span class="sw"></span></label>
@@ -598,19 +694,19 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
     </div>
 
     <div class="card" id="vacCard">
-      <span class="label">Urlaubsmodus</span>
+      <span class="label" style="--acc:#f472b6">Urlaubsmodus</span>
       <label class="toggle" for="sVac"><span><b>Nur der Mastercode öffnet</b><br><span class="note">Einmalcodes und Chips sind gesperrt, bis du es wieder ausschaltest. Die App funktioniert weiter.</span></span><input type="checkbox" id="sVac" data-k="vac"><span class="sw"></span></label>
     </div>
 
     <div class="card">
-      <span class="label">Wochenbericht</span>
+      <span class="label" style="--acc:#94a3b8">Wochenbericht</span>
       <label class="toggle" for="sWk"><span><b>Montags als Mitteilung</b><br><span class="note">Kurze Zusammenfassung der letzten Woche. Alles Weitere unter „Statistik“.</span></span><input type="checkbox" id="sWk" data-k="wk"><span class="sw"></span></label>
     </div>
     </div>
 
     <h2>Mitteilungen</h2>
     <div class="card" id="pushCard">
-      <span class="label">Auf diesem Handy</span>
+      <span class="label" style="--acc:#2f5fff">Auf diesem Handy</span>
       <p class="note" id="pushNote">Mitteilungen der Blackbox direkt aufs Handy, ohne weitere App.</p>
       <div class="push-list" id="pushOn" hidden>
         <div class="field"><label class="note" for="pushName">Name dieses Handys</label><input type="text" id="pushName" maxlength="23" placeholder="z. B. iPhone Fabian"></div>
@@ -647,7 +743,7 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
   <div class="sheet-bg" id="sheetBg"></div>
   <div class="sheet" role="dialog" aria-label="Neuer Code">
     <div class="grab"></div>
-    <span class="label" style="text-align:center">Neuer Einmalcode</span>
+    <span class="label" style="text-align:center" id="sheetLabel">Neuer Einmalcode</span>
     <div class="digits" id="digits"><span>0</span><span>0</span><span>0</span><span>0</span></div>
     <div class="valid" id="valid"></div>
     <div class="row">
@@ -734,12 +830,13 @@ function demoState() {
     now: n, gate: "closed", canClose: true, lockedFor: 0, rssi: -63, disp: true, door: "locked", authSec: 120, authFor: 0, ml: 6, stats: true,
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
-    cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true },
-    vapid: "demo", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 }],
+    cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
+    vapid: "demo", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
     codes: [
       { code: "0427", from: n - 2 * h, to: n + 6 * h, used: 0, usedAt: 0, label: "Beispiel: Catering Aufbau", door: true },
       { code: "5913", from: n + 20 * h, to: n + 44 * h, used: 0, usedAt: 0, label: "Beispiel: Bühnenbau Samstag" },
-      { code: "3390", from: n - 26 * h, to: n - 2 * h, used: 1, usedAt: n - 20 * h, label: "Beispiel: Spedition" }
+      { code: "3390", from: n - 26 * h, to: n - 2 * h, used: 1, usedAt: n - 20 * h, label: "Beispiel: Spedition" },
+      { code: "781204", from: n - 9 * 24 * h, to: n + 52 * 24 * h, used: 0, usedAt: n - 5 * h, uses: 7, multi: true, label: "Beispiel: Reinigungsfirma", win: true, days: 31, fm: 360, tm: 1140 }
     ],
     learning: 0,
     chips: [
@@ -853,8 +950,12 @@ function demoSend(op, p) {
       let code; do { code = String(Math.floor(Math.random() * 10 ** len)).padStart(len, "0"); } while (clash(code, master) || state.codes.some(c => !c.used && clash(code, c.code)));
       const f = Math.max(p.from || 0, n);
       const c = { code, from: f, to: f + p.dur * 60, used: 0, usedAt: 0, label: p.label, door: !!p.door };
-      state.codes.unshift(c); log(true, `Code ${code} erstellt` + (p.label ? " · " + p.label : ""));
-      return res({ ok: true, code, from: c.from, to: c.to, door: c.door });
+      if (p.multi) {
+        Object.assign(c, { multi: true, uses: 0, unl: !p.until, to: p.until || 4294967295 });
+        if (p.win) Object.assign(c, { win: true, days: p.days, fm: p.fm, tm: p.tm });
+      }
+      state.codes.unshift(c); log(true, (p.multi ? "Mehrfachcode " : "Code ") + `${code} erstellt` + (p.label ? " · " + p.label : ""));
+      return res({ ok: true, code, from: c.from, to: c.to, door: c.door, multi: !!p.multi });
     }
     if (op === "learn") {
       state.learning = 30;
@@ -1057,23 +1158,24 @@ function renderGateLoop() {
 $("gateSvg").addEventListener("click", () => { $("gateTimes").hidden = !$("gateTimes").hidden; });
 
 function renderCodes() {
-  const box = $("codes"); box.innerHTML = "";
-  if (!state.codes.length) { box.innerHTML = '<div class="empty">Noch keine Einmalcodes. Erzeuge oben den ersten.</div>'; return; }
+  const box = $("codes"); box.innerHTML = ""; $("codeCnt").textContent = state.codes.length ? "· " + state.codes.length : "";
+  if (!state.codes.length) { box.innerHTML = '<div class="empty">Noch keine Codes. Erzeuge oben den ersten.</div>'; return; }
   const now = Date.now() / 1000;
   state.codes.forEach((c, i) => {
     let st = "on", txt = "Aktiv";
     if (c.used) { st = "off"; txt = "Benutzt"; } else if (now >= c.to) { st = "off"; txt = "Abgelaufen"; } else if (now < c.from) { st = "wait"; txt = "Geplant"; }
     const el = document.createElement("div");
-    el.className = "code" + (st === "off" ? " off" : "");
+    el.className = "code" + (st === "off" ? " off" : st === "wait" ? " wait" : "");
     el.style.animationDelay = Math.min(i * 40, 240) + "ms";
     el.innerHTML = `<span class="num"></span><span class="who"></span>
-      <span class="side">${c.door ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${st}">${txt}</span><button class="del" type="button">Löschen</button></span>
+      <span class="side">${c.multi ? '<span class="pill multi">Mehrfach</span> ' : ""}${c.multi && c.win ? '<span class="pill win">Zeit</span> ' : ""}${c.door ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${st}">${txt}</span><button class="del" type="button">Löschen</button></span>
       <span class="when"></span>${st === "on" ? '<span class="bar"><span></span></span>' : ""}`;
     el.querySelector(".num").textContent = c.code;
     el.querySelector(".who").textContent = c.label || "Ohne Namen";
-    el.querySelector(".when").textContent = c.used ? "Benutzt " + fmt.format(new Date(c.usedAt * 1000)) + " Uhr"
+    el.querySelector(".when").textContent = c.multi ? multiText(c, st)
+      : c.used ? "Benutzt " + fmt.format(new Date(c.usedAt * 1000)) + " Uhr"
       : st === "on" ? left(c.to - now) + " · bis " + fmt.format(new Date(c.to * 1000)) : range(c.from, c.to);
-    if (st === "on") el.querySelector(".bar span").style.width = Math.max(2, (c.to - now) / (c.to - c.from) * 100) + "%";
+    if (st === "on") { const bar = el.querySelector(".bar span"); if (c.multi && isUnl(c)) bar.parentNode.remove(); else bar.style.width = Math.max(2, (c.to - now) / (c.to - c.from) * 100) + "%"; }
     const del = el.querySelector(".del");
     del.onclick = async () => {
       if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.textContent = "Wirklich löschen?"; setTimeout(() => { del.classList.remove("confirm"); del.textContent = "Löschen"; }, 4000); return; }
@@ -1082,6 +1184,18 @@ function renderCodes() {
     };
     box.appendChild(el);
   });
+}
+
+// Mehrfachcode: Gültigkeit, Zeitfenster und Nutzungen in einer Zeile
+const fmtDate = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+const isUnl = c => c.unl || c.to >= 4294967295;
+function untilText(c) { return isUnl(c) ? "unbegrenzt" : "bis " + fmtDate.format(new Date(c.to * 1000)); }
+function multiText(c, st) {
+  const parts = [];
+  parts.push(st === "wait" ? "ab " + fmt.format(new Date(c.from * 1000)) + " Uhr, " + untilText(c) : st === "off" ? "abgelaufen am " + fmtDate.format(new Date(c.to * 1000)) : untilText(c));
+  if (c.win) parts.push(winText(c));
+  parts.push((c.uses || 0) + "× benutzt" + (c.usedAt ? ", zuletzt " + fmt.format(new Date(c.usedAt * 1000)) + " Uhr" : ""));
+  return parts.join(" · ");
 }
 
 function renderLog() {
@@ -1232,16 +1346,66 @@ function setLater(v) {
 $("startNow").onclick = () => setLater(false);
 $("startLater").onclick = () => setLater(true);
 
+// ---------- Mehrfachcode: bis Datum oder unbegrenzt, optional Zeitfenster ----------
+let multi = false, untilUnl = false, mDays = 31, lenSingle = codeLen;
+function dateInput(d) { const p = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; }
+function setMulti(v) {
+  multi = v;
+  $("durField").hidden = v; $("multiBox").hidden = !v;
+  $("doorNote").textContent = v ? "Bei jeder Anmeldung mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist."
+    : "Mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist.";
+  if (v) { lenSingle = codeLen; codeLen = 6; if (!$("untilDate").value) { const d = new Date(); d.setMonth(d.getMonth() + 1); $("untilDate").value = dateInput(d); } $("untilDate").min = dateInput(new Date()); }
+  else codeLen = lenSingle;
+  renderLens();
+}
+function setUnl(v) {
+  untilUnl = v;
+  $("useg").classList.toggle("right", v);
+  $("untilDateBtn").setAttribute("aria-pressed", String(!v)); $("untilUnlBtn").setAttribute("aria-pressed", String(v));
+  $("untilDate").hidden = v;
+  $("untilNote").textContent = v ? "gilt, bis du den Code löschst" : "gilt bis einschließlich diesem Tag, 23:59 Uhr";
+}
+function renderMDays() {
+  $("mDays").innerHTML = "";
+  WD.forEach((d, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = d; b.setAttribute("aria-pressed", String(!!(mDays >> i & 1)));
+    b.onclick = () => { mDays ^= 1 << i; renderMDays(); }; $("mDays").appendChild(b); });
+}
+$("codeMulti").onchange = e => setMulti(e.target.checked);
+$("untilDateBtn").onclick = () => setUnl(false);
+$("untilUnlBtn").onclick = () => setUnl(true);
+$("mWinOn").onchange = e => { $("mWin").hidden = !e.target.checked; };
+
 $("make").onclick = async () => {
   let from = 0;
   if (later) { const v = new Date($("startAt").value).getTime(); if (isNaN(v)) { $("startAt").focus(); return; } from = Math.floor(v / 1000); }
   const label = fitBytes($("who").value.trim(), 27);
+  const params = { dur: DUR[durIdx], from, label, door: $("codeDoor").checked, len: codeLen };
+  let winInfo = null;
+  if (multi) {
+    let until = 0;
+    if (!untilUnl) {
+      const v = $("untilDate").value; if (!v) { $("untilDate").focus(); toast("Bitte ein Datum wählen", true); return; }
+      const [y, m, d] = v.split("-").map(Number);
+      until = Math.floor(new Date(y, m - 1, d, 23, 59, 59).getTime() / 1000);
+      const start = from || Math.floor(Date.now() / 1000);
+      if (until <= start) { toast("Das Datum liegt vor dem Beginn", true); return; }
+    }
+    Object.assign(params, { multi: true, until });
+    if ($("mWinOn").checked) {
+      const fm = toMin($("mFrom").value); let tm = toMin($("mTo").value); if (tm === 1439) tm = 1440;
+      if (!(mDays & 127)) { toast("Bitte mindestens einen Tag wählen", true); return; }
+      if (fm === tm) { toast("Von und bis dürfen nicht gleich sein", true); return; }
+      winInfo = { win: true, days: mDays & 127, fm, tm: tm || 1440 };
+      Object.assign(params, winInfo);
+    }
+  }
   $("make").disabled = true; $("make").textContent = "Erzeuge …";
   try {
-    const door = $("codeDoor").checked;
-    const r = await send("create", { dur: DUR[durIdx], from, label, door, len: codeLen });
+    const door = params.door;
+    const r = await send("create", params);
     $("who").value = ""; $("codeDoor").checked = false;
     r.door = r.door ?? door;
+    if (multi) { r.multi = true; r.unl = !params.until; Object.assign(r, winInfo || {}); }
     openSheet(r, label);
     if (mode === "demo") render();
   } catch (e) { toast(e.message, true); }
@@ -1250,12 +1414,25 @@ $("make").onclick = async () => {
 
 function openSheet(r, label) {
   lastCode = r.code;
-  lastMsg = `Dein Code für das Tor bei VTK Veranstaltungstechnik Koch: ${r.code}\nEinfach am Tastenfeld eintippen, das Tor öffnet sich.` +
-    (r.door ? `\nAm Display neben der Lagertür kannst du danach einmal „Tür öffnen“ antippen.` : "") +
-    `\nGültig ${range(r.from, r.to)} – nur einmal nutzbar.`;
   const v = $("valid"); v.innerHTML = "";
-  const s = document.createElement("strong"); s.textContent = range(r.from, r.to);
-  v.append("Gültig ", s, document.createElement("br"), "Einmal nutzbar" + (r.door ? " · mit Tür" : "") + (label ? " · " + label : ""));
+  const s = document.createElement("strong");
+  if (r.multi) {
+    const startTxt = r.from > Date.now() / 1000 + 60 ? "ab " + fmt.format(new Date(r.from * 1000)) + " Uhr " : "";
+    const gilt = startTxt + (r.unl ? "ohne Enddatum" : "bis einschließlich " + fmtDate.format(new Date(r.to * 1000)));
+    lastMsg = `Dein Code für das Tor bei VTK Veranstaltungstechnik Koch: ${r.code}\nEinfach am Tastenfeld eintippen, das Tor öffnet sich.` +
+      (r.door ? `\nAm Display neben der Lagertür kannst du danach jedes Mal einmal „Tür öffnen“ antippen.` : "") +
+      `\nGültig ${gilt} – beliebig oft nutzbar.` + (r.win ? `\nNur ${winText(r)}.` : "");
+    $("sheetLabel").textContent = "Neuer Mehrfachcode";
+    s.textContent = gilt;
+    v.append("Gültig ", s, document.createElement("br"), "Mehrfach nutzbar" + (r.win ? " · " + winText(r) : "") + (r.door ? " · mit Tür" : "") + (label ? " · " + label : ""));
+  } else {
+    lastMsg = `Dein Code für das Tor bei VTK Veranstaltungstechnik Koch: ${r.code}\nEinfach am Tastenfeld eintippen, das Tor öffnet sich.` +
+      (r.door ? `\nAm Display neben der Lagertür kannst du danach einmal „Tür öffnen“ antippen.` : "") +
+      `\nGültig ${range(r.from, r.to)} – nur einmal nutzbar.`;
+    $("sheetLabel").textContent = "Neuer Einmalcode";
+    s.textContent = range(r.from, r.to);
+    v.append("Gültig ", s, document.createElement("br"), "Einmal nutzbar" + (r.door ? " · mit Tür" : "") + (label ? " · " + label : ""));
+  }
   $("fallback").hidden = true;
   $("sheet").hidden = false;
   $("digits").innerHTML = "";
@@ -1319,7 +1496,45 @@ function renderCfg() {
   });
   $("rowOw").classList.toggle("off", !c.ow); $("rowTw").classList.toggle("off", !c.tw); $("rowAc").classList.toggle("off", !c.ac);
   $("vacCard").classList.toggle("vac-on", !!c.vac);
+  renderSched();
 }
+// ---------- Zeitplan "Tor schließen": mehrere Einträge mit Tagen + Uhrzeit ----------
+let schedEdit = null;                       // Arbeitskopie, solange jemand daran ändert
+function schedNow() { return schedEdit || (state.cfg && state.cfg.sched) || []; }
+function renderSched() {
+  const box = $("schedList"); if (!box || box.contains(document.activeElement)) return;
+  const list = schedNow();
+  box.innerHTML = "";
+  if (!list.length) { box.innerHTML = '<p class="note">Noch keine Uhrzeit eingetragen.</p>'; }
+  list.forEach((e, i) => {
+    const it = document.createElement("div"); it.className = "sched-item" + (e.on ? "" : " off");
+    it.innerHTML = `<div class="sched-top">
+        <input type="time" aria-label="Uhrzeit" value="${hhmm(e.min)}">
+        <span class="note">Uhr</span><span class="sp"></span>
+        <label class="minisw"><input type="checkbox" ${e.on ? "checked" : ""}><span class="sw"></span><span>${e.on ? "an" : "aus"}</span></label>
+        <button class="del" type="button">Löschen</button>
+      </div><div class="days"></div>`;
+    const days = it.querySelector(".days");
+    ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].forEach((d, k) => { const b = document.createElement("button"); b.type = "button"; b.textContent = d; b.setAttribute("aria-pressed", String(!!(e.days >> k & 1)));
+      b.onclick = () => { const n = e.days ^ (1 << k); if (!(n & 127)) { toast("Mindestens ein Tag", true); return; } saveSched(list.map((x, j) => j === i ? { ...x, days: n } : x)); };
+      days.appendChild(b); });
+    it.querySelector('input[type="time"]').onchange = ev => saveSched(list.map((x, j) => j === i ? { ...x, min: toMin(ev.target.value) } : x));
+    it.querySelector('input[type="checkbox"]').onchange = ev => saveSched(list.map((x, j) => j === i ? { ...x, on: ev.target.checked } : x));
+    it.querySelector(".del").onclick = ev => {
+      const b = ev.target; if (!b.dataset.c) { b.dataset.c = 1; b.textContent = "Wirklich?"; setTimeout(() => { delete b.dataset.c; b.textContent = "Löschen"; }, 3000); return; }
+      saveSched(list.filter((x, j) => j !== i));
+    };
+    box.appendChild(it);
+  });
+  $("schedAdd").hidden = list.length >= 6;
+}
+async function saveSched(list) {
+  schedEdit = list; renderSched();
+  try { await send("settings", { sched: list }); if (state.cfg) state.cfg.sched = list; toast("Zeitplan gespeichert"); }
+  catch (e) { toast(e.message, true); }
+  schedEdit = null; document.activeElement && document.activeElement.blur && $("schedList").contains(document.activeElement) && document.activeElement.blur(); renderSched();
+}
+$("schedAdd").onclick = () => saveSched([...schedNow(), { on: true, days: 31, min: 1080 }]);
 CFG_IN.forEach(el => el.addEventListener("change", async () => {
   const k = el.dataset.k;
   let v = el.type === "checkbox" ? el.checked : el.type === "time" ? toMin(el.value) : Math.round(+el.value);
@@ -1409,7 +1624,7 @@ $("testNotif").onclick = () => {
   const c = state && state.codes.find(x => !x.used && Date.now() / 1000 >= x.from && Date.now() / 1000 < x.to);
   const code = c ? c.code : "0427", who = c ? c.label : "Catering Aufbau";
   showNotif("Tor geöffnet", `Code ${code} · ${who}. Tippen für den Verlauf.`);
-  if (state && c) { c.used = 1; c.usedAt = Math.floor(Date.now() / 1000); state.log.unshift({ t: c.usedAt, ok: true, text: `Code ${code} · ${who} – geöffnet` }); state.gate = "between"; render();
+  if (state && c) { if (c.multi) c.uses = (c.uses || 0) + 1; else c.used = 1; c.usedAt = Math.floor(Date.now() / 1000); state.log.unshift({ t: c.usedAt, ok: true, text: `Code ${code} · ${who} – geöffnet` }); state.gate = "between"; render();
     setTimeout(() => { state.gate = "open"; render(); }, 2400); }
 };
 $("notif").onclick = () => {
@@ -1430,7 +1645,7 @@ function winText(c) {
 }
 function renderChips() {
   const box = $("chips"); box.innerHTML = "";
-  const list = state.chips || [];
+  const list = state.chips || []; $("chipCnt").textContent = list.length ? "· " + list.length : "";
   if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Chips. Lerne den ersten an.</div>'; return; }
   list.forEach((c, i) => {
     const el = document.createElement("div");
@@ -1478,6 +1693,7 @@ async function chipCmd(params, msg) {
   try { await send("chipSet", { chip: csId, ...params }); toast(msg); if (mode === "demo") render(); }
   catch (e) { toast(e.message, true); }
 }
+renderMDays();
 $("csDoor").onclick = () => { const c = curChip(); if (c) chipCmd({ door: !c.door }, c.door ? "Tür für diesen Chip verboten" : "Tür für diesen Chip erlaubt"); };
 $("csLock").onclick = () => { const c = curChip(); if (c) chipCmd({ enabled: !c.enabled }, c.enabled ? "Chip gesperrt" : "Chip freigegeben"); };
 $("csWinBtn").onclick = () => { $("csWin").hidden = !$("csWin").hidden; $("csRen").hidden = true; };
@@ -1530,8 +1746,18 @@ setInterval(() => { if (learnPending) renderLearn(); }, 1000);
 // ---------- Direktlink aus der Push-Nachricht (#log) ----------
 
 // ---------- Mitteilungen (Web Push, direkt von der Blackbox) ----------
-const EVENTS = [[1, "Einmalcode benutzt"], [4, "Tor per Chip geöffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip vorgehalten"], [16, "Tastatur nach Fehlversuchen gesperrt"], [128, "Tor-Warnungen und Störungen"], [64, "Wochenbericht"]];
-const PUSH_DEFAULT = 1 | 8 | 16 | 64 | 128;
+// Mitteilungs-Arten (Bits wie in der Blackbox). Die Tor-Warnungen sind ab 12.3 einzeln wählbar.
+const EVENTS = [[1, "Code benutzt (Einmal- und Mehrfachcodes)"], [4, "Tor per Chip geöffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip, Chip oder Code außerhalb seiner Zeit"], [16, "Tastatur nach Fehlversuchen gesperrt"],
+  [256, "warn"], [512, "warn"], [1024, "warn"], [2048, "warn"], [128, "warn"], [64, "Wochenbericht"]];
+const PUSH_DEFAULT = 1 | 8 | 16 | 64 | 128 | 256 | 512 | 1024 | 2048;
+function warnInfo(bit) {             // Text und ob die Warnung in den Einstellungen eingeschaltet ist
+  const c = (state && state.cfg) || {};
+  if (bit === 256) return { t: "Tor länger als " + (c.owm || 15) + " Min. offen", on: !!c.ow };
+  if (bit === 512) return { t: "Tor um " + hhmm(c.twt ?? 1200) + " Uhr noch offen", on: !!c.tw };
+  if (bit === 1024) return { t: "Tor automatisch geschlossen (nach " + (c.acm || 10) + " Min.)", on: !!c.ac };
+  if (bit === 2048) return { t: "Zeitplan: Tor geschlossen oder am Display abgebrochen", on: (c.sched || []).some(e => e.on) };
+  return { t: "Störung: Endlage nicht erreicht oder Tor zurückgefahren", on: true };
+}
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 const canPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
@@ -1557,16 +1783,24 @@ function renderPush() {
   if (me) {
     if (document.activeElement !== $("pushName")) $("pushName").value = me.name;
     const box = $("pushToggles");
-    if (box.dataset.mask !== String(me.mask)) {
-      box.dataset.mask = me.mask; box.innerHTML = "";
+    const key = me.mask + "|" + EVENTS.map(([b, t]) => t === "warn" ? JSON.stringify(warnInfo(b)) : "").join("");
+    if (box.dataset.key !== key) {
+      box.dataset.key = key; box.innerHTML = "";
       EVENTS.forEach(([bit, txt]) => {
+        if (bit === 1) { const h = document.createElement("span"); h.className = "label"; h.style.marginTop = "6px"; h.textContent = "Öffnungen und Zugang"; box.appendChild(h); }
+        if (bit === 256) { const h = document.createElement("span"); h.className = "label"; h.style.marginTop = "6px"; h.textContent = "Tor-Warnungen"; box.appendChild(h); }
+        if (bit === 64) { const h = document.createElement("span"); h.className = "label"; h.style.marginTop = "6px"; h.textContent = "Sonstiges"; box.appendChild(h); }
         const l = document.createElement("label"); l.className = "toggle";
         l.innerHTML = `<span><b></b></span><input type="checkbox"><span class="sw"></span>`;
+        if (txt === "warn") {
+          const w = warnInfo(bit); txt = w.t;
+          if (!w.on) { l.style.opacity = ".5"; l.querySelector("span").insertAdjacentHTML("beforeend", '<br><span class="note">In den Einstellungen ausgeschaltet</span>'); }
+        }
         l.querySelector("b").textContent = txt;
         const cb = l.querySelector("input"); cb.checked = (me.mask & bit) !== 0;
         cb.onchange = async () => {
           const m = cb.checked ? (me.mask | bit) : (me.mask & ~bit);
-          try { await send("pushSet", { pid: me.id, mask: m }); me.mask = m; box.dataset.mask = m; toast("Gespeichert"); }
+          try { await send("pushSet", { pid: me.id, mask: m }); me.mask = m; box.dataset.key = ""; renderPush(); toast("Gespeichert"); }
           catch (e) { cb.checked = !cb.checked; toast(e.message, true); }
         };
         box.appendChild(l);
