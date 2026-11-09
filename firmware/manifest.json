@@ -1,0 +1,15 @@
+{
+ "notes": "Fernupdate über die App, Personen-Sicherung",
+ "blackbox": {
+  "ver": "13.0",
+  "file": "firmware/blackbox-13.0.bin",
+  "size": 1295392,
+  "sha": "350351956869637c57c7fc0390f340de5dcee893f21e595e5d456b79b614a958"
+ },
+ "display": {
+  "ver": "13.0",
+  "file": "firmware/display-13.0.bin",
+  "size": 845904,
+  "sha": "e76dff5f3b5cd712be3c104d00af257a64a132d3a92d82625aec51eef452930b"
+ }
+}

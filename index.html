@@ -265,6 +265,14 @@ select#csPerson { width: 100%; background: var(--tile, #1b2131); color: inherit;
 .push-list { display: grid; gap: 14px; }
 .push-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .push-row .btn { flex: 1 1 140px; }
+.fw-rows { display: grid; gap: 6px; margin: 4px 0 10px; }
+.fw-row { display: flex; justify-content: space-between; gap: 10px; font-size: 15px; color: var(--muted); }
+.fw-row b { color: var(--fg); font-weight: 600; text-align: right; }
+.fw-row b.new { color: var(--ok); }
+.fw-bar { height: 10px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; margin: 6px 0; }
+.fw-bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+#fwCard .note.bad { color: var(--warn); }
+#fwCard .btn + .push-row, #fwCard .push-row + .push-row { margin-top: 10px; }
 .devs { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .devs li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); }
 .devs li b { color: var(--fg); font-weight: 600; }
@@ -756,6 +764,29 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       </div>
     </div>
 
+    <h2>Firmware</h2>
+    <p class="sub">Updates für Blackbox und Display kommen direkt aus GitHub – ohne Laptop.</p>
+    <div class="card" id="fwCard">
+      <span class="label" style="--acc:#3ddc97">Firmware-Update</span>
+      <div class="fw-rows">
+        <div class="fw-row"><span>Blackbox</span><b id="fwBb">–</b></div>
+        <div class="fw-row"><span>Display</span><b id="fwDp">–</b></div>
+      </div>
+      <p class="note" id="fwNote"></p>
+      <div id="fwProg" hidden><div class="fw-bar"><i id="fwBar"></i></div><p class="note" id="fwStep"></p></div>
+      <button class="btn" id="fwInstall" type="button" hidden>Update installieren</button>
+      <div class="push-row">
+        <button class="btn ghost small" id="fwCheck" type="button">Neu prüfen</button>
+        <button class="btn ghost small" id="fwFile" type="button">Datei wählen</button>
+      </div>
+      <div class="push-row">
+        <button class="btn ghost small" id="perSave" type="button">Personen sichern</button>
+        <button class="btn ghost small" id="perLoad" type="button">Personen zurückholen</button>
+      </div>
+      <input type="file" id="fwFileIn" accept=".bin,application/octet-stream" hidden>
+      <input type="file" id="perFileIn" accept=".json,application/json" hidden>
+    </div>
+
     <h2>Verbindung zur Blackbox</h2>
     <p class="sub">Die Daten vom MQTT-Broker (EMQX Serverless). Sie bleiben nur auf diesem Gerät.</p>
     <form class="card" id="cfgForm" autocomplete="off">
@@ -922,7 +953,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "12.6", logp: true, persons: [
+    vapid: "demo", fw: "13.0", dfw: "13.0", ota: { on: false, res: "" }, logp: true, persons: [
       { id: 1, name: "Andre Koch", gm: 1, greet: "", nm: 0, disp: "", code: "4711", on: true, door: true, gf: true, win: false, days: 31, fm: 420, tm: 1080, last: Math.floor(Date.now() / 1000) - 5400, via: "Chip Schlüssel", hello: "Moin Andre!" },
       { id: 2, name: "Reinigung Müller", gm: 2, greet: "", nm: 1, disp: "", code: "2580", on: true, door: false, gf: false, win: true, days: 31, fm: 360, tm: 540, last: Math.floor(Date.now() / 1000) - 3 * 86400, via: "Code", hello: "Guten Tag Reinigung Müller!" }
     ], push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
@@ -976,7 +1007,7 @@ function connect() {
     if (topic === b + "/online") { online = s === "1"; updateConn(); return; }
     let j; try { j = JSON.parse(s); } catch (e) { return; }
     if (topic === b + "/state") { j._rx = Date.now(); state = j; if (j.gm && j.gm.mv) gLocal = null; online = true; render(); updateConn(); }
-    else if (topic === b + "/resp" && pending.has(j.id)) { const p = pending.get(j.id); pending.delete(j.id); j.ok ? p.res(j) : p.rej(new Error(j.error || "Abgelehnt")); }
+    else if (topic === b + "/resp" && pending.has(j.id)) { const p = pending.get(j.id); pending.delete(j.id); j.ok ? p.res(j) : p.rej(Object.assign(new Error(j.error || "Abgelehnt"), { data: j })); }
   });
   client.on("error", e => { setConn("warn", /auth|Not authorized/i.test(e.message) ? "Zugangsdaten falsch" : "Verbindungsfehler"); });
   client.on("offline", () => setConn("warn", "Keine Internetverbindung"));
@@ -987,14 +1018,14 @@ function updateConn() {
   setConn(online ? "live" : "warn", online ? "Blackbox online" : "Blackbox offline");
 }
 
-function send(op, params = {}) {
+function send(op, params = {}, ms = 10000) {
   if (mode === "demo") return demoSend(op, params);
   return new Promise((res, rej) => {
     if (!client || !client.connected) return rej(new Error("Keine Verbindung zum Server."));
     const id = Math.random().toString(36).slice(2, 10);
     pending.set(id, { res, rej });
     client.publish(cfg.base + "/cmd", JSON.stringify({ id, k: cfg.key, op, ...params }), { qos: 1 });
-    setTimeout(() => { if (pending.has(id)) { pending.delete(id); rej(new Error("Die Blackbox antwortet nicht.")); } }, 10000);
+    setTimeout(() => { if (pending.has(id)) { pending.delete(id); rej(new Error("Die Blackbox antwortet nicht.")); } }, ms);
   });
 }
 
@@ -1081,6 +1112,19 @@ function demoSend(op, p) {
       pp.hello = greetingOf(pp);
       if (op === "personAdd") { state.persons.push(pp); log(true, "Person angelegt: " + pp.name); } else log(true, "Person geändert: " + pp.name);
       return res({ ok: true, pid: pp.id });
+    }
+    if (op === "otaBegin") { demoOta = { tgt: p.tgt, ver: p.ver, size: p.size }; return setTimeout(() => res({ ok: true }), 600); }
+    if (op === "otaChunk") return res({ ok: true, got: p.off + Math.floor(p.b.length / 4 * 3) });
+    if (op === "otaEnd") {
+      const d = demoOta || {}; state.ota = { on: false, res: "" };
+      setTimeout(() => { if (d.tgt === "display") state.dfw = d.ver; else state.fw = d.ver; state.ota = { on: false, res: "ok", resVer: d.ver }; log(true, `Update auf ${d.tgt === "display" ? "Display" : "Blackbox"} ${d.ver} bestätigt`); render(); }, 3000);
+      return res({ ok: true });
+    }
+    if (op === "otaAbort") return res({ ok: true });
+    if (op === "personRestore") {
+      let added = 0; state.persons = state.persons || [];
+      for (const o of p.list || []) if (o.name && !state.persons.some(x => x.id === o.id)) { state.persons.push({ ...o, last: 0, via: "", hello: greetingOf(o) }); added++; }
+      log(true, "Personen wiederhergestellt: " + added); return res({ ok: true, added });
     }
     if (op === "personDel") {
       const pp = (state.persons || []).find(x => x.id === p.pid);
@@ -1172,17 +1216,19 @@ function renderWifi() {
   $("wifiTxt").textContent = "WLAN-Empfang: " + ["", "schwach", "mittel", "gut"][q];
   $("wifiSub").textContent = r + " dBm" + (q === 1 ? " · Box näher an den Router oder einen WLAN-Verstärker setzen" : "");
 }
-var APP_VER = "12.6", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
+var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
+var APP_VER = "13.0", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
   const v = fwVer();
   const txt = state.fw ? "Blackbox-Firmware " + state.fw : v >= 12.2 ? "Blackbox-Firmware 12.2" : "Blackbox-Firmware 12.1 oder älter";
-  el.textContent = txt + " · App " + APP_VER + (v < APP_MIN_FW ? " – bitte die Blackbox aktualisieren" : "");
+  el.textContent = txt + (state.dfw ? " · Display " + state.dfw : "") + " · App " + APP_VER + (v < APP_MIN_FW ? " – bitte die Blackbox aktualisieren" : "");
   el.style.color = v < APP_MIN_FW ? "var(--warn)" : "";
 }
 function render() {
-  renderFw();
+  renderFw(); renderFwCard();
   $("demoBanner").hidden = mode !== "demo";
   renderWifi();
   if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
@@ -2229,6 +2275,182 @@ window.addEventListener("hashchange", handleHash);
 
 renderDurs(); setLater(false); connect(); handleHash();
 setInterval(() => { if (state) { renderCodes(); renderGate(); } }, 30000);
+
+// ================== Firmware-Update aus der App (ab 13.0) ==================
+// Die Liste firmware/manifest.json liegt neben der App bei GitHub Pages. Die App lädt die Datei, prüft sie und
+// schickt sie in Stücken über EMQX an die Blackbox; fürs Display reicht die Blackbox sie über das Kabel weiter.
+function vnum(v) { return parseFloat(v) || 0; }
+function fwHave(t) { return !state ? "" : (t === "blackbox" ? state.fw : state.dfw) || ""; }
+function fwRemote() { return vnum(state && state.fw) >= 13; }          // erst ab 13.0 kann die Blackbox Updates empfangen
+function fwDispOk() { return !!(state && state.disp && vnum(state.dfw) >= 13); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function fwLoadManifest(loud) {
+  try {
+    const r = await fetch("firmware/manifest.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    fwMan = await r.json(); fwManErr = false;
+  } catch (e) { fwMan = null; fwManErr = true; }
+  renderFwCard();
+  if (loud) { const n = fwTodo().length; toast(fwManErr ? "Update-Liste nicht erreichbar" : n ? "Update verfügbar" : "Alles aktuell", fwManErr); }
+}
+function fwTodo() {                       // welche Geräte eine neuere Version bekommen können
+  if (!fwMan || !state || !fwRemote()) return [];
+  return ["blackbox", "display"].filter(t => fwMan[t] && (t === "blackbox" || fwDispOk()) && vnum(fwMan[t].ver) > vnum(fwHave(t)));
+}
+function fwSetProg(frac, txt, bad) {
+  $("fwProg").hidden = false;
+  $("fwBar").style.width = Math.round(Math.max(0, Math.min(1, frac)) * 100) + "%";
+  const st = $("fwStep"); st.textContent = txt; st.className = "note" + (bad ? " bad" : "");
+}
+function renderFwCard() {
+  if (!$("fwCard")) return;
+  const m = fwMan || {}, todo = fwTodo();
+  const show = (el, t, cur) => {
+    const nv = m[t] && vnum(m[t].ver) > vnum(cur) ? m[t].ver : "";
+    el.textContent = (cur || "–") + (nv ? " → " + nv : ""); el.className = nv ? "new" : "";
+  };
+  show($("fwBb"), "blackbox", state ? state.fw : "");
+  const dp = $("fwDp");
+  if (!state) dp.textContent = "–";
+  else if (!state.disp) { dp.textContent = "nicht verbunden"; dp.className = ""; }
+  else if (!state.dfw) { dp.textContent = "älter als 13.0"; dp.className = ""; }
+  else show(dp, "display", state.dfw);
+  let note = "", bad = false;
+  if (!state) note = "";
+  else if (!fwRemote()) { note = "Die Blackbox braucht einmal Version 13.0 per USB – danach kommen Updates über die App."; bad = true; }
+  else if (state.disp && !state.dfw) { note = "Das Display braucht einmal Version 13.0 per USB – danach kommen Updates über die App."; bad = true; }
+  else if (fwManErr) note = "Update-Liste gerade nicht erreichbar.";
+  else if (!fwMan) note = "Suche nach Updates …";
+  else if (todo.length) note = "Update verfügbar: " + todo.map(t => FW_NAME[t] + " " + m[t].ver).join(" · ") + (m.notes ? " – " + m.notes : "");
+  else note = "Alles aktuell.";
+  const o = state && state.ota;
+  if (o && o.res === "back" && o.resVer) { note = "Update auf " + o.resVer + " wurde zurückgenommen – die alte Version läuft weiter."; bad = true; }
+  const nEl = $("fwNote"); nEl.textContent = note; nEl.className = "note" + (bad ? " bad" : "");
+  if (!fwBusy) {                          // läuft ein Update, das diese App nicht selbst gestartet hat?
+    if (o && o.on && o.size) fwSetProg(o.got / o.size, `${FW_NAME[o.tgt] || ""} ${o.ver || ""}: ${Math.round(o.got / o.size * 100)} % übertragen`);
+    else $("fwProg").hidden = true;
+  }
+  const ib = $("fwInstall");
+  ib.hidden = fwBusy || !todo.length || mode === "setup";
+  ib.textContent = todo.length > 1 ? "Beide Updates installieren" : todo.length ? FW_NAME[todo[0]] + " " + m[todo[0]].ver + " installieren" : "Update installieren";
+  ["fwCheck", "fwFile", "perLoad"].forEach(id => $(id).disabled = fwBusy);
+}
+async function sha256hex(buf) { const h = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(h)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+function toB64(u8) { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function fwTagOf(u8) {                     // Kennung "@@TORFW:<gerät>:<version>@@" aus der Datei lesen
+  const s = new TextDecoder("latin1").decode(u8), m = s.match(/@@TORFW:(blackbox|display):([0-9.]{1,12})@@/);
+  return m ? { tgt: m[1], ver: m[2] } : null;
+}
+async function fwFetch(t) {
+  const e = fwMan[t], r = await fetch(e.file + "?v=" + encodeURIComponent(e.ver), { cache: "no-store" });
+  if (!r.ok) throw new Error(FW_NAME[t] + "-Datei nicht gefunden.");
+  const buf = new Uint8Array(await r.arrayBuffer());
+  return { tgt: t, ver: e.ver, buf, sha: e.sha };
+}
+async function fwSendOne(j) {
+  const nm = FW_NAME[j.tgt] + " " + j.ver, size = j.buf.length;
+  const sha = await sha256hex(j.buf);
+  if (j.sha && j.sha.toLowerCase() !== sha) throw new Error("Datei beim Laden beschädigt – bitte nochmal versuchen.");
+  const tag = fwTagOf(j.buf);
+  if (!tag || tag.tgt !== j.tgt) throw new Error("Das ist keine passende " + FW_NAME[j.tgt] + "-Datei.");
+  fwSetProg(0, nm + ": wird vorbereitet …");
+  await send("otaBegin", { tgt: j.tgt, size, sha, ver: j.ver }, 75000);
+  const t0 = Date.now();
+  for (let off = 0; off < size; off += FW_CHUNK) {
+    const part = j.buf.subarray(off, off + FW_CHUNK), b = toB64(part);
+    for (let tries = 0; ; tries++) {
+      try { await send("otaChunk", { off, b }, j.tgt === "display" ? 30000 : 20000); break; }
+      catch (e) {                         // Antwort verloren, Stück aber angekommen? Dann weiter.
+        if (e.data && e.data.got === off + part.length) break;
+        if (tries >= 2 || !/antwortet nicht/.test(e.message)) throw e;
+      }
+    }
+    const done = off + part.length, sec = (Date.now() - t0) / 1000, rest = done < size ? Math.round(sec / done * (size - done)) : 0;
+    fwSetProg(done / size, `${nm}: ${Math.round(done / size * 100)} % übertragen` + (rest > 5 ? ` · noch ca. ${rest >= 90 ? Math.round(rest / 60) + " min" : rest + " s"}` : ""));
+  }
+  fwSetProg(1, nm + ": wird geprüft …");
+  await send("otaEnd", {}, 45000);
+  fwSetProg(1, nm + ": startet neu und meldet sich gleich …");
+  const w0 = Date.now();
+  while (Date.now() - w0 < 300000) {     // auf die Bestätigung warten (Neustart, ggf. nach Torfahrt)
+    await sleep(1500);
+    const o = state && state.ota;
+    if (o && o.resVer === j.ver && o.res === "ok") return;
+    if (o && o.resVer === j.ver && o.res === "back") throw new Error(nm + " ist nicht sauber gestartet – die alte Version läuft weiter.");
+  }
+  throw new Error(nm + " hat sich noch nicht zurückgemeldet – bitte gleich unter Verlauf nachsehen.");
+}
+async function fwRun(getJobs) {
+  if (fwBusy) return;
+  if (mode !== "live" && mode !== "demo") return toast("Keine Verbindung zur Blackbox", true);
+  fwBusy = true; renderFwCard();
+  let ok = false;
+  try {
+    if (navigator.wakeLock) navigator.wakeLock.request("screen").then(l => fwRun.lock = l).catch(() => {});
+    const jobs = await getJobs();
+    for (const j of jobs) await fwSendOne(j);
+    ok = true;
+    fwSetProg(1, "Fertig: " + jobs.map(j => FW_NAME[j.tgt] + " " + j.ver).join(" und ") + " läuft.");
+    toast("Update installiert");
+  } catch (e) {
+    fwSetProg(0, e.message, true); toast(e.message, true);
+    if (mode === "live" && state && state.ota && state.ota.on) send("otaAbort").catch(() => {});
+  }
+  try { fwRun.lock && fwRun.lock.release(); } catch (e) {}
+  fwBusy = false; renderFwCard();
+  if (ok) setTimeout(() => { if (!fwBusy) $("fwProg").hidden = true; }, 8000);
+  else $("fwProg").hidden = false;
+}
+$("fwInstall").onclick = () => {
+  const todo = fwTodo(); if (!todo.length) return;
+  const txt = todo.map(t => FW_NAME[t] + " " + fwMan[t].ver).join(" und ");
+  if (!confirm(`${txt} jetzt installieren?\n\nDauert einige Minuten. Die App dabei geöffnet lassen. Das Tor bleibt bedienbar; die Blackbox startet am Ende kurz neu (nie während das Tor fährt).`)) return;
+  fwRun(async () => { const out = []; for (const t of todo) out.push(await fwFetch(t)); return out; });   // erst die Blackbox, dann das Display
+};
+$("fwCheck").onclick = () => fwLoadManifest(true);
+$("fwFile").onclick = () => { if (!fwRemote() && mode !== "demo") return toast("Erst Version 13.0 per USB aufspielen", true); $("fwFileIn").click(); };
+$("fwFileIn").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const buf = new Uint8Array(await f.arrayBuffer()), tag = fwTagOf(buf);
+  if (!tag) return toast("Keine Firmware-Datei der Tor-Blackbox", true);
+  if (tag.tgt === "display" && !fwDispOk() && mode !== "demo") return toast("Display nicht bereit (verbunden und ab 13.0?)", true);
+  const cur = fwHave(tag.tgt);
+  if (!confirm(`${FW_NAME[tag.tgt]} ${tag.ver} aus der Datei installieren?` + (cur ? `\nJetzt läuft ${cur}.` : ""))) return;
+  fwRun(async () => [{ tgt: tag.tgt, ver: tag.ver, buf }]);
+};
+
+// Personen sichern / zurückholen – vor dem einmaligen USB-Update auf 13.0 (dabei wird der Dateispeicher neu angelegt)
+var PERSON_KEYS = ["id", "name", "gm", "greet", "nm", "disp", "code", "on", "door", "gf", "win", "days", "fm", "tm"];
+$("perSave").onclick = async () => {
+  const list = (state && state.persons || []).map(p => Object.fromEntries(PERSON_KEYS.filter(k => p[k] !== undefined).map(k => [k, p[k]])));
+  if (!list.length) return toast("Keine Personen zum Sichern", true);
+  const d = new Date(), stamp = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const name = `Personen_Tor-Blackbox_${stamp}.json`, blob = new Blob([JSON.stringify({ app: "torcode", kind: "persons", at: d.toISOString(), list }, null, 1)], { type: "application/json" });
+  const file = new File([blob], name, { type: "application/json" });
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); toast(list.length + " Personen gesichert"); return; } }
+  catch (e) { if (e.name === "AbortError") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast(list.length + " Personen gesichert");
+};
+$("perLoad").onclick = () => $("perFileIn").click();
+$("perFileIn").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  let list; try { const j = JSON.parse(await f.text()); list = Array.isArray(j) ? j : j.list; } catch (x) {}
+  if (!Array.isArray(list) || !list.length) return toast("Keine Personen-Sicherung", true);
+  if (vnum(state && state.fw) < 13 && mode !== "demo") return toast("Zurückholen geht ab Blackbox 13.0", true);
+  const have = new Set((state.persons || []).map(p => p.id)), neu = list.filter(p => p && p.name && !have.has(p.id));
+  if (!neu.length) return toast("Alle Personen sind schon da");
+  if (!confirm(`${neu.length} Person(en) aus der Sicherung zurückholen?\nVorhandene bleiben unverändert, Chips finden ihre Person wieder.`)) return;
+  let added = 0;
+  try {
+    for (let i = 0; i < neu.length; i += 12) {   // in Päckchen, damit jeder Befehl klein bleibt
+      const r = await send("personRestore", { list: neu.slice(i, i + 12).map(p => Object.fromEntries(PERSON_KEYS.filter(k => p[k] !== undefined).map(k => [k, p[k]]))) }, 15000);
+      added += r.added || 0;
+    }
+    toast(added + " Personen zurückgeholt"); render();
+  } catch (x) { toast(x.message, true); }
+};
+fwLoadManifest(false);
 </script>
 
 </body>
