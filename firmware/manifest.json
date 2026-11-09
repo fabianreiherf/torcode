@@ -1,10 +1,10 @@
 {
- "notes": "Display 13.3: Test des ruhigen Update-Bildschirms",
+ "notes": "Einmalcodes mit Nachlaufzeit (ab Werk 5 Minuten)",
  "blackbox": {
-  "ver": "13.2",
-  "file": "firmware/blackbox-13.2.bin",
-  "size": 1297264,
-  "sha": "23933f0379120b79c732f639a0f89357e50ac67fb4e3bfcefd608fc9dcb745d9"
+  "ver": "13.3",
+  "file": "firmware/blackbox-13.3.bin",
+  "size": 1297664,
+  "sha": "d8132a81b5a619dccf2ae85dbabd59cbeaee1f0ec873e323cd1d0130a45cdef5"
  },
  "display": {
   "ver": "13.3",
