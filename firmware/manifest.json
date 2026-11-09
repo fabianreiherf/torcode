@@ -1,5 +1,5 @@
 {
- "notes": "Probelauf Fernupdate",
+ "notes": "Display 13.2: ruhiger Update-Bildschirm",
  "blackbox": {
   "ver": "13.2",
   "file": "firmware/blackbox-13.2.bin",
@@ -7,9 +7,9 @@
   "sha": "23933f0379120b79c732f639a0f89357e50ac67fb4e3bfcefd608fc9dcb745d9"
  },
  "display": {
-  "ver": "13.1",
-  "file": "firmware/display-13.1.bin",
-  "size": 845904,
-  "sha": "cd8fbfeacf271ab7a084ba2b7599427c5f257d068062f800dc694993aaa02e19"
+  "ver": "13.2",
+  "file": "firmware/display-13.2.bin",
+  "size": 845920,
+  "sha": "419daea43d3863a5e9d5620859fb79ff63f5b03cdd305f97a7c0099197d33199"
  }
 }
