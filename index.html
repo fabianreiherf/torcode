@@ -2309,14 +2309,14 @@ function renderFwCard() {
     const nv = m[t] && vnum(m[t].ver) > vnum(cur) ? m[t].ver : "";
     el.textContent = (cur || "–") + (nv ? " → " + nv : ""); el.className = nv ? "new" : "";
   };
-  show($("fwBb"), "blackbox", state ? state.fw : "");
+  if (state) show($("fwBb"), "blackbox", state.fw); else { $("fwBb").textContent = "–"; $("fwBb").className = ""; }
   const dp = $("fwDp");
   if (!state) dp.textContent = "–";
   else if (!state.disp) { dp.textContent = "nicht verbunden"; dp.className = ""; }
   else if (!state.dfw) { dp.textContent = "älter als 13.0"; dp.className = ""; }
   else show(dp, "display", state.dfw);
   let note = "", bad = false;
-  if (!state) note = "";
+  if (!state) { note = mode === "live" ? "Warte auf die Blackbox … (oben steht, ob sie online ist)" : "Keine Verbindung zur Blackbox."; bad = mode === "live"; }
   else if (!fwRemote()) { note = "Die Blackbox braucht einmal Version 13.0 per USB – danach kommen Updates über die App."; bad = true; }
   else if (state.disp && !state.dfw) { note = "Das Display braucht einmal Version 13.0 per USB – danach kommen Updates über die App."; bad = true; }
   else if (fwManErr) note = "Update-Liste gerade nicht erreichbar.";
