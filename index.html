@@ -225,6 +225,14 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 .ev i { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; background: var(--ok); }
 .ev.bad i { background: var(--danger); }
 .ev.bad span { color: #ffb3b3; }
+.name-row { display: flex; gap: 8px; }
+.durs.wrap { flex-wrap: wrap; overflow: visible; margin: 0; padding-inline: 0; }
+#psPrev { font-family: var(--font-ui); font-size: 20px; }
+#personSheet .codes .tagrow .more { cursor: pointer; }
+select#csPerson { width: 100%; background: var(--tile, #1b2131); color: inherit; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font: inherit; }
+.name-row input { flex: 1; min-width: 0; }
+.name-row .btn { flex: none; }
+#logMore { margin-top: 12px; width: 100%; }
 
 /* ---------- Tabs & Toast ---------- */
 .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
@@ -579,6 +587,8 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       </div>
       <button class="btn ghost" id="masterSave" type="button">Eingetippten Code speichern</button>
       <p class="note" id="masterMsg">Der neue Code gilt sofort an Tastatur und Display. Keine leicht zu ratenden Zahlen wie 1234.</p>
+      <div class="field" id="mgBox"><label class="note" for="mgIn">Begrüßung am Display beim Mastercode</label>
+        <div class="name-row"><input type="text" id="mgIn" maxlength="40" placeholder="z. B. Hallo Chef! (leer = Hallo!)" autocomplete="off"><button class="btn small" id="mgSave" type="button">Speichern</button></div></div>
     </div>
     </div><div>
     <h3 class="grp">Codes <span id="codeCnt"></span></h3>
@@ -588,10 +598,27 @@ h3.grp:has(+ .card[hidden]) { display: none; }
 
   <!-- CHIPS -->
   <section class="view" id="v-chips" hidden>
-    <h2>Chips</h2>
+    <h2 id="chipsTitle">Personen</h2>
     <div class="cols"><div>
+    <div class="card" id="newPerson">
+      <span class="label" style="--acc:#2f5fff">Neue Person</span>
+      <div class="field"><label class="note" for="npName">Name</label><input type="text" id="npName" maxlength="27" placeholder="z. B. Andre Koch" autocomplete="off"></div>
+      <div class="field"><span class="note">Anrede am Display</span><div class="durs wrap" id="npGm"></div>
+        <input type="text" id="npGreet" maxlength="19" placeholder="eigene Anrede, z. B. Willkommen" hidden autocomplete="off"></div>
+      <div class="field"><label class="note" for="npCode">Persönlicher Code (4–6 Ziffern, darf leer bleiben)</label>
+        <div class="name-row"><input type="text" id="npCode" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="z. B. 4711" autocomplete="off"><button class="btn ghost small" id="npDice" type="button">Würfeln</button></div></div>
+      <button class="btn" id="npAdd" type="button">Person anlegen</button>
+    </div>
+    <p class="note infobox" id="personInfo">Eine Person hat einen Namen, eine Anrede, einen persönlichen Code und beliebig viele Chips. Die Rechte (Tür, Tor bei offener Tür, Zeitfenster) gelten für Code und Chips gemeinsam. Chips lernst du im Menü der Person an.</p>
+    <p class="note infobox" id="personOld" hidden>Personen gibt es ab Blackbox-Firmware 12.6. Bis dahin funktionieren die Chips wie bisher.</p>
+    <p class="note infobox" id="chipInfo">Tippe auf einen Chip für alle Möglichkeiten: Tür erlauben, sperren, Zeitfenster, umbenennen, löschen. Geht ein Chip verloren, sperre ihn sofort.</p>
+    </div><div>
+    <div id="personsWrap"><h3 class="grp">Personen <span id="personCnt"></span></h3>
+    <div class="codes" id="persons"></div></div>
+    <h3 class="grp" id="chipHead">Chips ohne Person <span id="chipCnt"></span></h3>
+    <div class="codes" id="chips"></div>
     <div class="card" id="learnCard">
-      <span class="label" style="--acc:#2f5fff">Neuen Chip anlernen</span>
+      <span class="label" style="--acc:#ff9f43" id="learnTitle">Chip ohne Person anlernen</span>
       <div class="field">
         <label class="note" for="chipName">Name</label>
         <input type="text" id="chipName" maxlength="23" placeholder="z. B. Fabian, Lager-Team" autocomplete="off">
@@ -604,18 +631,15 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       <span class="note" id="learnTxt" aria-live="polite">Die Blackbox wartet 30 Sekunden.</span>
       <button class="btn ghost small" id="learnCancel" type="button">Abbrechen</button>
     </div>
-    <p class="note infobox">Tippe auf einen Chip für alle Möglichkeiten: Tür erlauben, sperren, Zeitfenster, umbenennen, löschen. Geht ein Chip verloren, sperre ihn sofort.</p>
-    </div><div>
-    <h3 class="grp">Angelernte Chips <span id="chipCnt"></span></h3>
-    <div class="codes" id="chips"></div>
     </div></div>
   </section>
 
   <!-- VERLAUF -->
   <section class="view" id="v-log" hidden>
     <h2>Verlauf</h2>
-    <p class="sub">Die letzten 30 Ereignisse der Blackbox.</p>
+    <p class="sub" id="logSub">Die letzten 30 Ereignisse der Blackbox.</p>
     <div class="card" id="log"></div>
+    <button class="btn ghost" type="button" id="logMore" hidden>Ältere Einträge laden</button>
   </section>
 
   <!-- STATISTIK -->
@@ -717,7 +741,8 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       <span class="label" style="--acc:#2f5fff">Auf diesem Handy</span>
       <p class="note" id="pushNote">Mitteilungen der Blackbox direkt aufs Handy, ohne weitere App.</p>
       <div class="push-list" id="pushOn" hidden>
-        <div class="field"><label class="note" for="pushName">Name dieses Handys</label><input type="text" id="pushName" maxlength="23" placeholder="z. B. iPhone Fabian"></div>
+        <div class="field"><label class="note" for="pushName">Name dieses Handys</label>
+          <div class="name-row"><input type="text" id="pushName" maxlength="23" placeholder="z. B. iPhone Fabian" enterkeyhint="done"><button class="btn small" id="pushNameSave" type="button">Speichern</button></div></div>
         <div class="push-list" id="pushToggles"></div>
         <div class="push-row">
           <button class="btn ghost small" id="pushTest" type="button">Test senden</button>
@@ -744,6 +769,7 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       <p class="err" id="cfgErr" hidden></p>
     </form>
     <button class="btn ghost" id="cfgClear" type="button">Verbindungsdaten löschen</button>
+    <p class="note" id="fwInfo" style="text-align:center;margin-top:18px"></p>
   </section>
 </div>
 
@@ -778,6 +804,11 @@ h3.grp:has(+ .card[hidden]) { display: none; }
     <div class="card" id="csGateCard" style="background:none;border:0;padding:0;box-shadow:none">
       <label class="toggle" for="csGf"><span><b>Tor auch bei offener Schiebetür</b><br><span class="note" id="csGfNote">Mit diesem Chip lassen sich „Tor auf“ und „Tor zu“ am Display bedienen, auch wenn die Schiebetür nicht verriegelt ist.</span></span><input type="checkbox" id="csGf"><span class="sw"></span></label>
     </div>
+    <div class="card" id="csPersonCard" hidden style="gap:10px">
+      <span class="label" style="--acc:#3ddc97">Gehört zu</span>
+      <select id="csPerson"></select>
+      <p class="note" id="csPersonNote">Gehört der Chip zu einer Person, gelten deren Rechte und Anrede.</p>
+    </div>
     <div class="card" id="csWin" hidden>
       <label class="toggle" for="csWinOn"><span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Chip nicht, z. B. für Gäste.</span></span><input type="checkbox" id="csWinOn"><span class="sw"></span></label>
       <div class="days" id="csDays"></div>
@@ -790,6 +821,55 @@ h3.grp:has(+ .card[hidden]) { display: none; }
     </div>
     <button class="act danger" type="button" id="csDel" style="justify-items:center;text-align:center"><b>Chip löschen</b></button>
     <button class="btn ghost" type="button" id="csClose">Fertig</button>
+  </div>
+</div>
+
+<div id="personSheet" hidden>
+  <div class="sheet-bg" id="psBg"></div>
+  <div class="sheet" role="dialog" aria-labelledby="psTitle">
+    <div class="grab"></div>
+    <h3 id="psTitle">Person</h3>
+    <p class="note" style="text-align:center" id="psSub"></p>
+    <div class="card">
+      <span class="label" style="--acc:#2f5fff">Name und Anrede</span>
+      <div class="field"><label class="note" for="psName">Name</label><input type="text" id="psName" maxlength="27" autocomplete="off"></div>
+      <div class="field"><span class="note">Anrede</span><div class="durs wrap" id="psGm"></div>
+        <input type="text" id="psGreet" maxlength="19" placeholder="eigene Anrede, z. B. Willkommen" hidden autocomplete="off"></div>
+      <div class="field"><span class="note">Name am Display</span><div class="durs wrap" id="psNm"></div>
+        <input type="text" id="psDisp" maxlength="23" placeholder="z. B. Herr Koch" hidden autocomplete="off"></div>
+      <div class="kv" style="grid-template-columns:1fr"><div><span>So steht es am Display</span><b id="psPrev"></b></div></div>
+      <button class="btn" id="psSaveName" type="button">Name und Anrede speichern</button>
+    </div>
+    <div class="card">
+      <span class="label" style="--acc:#ffc531">Persönlicher Code</span>
+      <div class="name-row"><input type="text" id="psCodeShow" readonly style="letter-spacing:.2em"><button class="btn ghost small" id="psCodeEye" type="button">Anzeigen</button><button class="btn ghost small" id="psCodeEdit" type="button">Ändern</button></div>
+      <div id="psCodeBox" hidden class="field">
+        <div class="name-row"><input type="text" id="psCodeIn" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="4–6 Ziffern" autocomplete="off"><button class="btn ghost small" id="psCodeDice" type="button">Würfeln</button></div>
+        <div class="name-row"><button class="btn" id="psCodeSave" type="button" style="flex:1">Code speichern</button><button class="btn ghost" id="psCodeDel" type="button">Code entfernen</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="label" style="--acc:#3ddc97" id="psChipHead">Chips</span>
+      <div class="codes" id="psChips"></div>
+      <div class="name-row" id="psLearnRow"><input type="text" id="psChipName" maxlength="23" placeholder="Name des Chips, z. B. Schlüssel" autocomplete="off"><button class="btn ghost small" id="psLearn" type="button">+ Anlernen</button></div>
+      <p class="note" id="psLearnWait" hidden></p>
+    </div>
+    <div class="card">
+      <span class="label" style="--acc:#ff9f43">Rechte</span>
+      <label class="toggle" for="psDoor"><span><b>Tür öffnen</b><br><span class="note">Code und Chips entriegeln auch die Schiebetür.</span></span><input type="checkbox" id="psDoor"><span class="sw"></span></label>
+      <label class="toggle" for="psGf"><span><b>Tor auch bei offener Schiebetür</b><br><span class="note">„Tor auf“ und „Tor zu“ am Display gehen immer.</span></span><input type="checkbox" id="psGf"><span class="sw"></span></label>
+      <label class="toggle" for="psWin"><span><b>Nur zu bestimmten Zeiten</b><br><span class="note" id="psWinTxt">Außerhalb öffnen Code und Chips nicht.</span></span><input type="checkbox" id="psWin"><span class="sw"></span></label>
+      <div id="psWinBox" hidden class="field">
+        <div class="days" id="psDays"></div>
+        <div class="set-row"><span class="note">von</span><input type="time" id="psFrom" aria-label="von"><span class="note">bis</span><input type="time" id="psTo" aria-label="bis"></div>
+        <button class="btn" id="psWinSave" type="button">Zeitfenster speichern</button>
+      </div>
+    </div>
+    <div class="acts-big" style="grid-template-columns:1fr 1fr">
+      <button class="act" type="button" id="psLock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b></b><small></small></button>
+      <button class="act danger" type="button" id="psDel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><b>Löschen</b><small>mit allen Chips</small></button>
+    </div>
+    <button class="btn ghost" type="button" id="psClose">Fertig</button>
   </div>
 </div>
 
@@ -806,7 +886,7 @@ h3.grp:has(+ .card[hidden]) { display: none; }
     <button type="button" data-go="codes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8.5 8h.01M12 8h.01M15.5 8h.01M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" stroke-width="2.6"></path></svg>Codes</button>
     <button type="button" data-go="chips">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="12" r="5"></circle><path d="M8 12h.01" stroke-width="2.6"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9.5 9.5 0 0 1 0 13"></path></svg>Chips</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="12" r="5"></circle><path d="M8 12h.01" stroke-width="2.6"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9.5 9.5 0 0 1 0 13"></path></svg><span id="tabChipsTxt">Personen</span></button>
     <button type="button" data-go="log">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Verlauf</button>
     <button type="button" data-go="stats">
@@ -842,7 +922,10 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "12.4", push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
+    vapid: "demo", fw: "12.6", logp: true, persons: [
+      { id: 1, name: "Andre Koch", gm: 1, greet: "", nm: 0, disp: "", code: "4711", on: true, door: true, gf: true, win: false, days: 31, fm: 420, tm: 1080, last: Math.floor(Date.now() / 1000) - 5400, via: "Chip Schlüssel", hello: "Moin Andre!" },
+      { id: 2, name: "Reinigung Müller", gm: 2, greet: "", nm: 1, disp: "", code: "2580", on: true, door: false, gf: false, win: true, days: 31, fm: 360, tm: 540, last: Math.floor(Date.now() / 1000) - 3 * 86400, via: "Code", hello: "Guten Tag Reinigung Müller!" }
+    ], push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
     codes: [
       { code: "0427", from: n - 2 * h, to: n + 6 * h, used: 0, usedAt: 0, label: "Beispiel: Catering Aufbau", door: true },
       { code: "5913", from: n + 20 * h, to: n + 44 * h, used: 0, usedAt: 0, label: "Beispiel: Bühnenbau Samstag" },
@@ -853,7 +936,9 @@ function demoState() {
     chips: [
       { id: "04A1B2C3", label: "Beispiel: Fabian", enabled: true, last: n - 3 * h, door: true, win: false, days: 31, fm: 420, tm: 1080 },
       { id: "04D4E5F6", label: "Beispiel: Lager-Team", enabled: true, last: n - 27 * h, win: true, days: 31, fm: 420, tm: 1080 },
-      { id: "0477AA10", label: "Beispiel: Aushilfe", enabled: false, last: n - 9 * 24 * h, win: false, days: 31, fm: 420, tm: 1080 }
+      { id: "0477AA10", label: "Beispiel: Aushilfe", enabled: false, last: n - 9 * 24 * h, win: false, days: 31, fm: 420, tm: 1080 },
+      { id: "04BB0001", label: "Schlüssel", enabled: true, last: n - 90 * 60, win: false, days: 31, fm: 420, tm: 1080, pid: 1 },
+      { id: "04BB0002", label: "Handy-Aufkleber", enabled: true, last: n - 3 * 24 * h, win: false, days: 31, fm: 420, tm: 1080, pid: 1 }
     ],
     log: [
       { t: n - 600, ok: true, text: "Tor per App geöffnet" },
@@ -934,6 +1019,11 @@ function demoSend(op, p) {
     }
     if (op === "relearn") { state.travel = { o: 12000, c: 12000, lo: 0, lc: 0, no: 0, nc: 0, bo: 0, bc: 0, bat: 0 }; log(true, "Fahrzeiten werden neu gelernt"); return res({ ok: true }); }
     if (op === "stats") return res({ ok: true, ...demoStats(p.week || 0) });
+    if (op === "log") {                       // Demo: ältere Einträge erfinden
+      const total = 140, off = p.off || 0, n = Math.min(p.n || 50, Math.max(0, total - off)), base = Math.floor(Date.now() / 1000) - 2 * 86400;
+      const T = ["Code 4821 · Lieferant – geöffnet", "Chip Lager-Team – Tor auf", "Tür entriegelt – Chip Fabian", "Tor geschlossen", "Falscher Code"];
+      return res({ ok: true, total, log: Array.from({ length: n }, (_, k) => { const i = off + k; return { t: base - i * 7200, ok: i % 9 !== 4, text: T[i % T.length] }; }) });
+    }
     if (op === "door") {
       state.door = "unlocked"; log(true, "Tür entriegelt – per App"); render();
       setTimeout(() => { state.door = "locked"; render(); }, 6000);
@@ -974,19 +1064,37 @@ function demoSend(op, p) {
         if (!state.learning) return;
         state.learning = 0;
         const id = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, "0")).join("").toUpperCase();
-        state.chips.unshift({ id, label: p.label, enabled: true, last: 0, win: false, days: 31, fm: 420, tm: 1080 });
+        state.chips.unshift({ id, label: p.label, enabled: true, last: 0, win: false, days: 31, fm: 420, tm: 1080, ...(p.person ? { pid: p.person } : {}) });
         state.log.unshift({ t: Math.floor(Date.now() / 1000), ok: true, text: "Chip angelernt: " + p.label });
         render();
       }, 2800);
       return res({ ok: true });
     }
     if (op === "learnCancel") { state.learning = 0; return res({ ok: true }); }
+    if (op === "personAdd" || op === "personSet") {
+      state.persons = state.persons || [];
+      let pp = op === "personAdd" ? { id: (Math.max(0, ...state.persons.map(x => x.id)) + 1), on: true, door: false, gf: false, win: false, days: 31, fm: 420, tm: 1080, gm: 0, nm: 0, greet: "", disp: "", last: 0, via: "" } : state.persons.find(x => x.id === p.pid);
+      if (!pp) return rej(new Error("Person nicht gefunden."));
+      if (p.code && state.persons.some(x => x !== pp && x.code === p.code)) return rej(new Error("Dieser Code ist schon vergeben oder beginnt wie ein anderer Code."));
+      ["name", "gm", "greet", "nm", "disp", "on", "door", "gf", "win", "days", "fm", "tm"].forEach(k => { if (p[k] !== undefined) pp[k] = p[k]; });
+      if (p.code !== undefined) { if (p.code) pp.code = p.code; else delete pp.code; }
+      pp.hello = greetingOf(pp);
+      if (op === "personAdd") { state.persons.push(pp); log(true, "Person angelegt: " + pp.name); } else log(true, "Person geändert: " + pp.name);
+      return res({ ok: true, pid: pp.id });
+    }
+    if (op === "personDel") {
+      const pp = (state.persons || []).find(x => x.id === p.pid);
+      state.persons = (state.persons || []).filter(x => x.id !== p.pid); state.chips = state.chips.filter(c => c.pid !== p.pid);
+      if (pp) log(true, "Person gelöscht: " + pp.name);
+      return res({ ok: true });
+    }
     if (op === "chipSet") {
       const c = state.chips.find(x => x.id === p.chip); if (!c) return rej(new Error("Chip nicht gefunden."));
       if (typeof p.door === "boolean") { c.door = p.door; log(true, `Chip ${c.label}: Tür ${p.door ? "erlaubt" : "nicht erlaubt"}`); }
       if (typeof p.gf === "boolean") { c.gf = p.gf; log(true, `Chip ${c.label}: Tor bei offener Tür ${p.gf ? "erlaubt" : "nicht erlaubt"}`); }
       if (typeof p.enabled === "boolean") { c.enabled = p.enabled; log(true, `Chip ${p.enabled ? "freigegeben" : "gesperrt"}: ${c.label}`); }
       if (typeof p.label === "string") c.label = p.label;
+      if (typeof p.person === "number") { if (p.person) c.pid = p.person; else delete c.pid; }
       if (typeof p.win === "boolean") { Object.assign(c, { win: p.win, days: p.days, fm: p.fm, tm: p.tm }); log(true, `Chip ${c.label}: Zeitfenster ${p.win ? "an" : "aus"}`); }
       return res({ ok: true });
     }
@@ -1064,7 +1172,17 @@ function renderWifi() {
   $("wifiTxt").textContent = "WLAN-Empfang: " + ["", "schwach", "mittel", "gut"][q];
   $("wifiSub").textContent = r + " dBm" + (q === 1 ? " · Box näher an den Router oder einen WLAN-Verstärker setzen" : "");
 }
+var APP_VER = "12.6", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+function renderFw() {
+  const el = $("fwInfo"); if (!el) return;
+  if (!state) { el.textContent = ""; return; }
+  const v = fwVer();
+  const txt = state.fw ? "Blackbox-Firmware " + state.fw : v >= 12.2 ? "Blackbox-Firmware 12.2" : "Blackbox-Firmware 12.1 oder älter";
+  el.textContent = txt + " · App " + APP_VER + (v < APP_MIN_FW ? " – bitte die Blackbox aktualisieren" : "");
+  el.style.color = v < APP_MIN_FW ? "var(--warn)" : "";
+}
 function render() {
+  renderFw();
   $("demoBanner").hidden = mode !== "demo";
   renderWifi();
   if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
@@ -1072,7 +1190,7 @@ function render() {
   { const ok = fwVer() >= 12.4; $("mGf").disabled = !ok; if (!ok) $("mGf").checked = false; $("mGf").closest(".toggle").style.opacity = ok ? "" : ".5";
     $("mGfNote").textContent = ok ? "„Tor auf“ und „Tor zu“ am Display gehen auch, wenn die Schiebetür nicht verriegelt ist." : "Erst mit Blackbox-Firmware 12.4 oder neuer."; }
   if (!mOk && $("codeMulti").checked) { $("codeMulti").checked = false; setMulti(false); }
-  renderGate(); renderDoor(); renderCodes(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderTravel(); renderCfg(); renderChipSheet();
+  renderGate(); renderDoor(); renderCodes(); renderPersons(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderTravel(); renderCfg(); renderChipSheet(); renderPersonSheet();
 }
 
 // ---------- Tür ----------
@@ -1215,11 +1333,34 @@ function multiText(c, st) {
   return parts.join(" · ");
 }
 
+// Ältere Einträge (ab Blackbox 12.5 dauerhaft im Flash, 14 Tage): werden seitenweise nachgeladen
+let logOlder = [], logTotal = null, logBusy = false;
+const logKey = e => e.t + "|" + e.text;
+function logAll() {
+  const seen = new Set(state.log.map(logKey));
+  return state.log.concat(logOlder.filter(e => !seen.has(logKey(e))));
+}
+async function loadOlderLog() {
+  if (logBusy) return; logBusy = true; $("logMore").textContent = "Lädt …";
+  try {
+    const r = await send("log", { off: logAll().length, n: 50 });
+    const have = new Set(logAll().map(logKey));
+    (r.log || []).forEach(e => { if (!have.has(logKey(e))) { logOlder.push(e); have.add(logKey(e)); } });
+    logTotal = r.total ?? null;
+    if (!(r.log || []).length) logTotal = logAll().length;
+  } catch (e) { toast(e.message, true); }
+  logBusy = false; renderLog();
+}
+$("logMore").onclick = loadOlderLog;
 function renderLog() {
   const box = $("log"); box.innerHTML = "";
-  if (!state.log.length) { box.innerHTML = '<div class="empty">Noch keine Ereignisse.</div>'; return; }
+  const persist = !!state.logp;
+  $("logSub").textContent = persist ? "Ereignisse der letzten 14 Tage – bleiben auch nach Stromausfall erhalten." : "Die letzten 30 Ereignisse der Blackbox (gehen bei Stromausfall verloren).";
+  const list = persist ? logAll() : state.log;
+  const more = $("logMore"); more.hidden = !persist || (logTotal !== null && list.length >= logTotal); more.textContent = "Ältere Einträge laden";
+  if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Ereignisse.</div>'; return; }
   let day = null, wrap = null;
-  state.log.forEach((e, i) => {
+  list.forEach((e, i) => {
     const d = e.t ? new Date(e.t * 1000) : null;
     const key = d ? d.toDateString() : "–";
     if (key !== day) {
@@ -1230,7 +1371,7 @@ function renderLog() {
     }
     const ev = document.createElement("div");
     ev.className = "ev" + (e.ok ? "" : " bad");
-    ev.style.animationDelay = Math.min(i * 30, 300) + "ms";
+    ev.style.animationDelay = i < 30 ? Math.min(i * 30, 300) + "ms" : "0ms";
     ev.innerHTML = "<time></time><i></i><span></span>";
     ev.querySelector("time").textContent = d ? fmtTime.format(d) : "–";
     ev.querySelector("span").textContent = e.text;
@@ -1252,7 +1393,9 @@ function renderMLens() {
   $("masterIn").value = $("masterIn").value.slice(0, masterLen);
 }
 renderMLens();
+function renderMasterGreet() { const i = $("mgIn"); if (!i || !state) return; $("mgBox").hidden = !personsOk(); if (document.activeElement !== i) i.value = (state.cfg && state.cfg.mg) || ""; }
 function renderMaster() {
+  renderMasterGreet();
   const n = (master && master.length) || (state && state.ml) || 4, box = $("pins");
   if (box.children.length !== n) { box.innerHTML = ""; for (let i = 0; i < n; i++) box.appendChild(document.createElement("span")); }
   box.className = "pins n" + n + (box.classList.contains("reveal") ? " reveal" : "");
@@ -1683,11 +1826,14 @@ function winText(c) {
 }
 function renderChips() {
   const box = $("chips"); box.innerHTML = "";
-  const list = state.chips || []; $("chipCnt").textContent = list.length ? "· " + list.length : "";
-  if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Chips. Lerne den ersten an.</div>'; return; }
+  const pOk = personsOk();
+  const list = (state.chips || []).filter(c => !pOk || !c.pid); $("chipCnt").textContent = list.length ? "· " + list.length : "";
+  $("chipHead").firstChild.textContent = pOk ? "Chips ohne Person " : "Angelernte Chips ";
+  if (!list.length) { box.innerHTML = pOk ? '<div class="empty">Alle Chips gehören zu einer Person.</div>' : '<div class="empty">Noch keine Chips. Lerne den ersten an.</div>'; return; }
   list.forEach((c, i) => {
     const el = document.createElement("div");
     el.className = "tagrow" + (c.enabled ? "" : " off");
+    if (pOk && c.enabled) el.style.setProperty("--row", "#ff9f43");
     el.style.animationDelay = Math.min(i * 40, 240) + "ms";
     el.tabIndex = 0; el.setAttribute("role", "button");
     el.innerHTML = `<span class="ico"></span><span class="who"></span>
@@ -1696,7 +1842,7 @@ function renderChips() {
     const name = c.label || "Ohne Namen";
     el.querySelector(".ico").textContent = (name.replace(/^Beispiel: /, "").trim()[0] || "?").toUpperCase();
     el.querySelector(".who").textContent = name;
-    el.querySelector(".when").textContent = (c.win ? winText(c) + " · " : "") + (c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt");
+    el.querySelector(".when").textContent = (c.win ? winText(c) + " · " : "") + (c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt") + (pOk && (state.persons || []).length ? " · antippen → Person zuordnen" : "");
     el.onclick = () => openChip(c.id);
     el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openChip(c.id); } };
     box.appendChild(el);
@@ -1716,6 +1862,12 @@ function renderChipSheet(fill) {
   set("csDoor", !!c.door, c.door ? "Tür erlaubt" : "Tür nicht erlaubt", c.door ? "Antippen zum Verbieten" : "Antippen zum Erlauben");
   set("csLock", !c.enabled, c.enabled ? "Aktiv" : "Gesperrt", c.enabled ? "Antippen zum Sperren" : "Antippen zum Freigeben");
   set("csWinBtn", !!c.win, "Zeitfenster", c.win ? winText(c) : "Aus – gilt immer");
+  { const ok = personsOk(); $("csPersonCard").hidden = !ok;
+    if (ok) { const sel = $("csPerson"), want = String(c.pid || 0);
+      const opts = '<option value="0">– ohne Person –</option>' + (state.persons || []).map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
+      if (sel.dataset.o !== opts) { sel.innerHTML = opts; sel.dataset.o = opts; }
+      if (document.activeElement !== sel) sel.value = want;
+      $("csPersonNote").textContent = c.pid ? "Für diesen Chip gelten Rechte, Zeitfenster und Anrede der Person. Die Schalter darunter wirken nur, wenn er keiner Person gehört." : "Gehört der Chip zu einer Person, gelten deren Rechte und Anrede."; } }
   { const ok = fwVer() >= 12.4, g = $("csGf"); g.checked = !!c.gf; g.disabled = !ok; $("csGateCard").style.opacity = ok ? "" : ".5";
     $("csGfNote").textContent = ok ? "Mit diesem Chip lassen sich „Tor auf“ und „Tor zu“ am Display bedienen, auch wenn die Schiebetür nicht verriegelt ist."
       : "Erst mit Blackbox-Firmware 12.4 oder neuer."; }
@@ -1755,6 +1907,174 @@ $("csDel").onclick = async () => {
 };
 $("chipBg").onclick = closeChip; $("csClose").onclick = closeChip;
 
+// ---------- Personen (ab Blackbox 12.6) ----------
+const personsOk = () => fwVer() >= 12.6;
+const esc = t => String(t ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+const GMS = ["Hallo", "Moin", "nach Tageszeit", "eigene …"], NMS = ["Vorname", "ganzer Name", "eigener …"];
+function greetingOf(p) {             // wie die Blackbox: Anrede + Name am Display
+  const h = new Date().getHours();
+  const g = p.gm === 1 ? "Moin" : p.gm === 3 && p.greet ? p.greet : p.gm === 2 ? (h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend") : "Hallo";
+  const n = p.nm === 2 && p.disp ? p.disp : p.nm === 1 ? p.name : String(p.name || "").split(" ")[0];
+  return n ? `${g} ${n}!` : `${g}!`;
+}
+function pillRow(box, labels, cur, onPick) {
+  box.innerHTML = "";
+  labels.forEach((t, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", String(i === cur)); b.onclick = () => onPick(i); box.appendChild(b); });
+}
+function diceCode(len) {
+  const taken = new Set((state.persons || []).map(p => p.code).filter(Boolean).concat((state.codes || []).map(c => c.code)));
+  for (let k = 0; k < 200; k++) { let c = ""; for (let i = 0; i < len; i++) c += Math.floor(Math.random() * 10); if (!taken.has(c) && !/^(\d)\1+$/.test(c) && !"0123456789".includes(c)) return c; }
+  return "";
+}
+let npGm = 0;
+function renderNewPerson() { pillRow($("npGm"), GMS, npGm, i => { npGm = i; $("npGreet").hidden = i !== 3; renderNewPerson(); if (i === 3) $("npGreet").focus(); }); }
+renderNewPerson();
+$("npDice").onclick = () => { $("npCode").value = diceCode(4); };
+$("npAdd").onclick = async () => {
+  const name = fitBytes($("npName").value.trim(), 27), code = $("npCode").value.trim();
+  if (!name) { $("npName").focus(); toast("Bitte einen Namen eintragen", true); return; }
+  if (code && !/^\d{4,6}$/.test(code)) { $("npCode").focus(); toast("Der Code braucht 4 bis 6 Ziffern", true); return; }
+  try {
+    const r = await send("personAdd", { name, gm: npGm, greet: fitBytes($("npGreet").value.trim(), 19), nm: 0, code, door: true });
+    $("npName").value = ""; $("npCode").value = ""; $("npGreet").value = ""; npGm = 0; $("npGreet").hidden = true; renderNewPerson();
+    toast("Person angelegt: " + name); if (mode === "demo") render();
+    if (r && r.pid) openPerson(r.pid);
+  } catch (e) { toast(e.message, true); }
+};
+function renderPersons() {
+  const ok = personsOk();
+  $("tabChipsTxt").textContent = ok ? "Personen" : "Chips"; $("chipsTitle").textContent = ok ? "Personen" : "Chips";
+  $("newPerson").hidden = !ok; $("personInfo").hidden = !ok; $("personsWrap").hidden = !ok; $("personOld").hidden = ok || !state;
+  $("chipInfo").hidden = ok; $("learnTitle").textContent = ok ? "Chip ohne Person anlernen" : "Neuen Chip anlernen";
+  if (!ok) return;
+  const list = state.persons || [], box = $("persons"); $("personCnt").textContent = list.length ? "· " + list.length : "";
+  const key = JSON.stringify(list) + JSON.stringify((state.chips || []).map(c => c.pid || 0));
+  if (box.dataset.k === key) return; box.dataset.k = key; box.innerHTML = "";
+  if (!list.length) { box.innerHTML = '<div class="empty">Noch keine Personen. Lege oben die erste an.</div>'; return; }
+  [...list].sort((a, b) => a.name.localeCompare(b.name, "de")).forEach((p, i) => {
+    const n = (state.chips || []).filter(c => c.pid === p.id).length;
+    const el = document.createElement("div");
+    el.className = "tagrow" + (p.on ? "" : " off"); el.tabIndex = 0; el.setAttribute("role", "button");
+    el.style.animationDelay = Math.min(i * 40, 240) + "ms";
+    el.innerHTML = `<span class="ico"></span><span class="who"></span>
+      <span class="side">${p.win && p.on ? '<span class="pill win">Zeit</span> ' : ""}${p.door && p.on ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${p.on ? "on" : "off"}">${p.on ? "Aktiv" : "Gesperrt"}</span><span class="more">›</span></span>
+      <span class="when"></span>`;
+    el.querySelector(".ico").textContent = (p.name.trim()[0] || "?").toUpperCase();
+    el.querySelector(".who").textContent = p.name;
+    el.querySelector(".when").innerHTML = esc(`„${p.hello || greetingOf(p)}“ · ${p.code ? "Code" : "kein Code"} · ${n} ${n === 1 ? "Chip" : "Chips"}${p.win ? " · " + winText(p) : ""}`) + "<br>" +
+      esc(p.last ? "Zuletzt " + fmt.format(new Date(p.last * 1000)) + " Uhr" + (p.via ? " · " + p.via : "") : "Noch nie benutzt");
+    el.onclick = () => openPerson(p.id);
+    el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPerson(p.id); } };
+    box.appendChild(el);
+  });
+}
+// Personen-Blatt
+let psId = null, psGm = 0, psNm = 0, psDays = 31, psCodeVis = false, psLearn = false;
+const curPerson = () => state && (state.persons || []).find(p => p.id === psId);
+function openPerson(id) {
+  psId = id; const p = curPerson(); if (!p) return;
+  psGm = p.gm || 0; psNm = p.nm || 0; psDays = p.days ?? 31; psCodeVis = false;
+  $("psName").value = p.name; $("psGreet").value = p.greet || ""; $("psDisp").value = p.disp || "";
+  $("psCodeBox").hidden = true; $("psWinBox").hidden = !p.win; $("psFrom").value = hhmm(p.fm ?? 420); $("psTo").value = p.tm >= 1440 ? "23:59" : hhmm(p.tm ?? 1080);
+  const del = $("psDel"); del.classList.remove("confirm"); del.querySelector("b").textContent = "Löschen";
+  $("personSheet").hidden = false; renderPersonSheet(true);
+}
+function closePerson() { psId = null; $("personSheet").hidden = true; }
+function psDraft() { return { name: $("psName").value.trim(), gm: psGm, greet: $("psGreet").value.trim(), nm: psNm, disp: $("psDisp").value.trim() }; }
+function renderPsPills() {
+  pillRow($("psGm"), GMS, psGm, i => { psGm = i; renderPsPills(); if (i === 3) $("psGreet").focus(); });
+  pillRow($("psNm"), NMS, psNm, i => { psNm = i; renderPsPills(); if (i === 2) $("psDisp").focus(); });
+  $("psGreet").hidden = psGm !== 3; $("psDisp").hidden = psNm !== 2;
+  $("psPrev").textContent = greetingOf(psDraft());
+}
+function renderPsDays() {
+  $("psDays").innerHTML = "";
+  WD.forEach((d, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = d; b.setAttribute("aria-pressed", String(!!(psDays >> i & 1)));
+    b.onclick = () => { psDays ^= 1 << i; renderPsDays(); }; $("psDays").appendChild(b); });
+}
+function renderPersonSheet(fill) {
+  if (!psId) return;
+  const p = curPerson(); if (!p) { closePerson(); return; }
+  $("psTitle").textContent = p.name;
+  $("psSub").textContent = p.last ? "Zuletzt " + fmt.format(new Date(p.last * 1000)) + " Uhr" + (p.via ? " · " + p.via : "") : "Noch nie benutzt";
+  if (fill) { renderPsPills(); renderPsDays(); }
+  $("psCodeShow").value = p.code ? (psCodeVis ? p.code : "•".repeat(p.code.length)) : "kein Code";
+  $("psCodeEye").hidden = !p.code; $("psCodeEye").textContent = psCodeVis ? "Verbergen" : "Anzeigen";
+  $("psCodeEdit").textContent = p.code ? "Ändern" : "Festlegen"; $("psCodeDel").hidden = !p.code;
+  $("psDoor").checked = !!p.door; $("psGf").checked = !!p.gf; $("psWin").checked = !!p.win;
+  $("psWinTxt").textContent = p.win ? winText(p) + " – außerhalb öffnen Code und Chips nicht." : "Außerhalb öffnen Code und Chips nicht.";
+  const lock = $("psLock"); lock.classList.toggle("on", !p.on); lock.querySelector("b").textContent = p.on ? "Sperren" : "Freigeben"; lock.querySelector("small").textContent = p.on ? "Code und Chips aus" : "Code und Chips wieder an";
+  // Chips der Person
+  const chips = (state.chips || []).filter(c => c.pid === p.id), box = $("psChips");
+  $("psChipHead").textContent = "Chips · " + chips.length;
+  const key = JSON.stringify(chips);
+  if (box.dataset.k !== key) {
+    box.dataset.k = key; box.innerHTML = chips.length ? "" : '<div class="empty">Noch kein Chip.</div>';
+    chips.forEach(c => {
+      const el = document.createElement("div"); el.className = "tagrow" + (c.enabled ? "" : " off");
+      el.innerHTML = '<span class="ico"></span><span class="who"></span><span class="side"><span class="more" role="button" aria-label="Chip löschen">✕</span></span><span class="when"></span>';
+      el.querySelector(".ico").textContent = (c.label.trim()[0] || "?").toUpperCase(); el.querySelector(".who").textContent = c.label;
+      el.querySelector(".when").textContent = c.last ? "Zuletzt " + fmt.format(new Date(c.last * 1000)) + " Uhr" : "Noch nie benutzt";
+      const x = el.querySelector(".more");
+      x.onclick = async ev => {
+        ev.stopPropagation();
+        if (!x.dataset.c) { x.dataset.c = 1; x.textContent = "Löschen?"; setTimeout(() => { delete x.dataset.c; x.textContent = "✕"; }, 3500); return; }
+        try { await send("chipDelete", { chip: c.id }); toast("Chip gelöscht: " + c.label); if (mode === "demo") render(); } catch (e) { toast(e.message, true); }
+      };
+      box.appendChild(el);
+    });
+  }
+}
+async function personCmd(params, msg) {
+  try { await send("personSet", { pid: psId, ...params }); if (msg) toast(msg); if (mode === "demo") render(); return true; }
+  catch (e) { toast(e.message, true); renderPersonSheet(); return false; }
+}
+["psName", "psGreet", "psDisp"].forEach(id => $(id).addEventListener("input", () => { $("psPrev").textContent = greetingOf(psDraft()); }));
+$("psSaveName").onclick = () => {
+  const d = psDraft(); if (!d.name) { $("psName").focus(); toast("Bitte einen Namen eintragen", true); return; }
+  if (d.gm === 3 && !d.greet) { $("psGreet").focus(); toast("Bitte die eigene Anrede eintragen", true); return; }
+  if (d.nm === 2 && !d.disp) { $("psDisp").focus(); toast("Bitte den Namen fürs Display eintragen", true); return; }
+  personCmd({ name: fitBytes(d.name, 27), gm: d.gm, greet: fitBytes(d.greet, 19), nm: d.nm, disp: fitBytes(d.disp, 23) }, "Gespeichert – am Display: " + greetingOf(d));
+};
+$("psCodeEye").onclick = () => { psCodeVis = !psCodeVis; renderPersonSheet(); };
+$("psCodeEdit").onclick = () => { $("psCodeBox").hidden = !$("psCodeBox").hidden; if (!$("psCodeBox").hidden) { $("psCodeIn").value = ""; $("psCodeIn").focus(); } };
+$("psCodeDice").onclick = () => { $("psCodeIn").value = diceCode(4); };
+$("psCodeSave").onclick = async () => {
+  const c = $("psCodeIn").value.trim(); if (!/^\d{4,6}$/.test(c)) { $("psCodeIn").focus(); toast("Der Code braucht 4 bis 6 Ziffern", true); return; }
+  if (await personCmd({ code: c }, "Code gespeichert")) { $("psCodeBox").hidden = true; psCodeVis = true; renderPersonSheet(); }
+};
+$("psCodeDel").onclick = async () => { if (await personCmd({ code: "" }, "Code entfernt")) $("psCodeBox").hidden = true; };
+$("psDoor").onchange = e => personCmd({ door: e.target.checked }, e.target.checked ? "Tür erlaubt" : "Tür nicht erlaubt");
+$("psGf").onchange = e => personCmd({ gf: e.target.checked }, e.target.checked ? "Tor bei offener Schiebetür erlaubt" : "Tor nur bei verriegelter Schiebetür");
+$("psWin").onchange = e => { if (e.target.checked) { $("psWinBox").hidden = false; } else { $("psWinBox").hidden = true; personCmd({ win: false }, "Zeitfenster aus – gilt immer"); } };
+$("psWinSave").onclick = () => {
+  const fm = toMin($("psFrom").value); let tm = toMin($("psTo").value); if (tm === 1439) tm = 1440;
+  if (!(psDays & 127)) { toast("Bitte mindestens einen Tag wählen", true); return; }
+  if (fm === tm) { toast("Von und bis dürfen nicht gleich sein", true); return; }
+  personCmd({ win: true, days: psDays & 127, fm, tm: tm || 1440 }, "Zeitfenster gespeichert");
+};
+$("psLock").onclick = () => { const p = curPerson(); if (p) personCmd({ on: !p.on }, p.on ? "Person gesperrt – Code und Chips aus" : "Person freigegeben"); };
+$("psDel").onclick = async () => {
+  const del = $("psDel");
+  if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.querySelector("b").textContent = "Nochmal tippen"; setTimeout(() => { del.classList.remove("confirm"); del.querySelector("b").textContent = "Löschen"; }, 4000); return; }
+  try { await send("personDel", { pid: psId, chips: true }); toast("Person gelöscht"); closePerson(); if (mode === "demo") render(); } catch (e) { toast(e.message, true); }
+};
+$("psLearn").onclick = async () => {
+  const label = fitBytes($("psChipName").value.trim(), 23) || "Chip";
+  if (!state) { toast("Die Blackbox ist nicht verbunden.", true); return; }
+  try {
+    await send("learn", { label, person: psId });
+    learnPending = { count: (state.chips || []).length, label, seen: false, end: Date.now() + 30000, person: psId };
+    renderLearn();
+  } catch (e) { toast(e.message, true); }
+};
+$("psBg").onclick = closePerson; $("psClose").onclick = closePerson;
+$("csPerson").onchange = e => { const v = +e.target.value; chipCmd({ person: v }, v ? "Chip zugeordnet: " + ((state.persons || []).find(p => p.id === v) || {}).name : "Chip ohne Person"); };
+$("mgSave").onclick = async () => {
+  const v = fitBytes($("mgIn").value.trim(), 40);
+  try { await send("settings", { mg: v }); if (state.cfg) state.cfg.mg = v; toast(v ? "Begrüßung gespeichert: " + v : "Begrüßung: Hallo!"); } catch (e) { toast(e.message, true); }
+};
+
 // Anlernen: Die App schickt den Namen, die Blackbox wartet auf den nächsten Chip an der Tastatur
 let learnPending = null;
 function renderLearn() {
@@ -1765,11 +2085,14 @@ function renderLearn() {
       const added = (state.chips || []).length > learnPending.count;
       const last = state.log[0];
       toast(added ? "Chip angelernt: " + learnPending.label : (last && !last.ok ? last.text : "Kein Chip erkannt"), !added);
-      if (added) $("chipName").value = "";
+      if (added) { $("chipName").value = ""; $("psChipName").value = ""; }
       learnPending = null;
     }
   }
-  $("learnWait").hidden = !learnPending; $("learnCard").hidden = !!learnPending;
+  const inSheet = !!(learnPending && learnPending.person);
+  $("learnWait").hidden = !learnPending || inSheet; $("learnCard").hidden = !!learnPending && !inSheet;
+  $("psLearnWait").hidden = !inSheet; $("psLearnRow").hidden = inSheet;
+  if (inSheet) $("psLearnWait").textContent = `Jetzt den Chip an die Tastatur halten – noch ${Math.max(0, Math.ceil((learnPending.end - Date.now()) / 1000))} Sekunden.`;
   if (learnPending) $("learnTxt").textContent = `Die Blackbox wartet noch ${Math.max(0, Math.ceil((learnPending.end - Date.now()) / 1000))} Sekunden.`;
 }
 $("learnBtn").onclick = async () => {
@@ -1789,7 +2112,7 @@ setInterval(() => { if (learnPending) renderLearn(); }, 1000);
 
 // ---------- Mitteilungen (Web Push, direkt von der Blackbox) ----------
 // Mitteilungs-Arten (Bits wie in der Blackbox). Die Tor-Warnungen sind ab 12.3 einzeln wählbar.
-const EVENTS = [[1, "Code benutzt (Einmal- und Mehrfachcodes)"], [4, "Tor per Chip geöffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip, Chip oder Code außerhalb seiner Zeit"], [16, "Tastatur nach Fehlversuchen gesperrt"],
+const EVENTS = [[1, "Code benutzt (Einmal- und Mehrfachcodes)"], [4096, "Person öffnet (Code oder Chip)"], [4, "Chip ohne Person öffnet"], [2, "Tor per Mastercode geöffnet"], [32, "Tür entriegelt"], [8, "Gesperrter Chip, Chip oder Code außerhalb seiner Zeit"], [16, "Tastatur nach Fehlversuchen gesperrt"],
   [256, "warn"], [512, "warn"], [1024, "warn"], [2048, "warn"], [128, "warn"], [64, "Wochenbericht"]];
 const PUSH_DEFAULT = 1 | 8 | 16 | 64 | 128 | 256 | 512 | 1024 | 2048;
 function warnInfo(bit) {             // Text und ob die Warnung in den Einstellungen eingeschaltet ist
@@ -1876,10 +2199,21 @@ $("pushEnable").onclick = async () => {
   } catch (e) { toast(e.message || "Einschalten hat nicht geklappt", true); }
   finally { btn.disabled = false; }
 };
-$("pushName").addEventListener("change", async () => {
-  const v = $("pushName").value.trim().slice(0, 23); if (!v) return;
-  try { await send("pushSet", { pid: myPid(), name: v }); toast("Name gespeichert"); if (mode === "demo") render(); } catch (e) { toast(e.message, true); }
-});
+// Name speichern: per Knopf, mit "Fertig"/Enter oder beim Verlassen des Feldes – jeweils nur, wenn er sich geändert hat
+async function savePushName() {
+  const inp = $("pushName"), v = inp.value.trim().slice(0, 23);
+  const me = state && (state.push || []).find(d => d.id === myPid());
+  if (!v) { toast("Bitte einen Namen eingeben", true); return; }
+  if (me && me.name === v) { inp.blur(); return; }
+  const b = $("pushNameSave"); b.disabled = true;
+  try { await send("pushSet", { pid: myPid(), name: v }); if (me) me.name = v; toast("Name gespeichert"); inp.blur(); render(); }
+  catch (e) { toast(e.message, true); }
+  b.disabled = false;
+}
+$("pushNameSave").addEventListener("pointerdown", e => e.preventDefault());   // Feld behält den Fokus, sonst speichert "change" doppelt
+$("pushNameSave").onclick = savePushName;
+$("pushName").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); savePushName(); } });
+$("pushName").addEventListener("change", savePushName);
 $("pushTest").onclick = async () => { try { await send("pushTest", { pid: myPid() }); if (mode !== "demo") toast("Test geschickt – kommt gleich an"); } catch (e) { toast(e.message, true); } };
 $("pushOff").onclick = async () => {
   try {
