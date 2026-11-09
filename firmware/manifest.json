@@ -1,10 +1,10 @@
 {
- "notes": "Fernupdate über die App, Personen-Sicherung",
+ "notes": "Blackbox 13.1: weniger Speicherverbrauch, Status kommt zuverlässig an",
  "blackbox": {
-  "ver": "13.0",
-  "file": "firmware/blackbox-13.0.bin",
-  "size": 1295392,
-  "sha": "350351956869637c57c7fc0390f340de5dcee893f21e595e5d456b79b614a958"
+  "ver": "13.1",
+  "file": "firmware/blackbox-13.1.bin",
+  "size": 1297264,
+  "sha": "329e680a080bd6b547734202d1f88563586a764aafca4c458e043a3ec026da8a"
  },
  "display": {
   "ver": "13.0",
