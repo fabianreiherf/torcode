@@ -575,6 +575,15 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
 @media (max-width: 759px) { .nsheet, #sheet .sheet { animation: sheetUp .38s cubic-bezier(.2,.8,.2,1); } }
 @keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .in, .headline.swap, .headline.pop, .gate[data-gs="move"], .digits.shine span { animation: none !important; } .tpill { transition: none; } }
+
+/* App 14.3: Ergebnis erledigter Codes */
+.code .res { grid-column: 2 / -1; display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; margin-top: 2px; }
+.code .res::before { content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none; background: currentColor; }
+.code .res.yes { color: #3ddc97; }
+.code .res.no { color: #aab3c5; }
+.code .res.no::before { background: #6b7385; }
+.pill.used { background: rgba(61,220,151,.14); color: #3ddc97; }
+.pill.never { background: rgba(255,255,255,.08); color: #aab3c5; }
 </style>
 
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
@@ -1496,7 +1505,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.2", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.3", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -1645,7 +1654,7 @@ let codeFilter = "act";
 function renderCodes() {
   const box = $("codes"); box.innerHTML = "";
   const now = Date.now() / 1000;
-  const isDone = c => { const g = !c.multi && !c.used && c.uses > 0 && now < c.to; return !g && ((!c.multi && (c.used || c.uses > 0)) || now >= c.to); };
+  const isDone = c => { const g = !c.multi && !c.used && c.uses > 0 && now < c.to; return !!(!g && ((!c.multi && (c.used || c.uses > 0)) || now >= c.to)); };
   const nDone = state.codes.filter(isDone).length, nAct = state.codes.length - nDone;
   $("cntAct").textContent = "· " + nAct; $("cntDone").textContent = "· " + nDone;
   const list = state.codes.filter(c => (codeFilter === "done") === isDone(c));
@@ -1655,15 +1664,26 @@ function renderCodes() {
     const inGrace = !c.multi && !c.used && c.uses > 0 && now < c.to;   // Einmalcode in seiner Nachlaufzeit
     if (inGrace) { txt = "Noch " + Math.max(1, Math.ceil((c.to - now) / 60)) + " Min."; }
     else if (!c.multi && !c.used && c.uses > 0) { st = "off"; txt = "Benutzt"; }
-    else if (c.used) { st = "off"; txt = "Benutzt"; } else if (now >= c.to) { st = "off"; txt = "Abgelaufen"; } else if (now < c.from) { st = "wait"; txt = "Geplant"; }
+    else if (c.used) { st = "off"; txt = "Benutzt"; } else if (now >= c.to) { st = "off"; txt = c.multi ? "Mehrfach" : "Nicht benutzt"; } else if (now < c.from) { st = "wait"; txt = "Geplant"; }
+    const done = st === "off";                 // ab App 14.3: Ergebnis-Zeile für erledigte Codes
+    const usedAny = c.used || (c.uses || 0) > 0 || (c.usedAt || 0) > 0;
     const el = document.createElement("div");
     el.className = "code" + (st === "off" ? " off" : st === "wait" ? " wait" : "") + (inGrace ? " g-grace" : st === "on" ? (c.multi ? " g-multi" : " g-on") : "");
     el.style.animationDelay = Math.min(i * 40, 240) + "ms";
     el.innerHTML = `<span class="num"></span><span class="who"></span>
-      <span class="side">${c.multi ? '<span class="pill multi">Mehrfach</span> ' : ""}${c.multi && c.win ? '<span class="pill win">Zeit</span> ' : ""}${c.door ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${st}">${txt}</span><button class="del" type="button">Löschen</button></span>
-      <span class="when"></span>${st === "on" ? '<span class="bar"><span></span></span>' : ""}`;
+      <span class="side">${c.multi ? '<span class="pill multi">Mehrfach</span> ' : ""}${c.multi && c.win ? '<span class="pill win">Zeit</span> ' : ""}${c.door ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${done ? (usedAny ? "used" : "never") : st}">${done && c.multi ? (usedAny ? "Benutzt" : "Nicht benutzt") : txt}</span><button class="del" type="button">Löschen</button></span>
+      <span class="when"></span>${done ? '<span class="res"></span>' : ""}${st === "on" ? '<span class="bar"><span></span></span>' : ""}`;
     el.querySelector(".num").textContent = c.code;
     el.querySelector(".who").textContent = c.label || "Ohne Namen";
+    if (done) {
+      const dm = t => fmtDM.format(new Date(t * 1000)) + " um " + hm(t) + " Uhr";
+      el.querySelector(".when").textContent = c.multi ? "Gültig " + (isUnl(c) ? "ohne Enddatum" : "bis " + fmtDate.format(new Date(c.to * 1000))) + (c.win ? " · " + winText(c) : "") : "Gültig " + range(c.from, c.to);
+      const r = el.querySelector(".res");
+      if (c.multi) r.textContent = usedAny ? (c.uses || 0) + "× benutzt" + (c.usedAt ? ", zuletzt " + dm(c.usedAt) : "") : "Nie benutzt";
+      else if (usedAny) r.textContent = "Benutzt am " + dm(c.usedAt || c.to) + ((c.uses || 0) > 1 ? " · " + (c.uses - 1) + "× in der Nachlaufzeit" : "");
+      else r.textContent = "Nicht benutzt – abgelaufen am " + dm(c.to);
+      r.classList.add(usedAny ? "yes" : "no");
+    } else
     el.querySelector(".when").textContent = c.multi ? multiText(c, st)
       : inGrace ? (c.uses > 1 ? c.uses + "× benutzt" : "Benutzt um " + hm(c.usedAt)) + " · gilt noch bis " + hm(c.to) + " Uhr"
       : c.used || c.uses > 0 ? "Benutzt " + fmt.format(new Date(c.usedAt * 1000)) + " Uhr"
@@ -1681,6 +1701,7 @@ function renderCodes() {
 
 // Mehrfachcode: Gültigkeit, Zeitfenster und Nutzungen in einer Zeile
 const fmtDate = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+const fmtDM = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit" });
 const isUnl = c => c.unl || c.to >= 4294967295;
 function untilText(c) { return isUnl(c) ? "unbegrenzt" : "bis " + fmtDate.format(new Date(c.to * 1000)); }
 function multiText(c, st) {
