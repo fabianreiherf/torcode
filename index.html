@@ -832,6 +832,7 @@ details.more .schev { transition: transform .2s; }
       <div class="fw-rows">
         <div class="fw-row"><span>Blackbox</span><b id="fwBb">–</b></div>
         <div class="fw-row"><span>Display</span><b id="fwDp">–</b></div>
+        <div class="fw-row"><span>App</span><b id="fwApp">–</b></div>
       </div>
       <p class="note" id="fwNote"></p>
       <div id="fwProg" hidden><div class="fw-bar"><i id="fwBar"></i></div><p class="note" id="fwStep"></p></div>
@@ -1375,7 +1376,7 @@ function renderSetHome() {                 // Kurzfassung je Punkt in der Übers
     sum("sumVac", c.vac ? "An – nur der Mastercode öffnet" : "Nur der Mastercode öffnet");
     const devs = (state.push || []).length;
     sum("sumPush", (!$("pushOn").hidden ? "Dieses Handy an" : "Dieses Handy aus") + " · " + devs + (devs === 1 ? " Handy" : " Handys") + " angemeldet");
-    sum("sumFw", "Blackbox " + (state.fw || "?") + (state.dfw ? " · Display " + state.dfw : ""));
+    sum("sumFw", "Blackbox " + (state.fw || "?") + (state.dfw ? " · Display " + state.dfw : "") + " · App " + APP_VER);
   }
   const fb = $("fwBadge"), todo = typeof fwTodo === "function" ? fwTodo() : [];
   if (state && fwRemote && fwRemote()) { fb.hidden = false; fb.textContent = todo.length ? "Update" : "aktuell"; fb.className = "sbadge" + (todo.length ? " up" : ""); } else fb.hidden = true;
@@ -1397,7 +1398,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "13.7", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "13.8", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -2576,6 +2577,7 @@ function fwSetProg(frac, txt, bad) {
 }
 function renderFwCard() {
   if (!$("fwCard")) return;
+  $("fwApp").textContent = APP_VER;
   const m = fwMan || {}, todo = fwTodo();
   const show = (el, t, cur) => {
     const nv = m[t] && vnum(m[t].ver) > vnum(cur) ? m[t].ver : "";
