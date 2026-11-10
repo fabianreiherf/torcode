@@ -543,6 +543,38 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
   .app { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
   .toast { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* ================= App 14.2 – Animationen ================= */
+@keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.in { animation: cardIn .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0ms); }
+.view { animation: none; }
+.tabs nav { position: relative; }
+.tpill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 16px; background: rgba(91,140,255,.16); box-shadow: 0 0 18px rgba(91,140,255,.30);
+  opacity: 0; transition: transform .38s cubic-bezier(.3,1.3,.5,1), width .3s; pointer-events: none; }
+@media (min-width: 1020px) and (orientation: landscape) { .tpill { display: none; } }
+.hold { overflow: hidden; }
+.hold.done::after { content: ""; position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px; border-radius: 50%; border: 2px solid #fff; animation: ripple .6s ease-out forwards; pointer-events: none; }
+@keyframes ripple { from { transform: scale(1); opacity: 1; } to { transform: scale(10); opacity: 0; } }
+#gateSvg image { transition: filter .3s linear; }
+.gate[data-gs="move"] { animation: glowPulse 1.1s ease-in-out infinite; }
+@keyframes glowPulse { 0%,100% { box-shadow: 0 0 26px color-mix(in srgb, var(--g) 18%, transparent), 0 8px 28px rgba(0,0,0,.28); } 50% { box-shadow: 0 0 56px color-mix(in srgb, var(--g) 42%, transparent), 0 8px 28px rgba(0,0,0,.28); } }
+.headline { overflow: hidden; }
+.headline.swap { animation: hSwap .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes hSwap { from { opacity: 0; transform: translateY(60%); } to { opacity: 1; transform: none; } }
+.headline.pop { animation: hPop .5s cubic-bezier(.3,1.5,.5,1); transform-origin: left center; }
+@keyframes hPop { 0% { opacity: 0; transform: translateY(40%) scale(.96); } 60% { opacity: 1; transform: scale(1.05); } 100% { transform: none; } }
+.dmini svg .op { transform-origin: 70% 60%; }
+.dmini.unlocked svg .op { animation: shackle .45s cubic-bezier(.3,1.5,.5,1); }
+@keyframes shackle { from { transform: translate(-2px, 3px) rotate(18deg); } to { transform: none; } }
+.dmini.unlocked { box-shadow: 0 0 0 2px rgba(61,220,151,.8), 0 0 20px rgba(61,220,151,.45); }
+.digits span.rolling { position: relative; overflow: hidden; }
+.digits .reel { position: absolute; left: 0; right: 0; top: 0; display: block; font-style: normal; }
+.digits .reel b { display: grid; place-items: center; height: min(24vw, 96px); font: inherit; }
+.digits.shine span { animation: shine .7s ease-out; }
+@keyframes shine { 0% { box-shadow: 0 0 24px rgba(91,140,255,.35); } 40% { box-shadow: 0 0 46px rgba(124,58,237,.75); } 100% { box-shadow: 0 0 24px rgba(91,140,255,.35); } }
+@media (max-width: 759px) { .nsheet, #sheet .sheet { animation: sheetUp .38s cubic-bezier(.2,.8,.2,1); } }
+@keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .in, .headline.swap, .headline.pop, .gate[data-gs="move"], .digits.shine span { animation: none !important; } .tpill { transition: none; } }
 </style>
 
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
@@ -1104,7 +1136,7 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
 </button>
 
 <div class="tabs">
-  <nav>
+  <nav><span class="tpill" id="tpill" aria-hidden="true"></span>
     <button type="button" data-go="gate" aria-current="page">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 21V8l9-5 9 5v13"></path><path d="M7 21v-9h10v9M7 15h10M7 18h10"></path></svg>Tor</button>
     <button type="button" data-go="codes">
@@ -1397,11 +1429,25 @@ function toast(msg, bad) {
 // ---------- Ansichten ----------
 function setPage(p) {                      // Einstellungen: Übersicht oder Unterseite (ab App 13.5)
   document.querySelectorAll("#v-settings .spage").forEach(el => el.hidden = el.dataset.p !== p);
+  setTimeout(() => staggerIn(document.querySelector(`#v-settings .spage[data-p="${p}"]`)), 0);
   window.scrollTo({ top: 0, behavior: "auto" });
 }
+function staggerIn(root) {                 // ab 14.2: Karten gleiten nacheinander herein
+  if (reduced || !root) return;
+  const els = [...root.querySelectorAll(".card, .slist, .code, .controls, .h2row, .headline, .hello, .seg, .grp, .spage:not([hidden]) > h2")].filter(e => e.offsetParent !== null).slice(0, 14);
+  els.forEach((e, i) => { e.classList.remove("in"); void e.offsetWidth; e.style.setProperty("--d", i * 55 + "ms"); e.classList.add("in"); });
+}
+function movePill() {
+  const nav = document.querySelector(".tabs nav"), cur = document.querySelector(".tabs button[aria-current]"), pill = $("tpill");
+  if (!nav || !cur || !pill) return;
+  pill.style.width = cur.offsetWidth + "px"; pill.style.transform = `translateX(${cur.offsetLeft}px)`; pill.style.opacity = 1;
+}
+window.addEventListener("resize", movePill);
+window.addEventListener("load", () => setTimeout(() => { movePill(); staggerIn(document.querySelector(".view:not([hidden])")); }, 120));
 function go(view, sp) {
   if (view === "settings") setPage(sp || "home");
   if (view === "codes") setCodePage("home");
+  setTimeout(() => { movePill(); staggerIn($("v-" + view)); }, 0);
   VIEWS.forEach(v => $("v-" + v).hidden = v !== view);
   document.querySelectorAll(".tabs button").forEach(b => b.toggleAttribute("aria-current", b.dataset.go === view));
   document.querySelectorAll(".tabs button[aria-current]").forEach(b => b.setAttribute("aria-current", "page"));
@@ -1450,7 +1496,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.1", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.2", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -1553,7 +1599,14 @@ function renderGate() {
   // Ab App 14.0: Farbe des Glas-Rahmens und Überschrift nach Zustand
   const gs = warn ? "warn" : m ? "move" : g === "closed" ? "closed" : g === "open" ? "open" : g === "between" ? "half" : "unk";
   $("gateCard").dataset.gs = gs;
-  $("gateHead").textContent = warn ? "Bitte am Tor nachsehen." : m ? (m.mv === 1 ? "Tor fährt hoch." : "Tor fährt zu.") : g === "closed" ? "Halle ist zu." : g === "open" ? "Tor ist offen." : g === "between" ? "Tor steht halb offen." : "Tor";
+  const head = warn ? "Bitte am Tor nachsehen." : m ? (m.mv === 1 ? "Tor fährt hoch." : "Tor fährt zu.") : g === "closed" ? "Halle ist zu." : g === "open" ? "Tor ist offen." : g === "between" ? "Tor steht halb offen." : "Tor";
+  const hd = $("gateHead");
+  if (hd.textContent !== head) {               // ab 14.2: Überschrift gleitet, "offen" hüpft kurz
+    hd.textContent = head;
+    if (!reduced && hd.dataset.init) { hd.classList.remove("swap", "pop"); void hd.offsetWidth; hd.classList.add(gs === "open" || gs === "closed" ? "pop" : "swap"); }
+    hd.dataset.init = 1;
+  }
+  hallLight(pos);
   $("gateProg").style.width = (gs === "closed" || gs === "unk" ? 100 : pos) + "%";
   renderHello();
   cancelAnimationFrame(gateRaf);
@@ -1573,10 +1626,15 @@ function renderGate() {
   $("stFails").textContent = todays.filter(e => !e.ok && /Falscher/.test(e.text)).length;
 }
 let lastGateTxt = 0;
+function hallLight(pos) {                  // ab 14.2: in der Halle wird es heller, je weiter das Tor offen ist
+  const img = document.querySelector("#gateSvg image"); if (!img) return;
+  img.style.filter = `brightness(${(0.35 + 0.7 * Math.min(1, pos / 60)).toFixed(3)})`;
+}
 function renderGateLoop() {
   const m = gateModel();
   if (!m) { renderGate(); return; }
   $("door").style.transform = `translateY(${-curPos() / 100 * OPEN_H}px)`;
+  hallLight(curPos()); $("gateProg").style.width = curPos() + "%";
   if (Date.now() - lastGateTxt > 250) { lastGateTxt = Date.now(); const pos = curPos(), left = Math.max(0, Math.ceil((m.mv === 1 ? 100 - pos : pos) / 100 * m.dur / 1000)); $("gateHint").textContent = left > 0 ? `noch etwa ${left} s` : "gleich da"; }
   gateRaf = requestAnimationFrame(renderGateLoop);
 }
@@ -1735,7 +1793,7 @@ function holdButton(btn, onDone) {
     const p = Math.min(1, (t - start) / ms);
     btn.style.setProperty("--p", p);
     if (p < 1) raf = requestAnimationFrame(tick);
-    else { reset(); btn.classList.remove("done"); void btn.offsetWidth; btn.classList.add("done"); onDone(); }
+    else { reset(); btn.classList.remove("done"); void btn.offsetWidth; btn.classList.add("done"); try { navigator.vibrate && navigator.vibrate(25); } catch (e) {} onDone(); }
   };
   btn.addEventListener("pointerdown", e => {
     if (btn.disabled) return;
@@ -1890,7 +1948,7 @@ $("make").onclick = async () => {
   finally { $("make").disabled = false; $("make").textContent = "Code erzeugen"; }
 };
 // ---------- Codes-Bereich ab App 13.7: Liste zuerst, "Neuer Code" als Fenster, Mastercode als eigene Seite ----------
-function setCodePage(p) { document.querySelectorAll("#v-codes .cpage").forEach(el => el.hidden = el.dataset.c !== p); window.scrollTo({ top: 0, behavior: "auto" }); }
+function setCodePage(p) { document.querySelectorAll("#v-codes .cpage").forEach(el => el.hidden = el.dataset.c !== p); window.scrollTo({ top: 0, behavior: "auto" }); setTimeout(() => staggerIn(document.querySelector(`#v-codes .cpage[data-c="${p}"]`)), 0); }
 function updMoreSum() {
   const parts = [multi ? "Mehrfach" : "Einmal"];
   if (!multi && fwVer() >= 13.3) parts.push(graceMin ? "Nachlauf " + graceMin + " Min" : "ohne Nachlauf");
@@ -1944,12 +2002,13 @@ function openSheet(r, label) {
   spans.forEach(sp => { sp.classList.remove("set"); sp.textContent = "·"; });
   spans.forEach((sp, i) => {
     if (reduced) { sp.textContent = r.code[i]; sp.classList.add("set"); return; }
-    const end = performance.now() + 450 + i * 180;
-    const roll = () => {
-      if (performance.now() < end) { sp.textContent = Math.floor(Math.random() * 10); setTimeout(roll, 55); }
-      else { sp.textContent = r.code[i]; sp.classList.add("set"); }
-    };
-    roll();
+    // ab 14.2: Walze wie am Spielautomaten
+    const d = +r.code[i], reel = document.createElement("i"); reel.className = "reel";
+    reel.innerHTML = Array.from({ length: 30 }, (_, k) => `<b>${k % 10}</b>`).join("");
+    sp.textContent = ""; sp.classList.add("rolling"); sp.appendChild(reel);
+    const dur = 700 + i * 220;
+    requestAnimationFrame(() => requestAnimationFrame(() => { reel.style.transition = `transform ${dur}ms cubic-bezier(.15,.85,.25,1)`; reel.style.transform = `translateY(${-(20 + d) * 100 / 30}%)`; }));
+    setTimeout(() => { sp.classList.remove("rolling"); sp.textContent = r.code[i]; sp.classList.add("set"); if (i === spans.length - 1) { const dg = $("digits"); dg.classList.remove("shine"); void dg.offsetWidth; dg.classList.add("shine"); } }, dur + 40);
   });
 }
 function closeSheet() { $("sheet").hidden = true; }
