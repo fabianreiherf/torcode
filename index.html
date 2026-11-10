@@ -536,12 +536,12 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
 .hold.stop:not(.big) { border-color: rgba(255,93,93,.40) !important; }
 /* schwebende Leiste (nur Handy) */
 @media (max-width: 1019px), (orientation: portrait) {
-  .tabs { left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); padding: 8px 8px; border-radius: 26px;
-    background: rgba(18,22,36,.72); border: 1px solid var(--glass-line); box-shadow: 0 12px 34px rgba(0,0,0,.45); }
+  .tabs { left: 0; right: 0; bottom: 0; padding: 8px 8px calc(6px + env(safe-area-inset-bottom, 0px)); border-radius: 24px 24px 0 0;
+    background: rgba(18,22,36,.80); border: 1px solid var(--glass-line); border-bottom: 0; box-shadow: 0 -10px 30px rgba(0,0,0,.35); }
   .tabs button[aria-current="page"] svg { color: #fff; transform: none; filter: drop-shadow(0 0 8px rgba(91,140,255,.8)); }
   .tabs button[aria-current="page"] { color: #fff; }
-  .app { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
-  .toast { bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .app { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
 }
 </style>
 
@@ -1450,7 +1450,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.0", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.1", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
