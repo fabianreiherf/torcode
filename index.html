@@ -1181,7 +1181,7 @@ try { cfg = JSON.parse(store.get("torcode.cfg") || "null"); } catch (e) {}
 let mode = cfg ? "connecting" : "demo";
 let client = null, online = false, state = null, master = null;
 const pending = new Map();
-let durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", gLocal = null, gFrozen = null, gateRaf = 0;
+let gDisp = null, durIdx = 6, later = false, masterVisible = false, lastMsg = "", lastCode = "", gLocal = null, gFrozen = null, gateRaf = 0;
 
 // ---------- Beispieldaten ----------
 function demoState() {
@@ -1509,7 +1509,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.4", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.5", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -1578,7 +1578,15 @@ function gateModel() {
 function curPos() {
   const m = gateModel();
   if (!m && gFrozen) return gFrozen.pos;
-  if (m) { const d = (Date.now() - m.start) / m.dur * 100; return Math.max(0, Math.min(100, m.mv === 1 ? m.sp + d : m.sp - d)); }
+  if (m) {
+    const d = (Date.now() - m.start) / m.dur * 100;
+    let p = Math.max(0, Math.min(100, m.mv === 1 ? m.sp + d : m.sp - d));
+    // ab 14.5: bei derselben Fahrt nie rückwärts springen (neue Meldung der Box mit etwas anderer Startzeit)
+    if (gDisp && gDisp.mv === m.mv && Date.now() - gDisp.t < 1500) p = m.mv === 1 ? Math.max(p, gDisp.p) : Math.min(p, gDisp.p);
+    gDisp = { mv: m.mv, p, t: Date.now() };
+    return p;
+  }
+  gDisp = null;
   const g = state && state.gate;
   if (g === "open") return 100;
   if (g === "closed") return 0;
@@ -1644,7 +1652,7 @@ function hallLight(pos) {                  // ab 14.2: Halle wird heller, je wei
   const img = $("hallBase"); if (!img) return;
   const night = isDark(), o = Math.min(1, pos / 60);
   img.style.filter = `brightness(${(night ? 0.3 + 0.12 * o : 0.35 + 0.7 * o).toFixed(3)})`;
-  const on = night && pos > 3;
+  const on = night && (pos > 3 || (hallLampOn && pos > 0));   // 14.5: bleibt beim Zufahren an, bis das Tor unten ist
   if (on !== hallLampOn) {
     hallLampOn = on;
     if (reduced) $("hallLamp").style.opacity = on ? 1 : 0; else $("hallLamp").classList.toggle("on", on);
