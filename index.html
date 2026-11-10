@@ -493,6 +493,56 @@ details.more[open] summary .schev { transform: rotate(90deg); }
 details.more .schev { transition: transform .2s; }
 .more-in { display: grid; gap: 14px; padding: 0 14px 14px; }
 #mrBox { margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* ================= App 14.0 – Glas-Design ================= */
+:root { --bg: #070912; --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.10); --tile: rgba(255,255,255,.06); --tile-line: rgba(255,255,255,.10); --tile-in: rgba(0,0,0,.28);
+  --glass: rgba(255,255,255,.06); --glass-line: rgba(255,255,255,.14); --grad: linear-gradient(135deg, #3b6bff, #7c3aed); --violet: #7c3aed; }
+body { background: var(--bg); }
+body::before { background:
+  radial-gradient(420px 420px at calc(100% + 60px) -80px, rgba(47,95,255,.55), transparent 70%),
+  radial-gradient(400px 400px at -120px 85%, rgba(124,58,237,.32), transparent 70%); }
+.card, .slist, .code, .hold:not(.big), .conn { background: var(--glass) !important; border: 1px solid var(--glass-line) !important; box-shadow: 0 8px 28px rgba(0,0,0,.28) !important; }
+.card, .slist { border-radius: 24px; }
+.code { border-radius: 22px; }
+.code.off { background: rgba(255,255,255,.03) !important; box-shadow: none !important; }
+.code.g-on { border-color: rgba(61,220,151,.30) !important; }
+.code.g-grace { border-color: rgba(255,181,71,.45) !important; }
+.code.g-multi { border-color: rgba(125,151,255,.40) !important; }
+.code.g-grace .bar span { background: var(--warn) !important; }
+.btn:not(.ghost), .hold.big, .h2row .btn, #newCode { background: var(--grad) !important; border: 0 !important; box-shadow: 0 10px 28px rgba(59,107,255,.40); color: #fff; }
+.btn.ghost { background: rgba(255,255,255,.08); border: 1px solid var(--glass-line); }
+.toggle input:checked + .sw { background: var(--grad); border-color: transparent; }
+.durs button[aria-pressed="true"], .days button[aria-pressed="true"] { background: var(--grad) !important; border-color: transparent !important; color: #fff; }
+.sic { background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 55%, #000)); box-shadow: 0 4px 14px color-mix(in srgb, var(--c) 40%, transparent); }
+.card > .label::before { background: linear-gradient(135deg, var(--acc, #2f5fff), color-mix(in srgb, var(--acc, #2f5fff) 55%, #000)); box-shadow: 0 4px 14px color-mix(in srgb, var(--acc, #2f5fff) 40%, transparent); }
+input[type="text"], input[type="password"], input[type="datetime-local"], input[type="date"], input[type="number"], input[type="time"] { background: rgba(0,0,0,.28) !important; border-color: var(--glass-line) !important; }
+.sheet { background: rgba(20,24,40,.92) !important; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--glass-line); }
+/* Tor-Seite */
+.hello { color: #9aa3b5; font-size: 15px; margin-top: 10px; min-height: 1.2em; }
+.hello + .headline, .headline { font-size: 32px; font-weight: 800; letter-spacing: -.03em; margin: 0 0 6px; }
+.hello { margin-bottom: -8px; }
+.gate { --g: #8a93a6; border-color: color-mix(in srgb, var(--g) 55%, transparent) !important; box-shadow: 0 0 40px color-mix(in srgb, var(--g) 20%, transparent), 0 8px 28px rgba(0,0,0,.28) !important; transition: border-color .4s, box-shadow .4s; }
+.gate[data-gs="closed"] { --g: #3ddc97; }
+.gate[data-gs="open"] { --g: #5b8cff; }
+.gate[data-gs="move"], .gate[data-gs="half"] { --g: #ffb547; }
+.gate[data-gs="warn"] { --g: #ff5d5d; }
+.gate svg > rect:first-of-type { fill: transparent; }
+.gprog { height: 4px; background: rgba(255,255,255,.06); }
+.gprog i { display: block; height: 100%; width: 0; background: var(--g); transition: width .3s linear, background .4s; }
+.controls { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.controls .hold { grid-column: auto !important; padding: 15px 8px !important; text-align: center; border-radius: 18px; display: grid; gap: 2px; justify-items: center; }
+.controls .hold b { font-size: 16px; }
+.controls .hold small { font-size: 11.5px; }
+.hold.stop:not(.big) { border-color: rgba(255,93,93,.40) !important; }
+/* schwebende Leiste (nur Handy) */
+@media (max-width: 1019px), (orientation: portrait) {
+  .tabs { left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); padding: 8px 8px; border-radius: 26px;
+    background: rgba(18,22,36,.72); border: 1px solid var(--glass-line); box-shadow: 0 12px 34px rgba(0,0,0,.45); }
+  .tabs button[aria-current="page"] svg { color: #fff; transform: none; filter: drop-shadow(0 0 8px rgba(91,140,255,.8)); }
+  .tabs button[aria-current="page"] { color: #fff; }
+  .app { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+}
 </style>
 
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
@@ -513,8 +563,9 @@ details.more .schev { transition: transform .2s; }
   <section class="view" id="v-gate">
     <div class="cols">
     <div>
-    <h2>Tor</h2>
-    <div class="card gate">
+    <div class="hello" id="hello"></div>
+    <h2 class="headline" id="gateHead">Tor</h2>
+    <div class="card gate" id="gateCard" data-gs="unk">
       <svg viewBox="0 0 320 226" role="img" aria-label="Torzustand – antippen für die Fahrzeiten" id="gateSvg">
         <defs>
           <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
@@ -551,6 +602,7 @@ details.more .schev { transition: transform .2s; }
         <span class="chip" id="lockChip" hidden>Tastatur gesperrt</span>
       </div>
       <div class="gate-times" id="gateTimes" hidden></div>
+      <div class="gprog"><i id="gateProg"></i></div>
     </div>
 
     <div class="controls">
@@ -1398,7 +1450,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "13.8", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.0", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -1474,6 +1526,12 @@ function curPos() {
   return g === "between" ? 50 : 0;
 }
 const secs = ms => (ms / 1000).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " s";
+function renderHello() {
+  const h = new Date().getHours(), g = h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend";
+  let n = ($("pushName") && $("pushName").value || "").trim().replace(/^(i?phone|ipad|handy|smartphone)\s+/i, "");
+  if (/^(i?phone|ipad|handy)$/i.test(n)) n = "";
+  $("hello").textContent = g + (n ? ", " + n : "");
+}
 function renderGate() {
   const g = state.gate || "unknown", m = gateModel(), pos = curPos(), gm = state.gm || {};
   const door = $("door");
@@ -1492,6 +1550,12 @@ function renderGate() {
   if (!hint && state.now) hint = "Stand " + fmtTime.format(new Date(state.now * 1000)) + " Uhr";
   $("gateState").textContent = txt; $("gateState").classList.toggle("warn", warn);
   $("gateHint").textContent = hint;
+  // Ab App 14.0: Farbe des Glas-Rahmens und Überschrift nach Zustand
+  const gs = warn ? "warn" : m ? "move" : g === "closed" ? "closed" : g === "open" ? "open" : g === "between" ? "half" : "unk";
+  $("gateCard").dataset.gs = gs;
+  $("gateHead").textContent = warn ? "Bitte am Tor nachsehen." : m ? (m.mv === 1 ? "Tor fährt hoch." : "Tor fährt zu.") : g === "closed" ? "Halle ist zu." : g === "open" ? "Tor ist offen." : g === "between" ? "Tor steht halb offen." : "Tor";
+  $("gateProg").style.width = (gs === "closed" || gs === "unk" ? 100 : pos) + "%";
+  renderHello();
   cancelAnimationFrame(gateRaf);
   if (m) gateRaf = requestAnimationFrame(renderGateLoop);
   $("lockChip").hidden = !(state.lockedFor > 0);
@@ -1535,7 +1599,7 @@ function renderCodes() {
     else if (!c.multi && !c.used && c.uses > 0) { st = "off"; txt = "Benutzt"; }
     else if (c.used) { st = "off"; txt = "Benutzt"; } else if (now >= c.to) { st = "off"; txt = "Abgelaufen"; } else if (now < c.from) { st = "wait"; txt = "Geplant"; }
     const el = document.createElement("div");
-    el.className = "code" + (st === "off" ? " off" : st === "wait" ? " wait" : "");
+    el.className = "code" + (st === "off" ? " off" : st === "wait" ? " wait" : "") + (inGrace ? " g-grace" : st === "on" ? (c.multi ? " g-multi" : " g-on") : "");
     el.style.animationDelay = Math.min(i * 40, 240) + "ms";
     el.innerHTML = `<span class="num"></span><span class="who"></span>
       <span class="side">${c.multi ? '<span class="pill multi">Mehrfach</span> ' : ""}${c.multi && c.win ? '<span class="pill win">Zeit</span> ' : ""}${c.door ? '<span class="pill door">Tür</span> ' : ""}<span class="pill ${st}">${txt}</span><button class="del" type="button">Löschen</button></span>
