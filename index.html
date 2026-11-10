@@ -470,6 +470,29 @@ h3.grp:has(+ .card[hidden]) { display: none; }
 .sbadge[hidden] { display: none; }
 .sback { justify-self: start; background: none; border: 0; padding: 6px 0 0; color: #7d97ff; font: 500 16px var(--font-ui); cursor: pointer; }
 .spage > h2 { margin-top: 0; }
+
+/* ---------- Codes ab App 13.7 ---------- */
+.cpage[hidden] { display: none !important; }
+.cpage { display: grid; gap: 14px; }
+.h2row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.h2row h2 { margin: 14px 0 4px; }
+.h2row .btn { width: auto; padding: 11px 16px; font-size: 15px; }
+.cseg button span { font-weight: 500; opacity: .8; }
+.code { background: #1d2436; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+.code.off { background: #171d2b; box-shadow: none; }
+.nsheet { display: grid; gap: 14px; padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+.nhead { display: flex; align-items: center; justify-content: space-between; }
+.nhead h3 { text-align: left !important; font-size: 22px !important; }
+.nclose { background: none; border: 0; color: #7d97ff; font: 500 16px var(--font-ui); cursor: pointer; padding: 6px 0; }
+.nsheet .toggle { background: var(--tile); border: 1px solid var(--tile-line); border-radius: 14px; padding: 13px 14px; }
+details.more { border: 1px dashed rgba(255,255,255,.16); border-radius: 14px; }
+details.more summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; cursor: pointer; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary > span { display: grid; gap: 2px; min-width: 0; }
+details.more[open] summary .schev { transform: rotate(90deg); }
+details.more .schev { transition: transform .2s; }
+.more-in { display: grid; gap: 14px; padding: 0 14px 14px; }
+#mrBox { margin-top: 0; padding-top: 0; border-top: 0; }
 </style>
 
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
@@ -562,71 +585,23 @@ h3.grp:has(+ .card[hidden]) { display: none; }
 
   <!-- CODES -->
   <section class="view" id="v-codes" hidden>
-    <h2>Codes</h2>
-    <div class="cols"><div>
-    <div class="card">
-      <span class="label" style="--acc:#2f5fff">Neuer Code</span>
-      <label class="toggle" for="codeMulti">
-        <span><b>Mehrfach nutzbar</b><br><span class="note">Bleibt nach dem Benutzen gültig – bis zu einem Datum oder unbegrenzt.</span><span class="note" id="multiOld" hidden><br>Erst mit Blackbox-Firmware 12.2 oder neuer.</span></span>
-        <input type="checkbox" id="codeMulti"><span class="sw"></span>
-      </label>
-      <div class="field" id="durField">
-        <span class="note">Gültig für</span>
-        <div class="durs" id="durs"></div>
+    <div class="cpage" data-c="home">
+      <div class="h2row"><h2>Codes</h2><button class="btn small" id="newCode" type="button">+ Neuer Code</button></div>
+      <div class="slist">
+        <button class="srow" type="button" id="openMaster"><span class="sic" style="--c:#f5b301"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M17 6l2 2M15 8l2 2"/></svg></span><span class="st"><b>Mastercode</b><span id="sumMaster">••••</span></span><span class="schev">›</span></button>
       </div>
-      <div class="field" id="graceField">
-        <span class="note">Nach der ersten Eingabe noch gültig</span>
-        <div class="durs" id="graces"></div>
-        <span class="note" id="graceNote"></span>
+      <div class="seg cseg" id="codeSeg">
+        <button type="button" data-f="act" aria-pressed="true">Aktiv <span id="cntAct"></span></button>
+        <button type="button" data-f="done" aria-pressed="false">Erledigt <span id="cntDone"></span></button>
       </div>
-      <div class="multi-box" id="multiBox" hidden>
-        <div class="field">
-          <span class="note">Gültig bis</span>
-          <div class="seg" id="useg">
-            <button type="button" id="untilDateBtn" aria-pressed="true">Datum</button>
-            <button type="button" id="untilUnlBtn" aria-pressed="false">Unbegrenzt</button>
-          </div>
-          <input type="date" id="untilDate" aria-label="Gültig bis einschließlich">
-          <span class="note" id="untilNote">gilt bis einschließlich diesem Tag, 23:59 Uhr</span>
-        </div>
-        <label class="toggle" for="mWinOn">
-          <span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Code nicht. Das zählt nicht als Fehlversuch.</span></span>
-          <input type="checkbox" id="mWinOn"><span class="sw"></span>
-        </label>
-        <label class="toggle" for="mGf">
-          <span><b>Tor auch bei offener Schiebetür</b><br><span class="note" id="mGfNote">„Tor auf“ und „Tor zu“ am Display gehen auch, wenn die Schiebetür nicht verriegelt ist.</span></span>
-          <input type="checkbox" id="mGf"><span class="sw"></span>
-        </label>
-        <div id="mWin" class="mwin" hidden>
-          <div class="days" id="mDays"></div>
-          <div class="set-row"><span class="note">von</span><input type="time" id="mFrom" value="07:00" aria-label="von"><span class="note">bis</span><input type="time" id="mTo" value="18:00" aria-label="bis"></div>
-        </div>
-      </div>
-      <div class="field">
-        <span class="note">Länge des Codes</span>
-        <div class="durs" id="lens"></div>
-      </div>
-      <div class="field">
-        <span class="note">Gültig ab</span>
-        <div class="seg" id="seg">
-          <button type="button" id="startNow" aria-pressed="true">Jetzt</button>
-          <button type="button" id="startLater" aria-pressed="false">Später</button>
-        </div>
-        <input type="datetime-local" id="startAt" hidden>
-      </div>
-      <div class="field">
-        <label class="note" for="who">Für wen – steht als „Hallo …“ auf dem Display</label>
-        <input type="text" id="who" maxlength="27" placeholder="z. B. Spedition, Catering, Techniker" autocomplete="off">
-      </div>
-      <label class="toggle" for="codeDoor">
-        <span><b>Auch die Tür zum Lager</b><br><span class="note" id="doorNote">Mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist.</span></span>
-        <input type="checkbox" id="codeDoor"><span class="sw"></span>
-      </label>
-      <button class="btn" id="make" type="button">Code erzeugen</button>
+      <div class="codes" id="codes"></div>
     </div>
-
-    <div class="card">
-      <span class="label" style="--acc:#ffc531">Mastercode</span>
+    <div class="cpage" data-c="master" hidden>
+      <button class="sback" type="button" id="masterBack">‹ Codes</button>
+      <h2>Mastercode</h2>
+      <div class="settings-grid">
+      <div class="card">
+        <span class="label" style="--acc:#ffc531">Code</span>
       <div class="master-row">
         <div class="pins" id="pins"></div>
         <button class="btn ghost small" id="masterShow" type="button">Anzeigen</button>
@@ -642,10 +617,15 @@ h3.grp:has(+ .card[hidden]) { display: none; }
       </div>
       <button class="btn ghost" id="masterSave" type="button">Eingetippten Code speichern</button>
       <p class="note" id="masterMsg">Der neue Code gilt sofort an Tastatur und Display. Keine leicht zu ratenden Zahlen wie 1234.</p>
-      <div class="field" id="mgBox"><label class="note" for="mgIn">Begrüßung am Display beim Mastercode</label>
+      </div>
+      <div class="card">
+        <span class="label" style="--acc:#38bdf8">Begrüßung am Display</span>
+      <div class="field" id="mgBox"><label class="note" for="mgIn">Steht nach dem Mastercode auf dem Display.</label>
         <div class="name-row"><input type="text" id="mgIn" maxlength="40" placeholder="z. B. Hallo Chef! (leer = Hallo!)" autocomplete="off"><button class="btn small" id="mgSave" type="button">Speichern</button></div></div>
+      </div>
+      <div class="card" id="mrCard">
+        <span class="label" style="--acc:#a78bfa">Rechte</span>
       <div class="mr" id="mrBox" hidden>
-        <h4 class="mr-h">Rechte des Mastercodes</h4>
         <label class="toggle" for="mrGate"><span><b>Tor öffnen über die Tastatur</b></span><input type="checkbox" id="mrGate" data-mr="gate"><span class="sw"></span></label>
         <label class="toggle" for="mrDoor"><span><b>Tür entriegeln</b><br><span class="note">Nach der Eingabe „Tür öffnen“ am Display.</span></span><input type="checkbox" id="mrDoor" data-mr="door"><span class="sw"></span></label>
         <label class="toggle" for="mrDm"><span><b>Tür beliebig oft</b><br><span class="note">Aus: einmal pro Eingabe.</span></span><input type="checkbox" id="mrDm" data-mr="dm"><span class="sw"></span></label>
@@ -661,11 +641,9 @@ h3.grp:has(+ .card[hidden]) { display: none; }
         </div>
         <p class="note" id="mrNote"></p>
       </div>
+      </div>
+      </div>
     </div>
-    </div><div>
-    <h3 class="grp">Codes <span id="codeCnt"></span></h3>
-    <div class="codes" id="codes"></div>
-    </div></div>
   </section>
 
   <!-- CHIPS -->
@@ -897,6 +875,75 @@ h3.grp:has(+ .card[hidden]) { display: none; }
   </section>
 </div>
 
+<div id="newSheet" hidden>
+  <div class="sheet-bg" id="newBg"></div>
+  <div class="sheet nsheet" role="dialog" aria-label="Neuer Code">
+    <div class="grab"></div>
+    <div class="nhead"><h3>Neuer Code</h3><button class="nclose" type="button" id="newClose">Abbrechen</button></div>
+      <div class="field">
+        <label class="note" for="who">Für wen – steht als „Hallo …“ am Display</label>
+        <input type="text" id="who" maxlength="27" placeholder="z. B. Spedition, Catering, Techniker" autocomplete="off">
+      </div>
+      <div class="field" id="durField">
+        <span class="note">Gültig für</span>
+        <div class="durs" id="durs"></div>
+      </div>
+      <label class="toggle" for="codeDoor">
+        <span><b>Auch die Tür zum Lager</b><br><span class="note" id="doorNote">Mit dem Code die Tür einmal am Display öffnen. Ist das aus, öffnet der Code das Tor nur, wenn die Tür verriegelt ist.</span></span>
+        <input type="checkbox" id="codeDoor"><span class="sw"></span>
+      </label>
+    <details class="more" id="newMore">
+      <summary><span><b>Mehr Optionen</b><span class="note" id="moreSum">Mehrfach · Nachlauf · Start später · Länge</span></span><span class="schev">›</span></summary>
+      <div class="more-in">
+      <label class="toggle" for="codeMulti">
+        <span><b>Mehrfach nutzbar</b><br><span class="note">Bleibt nach dem Benutzen gültig – bis zu einem Datum oder unbegrenzt.</span><span class="note" id="multiOld" hidden><br>Erst mit Blackbox-Firmware 12.2 oder neuer.</span></span>
+        <input type="checkbox" id="codeMulti"><span class="sw"></span>
+      </label>
+      <div class="multi-box" id="multiBox" hidden>
+        <div class="field">
+          <span class="note">Gültig bis</span>
+          <div class="seg" id="useg">
+            <button type="button" id="untilDateBtn" aria-pressed="true">Datum</button>
+            <button type="button" id="untilUnlBtn" aria-pressed="false">Unbegrenzt</button>
+          </div>
+          <input type="date" id="untilDate" aria-label="Gültig bis einschließlich">
+          <span class="note" id="untilNote">gilt bis einschließlich diesem Tag, 23:59 Uhr</span>
+        </div>
+        <label class="toggle" for="mWinOn">
+          <span><b>Nur zu bestimmten Zeiten</b><br><span class="note">Außerhalb öffnet der Code nicht. Das zählt nicht als Fehlversuch.</span></span>
+          <input type="checkbox" id="mWinOn"><span class="sw"></span>
+        </label>
+        <label class="toggle" for="mGf">
+          <span><b>Tor auch bei offener Schiebetür</b><br><span class="note" id="mGfNote">„Tor auf“ und „Tor zu“ am Display gehen auch, wenn die Schiebetür nicht verriegelt ist.</span></span>
+          <input type="checkbox" id="mGf"><span class="sw"></span>
+        </label>
+        <div id="mWin" class="mwin" hidden>
+          <div class="days" id="mDays"></div>
+          <div class="set-row"><span class="note">von</span><input type="time" id="mFrom" value="07:00" aria-label="von"><span class="note">bis</span><input type="time" id="mTo" value="18:00" aria-label="bis"></div>
+        </div>
+      </div>
+      <div class="field" id="graceField">
+        <span class="note">Nach der ersten Eingabe noch gültig</span>
+        <div class="durs" id="graces"></div>
+        <span class="note" id="graceNote"></span>
+      </div>
+      <div class="field">
+        <span class="note">Gültig ab</span>
+        <div class="seg" id="seg">
+          <button type="button" id="startNow" aria-pressed="true">Jetzt</button>
+          <button type="button" id="startLater" aria-pressed="false">Später</button>
+        </div>
+        <input type="datetime-local" id="startAt" hidden>
+      </div>
+      <div class="field">
+        <span class="note">Länge des Codes</span>
+        <div class="durs" id="lens"></div>
+      </div>
+      </div>
+    </details>
+    <button class="btn" id="make" type="button">Code erzeugen</button>
+  </div>
+</div>
 <div id="sheet" hidden>
   <div class="sheet-bg" id="sheetBg"></div>
   <div class="sheet" role="dialog" aria-label="Neuer Code">
@@ -1301,6 +1348,7 @@ function setPage(p) {                      // Einstellungen: Übersicht oder Unt
 }
 function go(view, sp) {
   if (view === "settings") setPage(sp || "home");
+  if (view === "codes") setCodePage("home");
   VIEWS.forEach(v => $("v-" + v).hidden = v !== view);
   document.querySelectorAll(".tabs button").forEach(b => b.toggleAttribute("aria-current", b.dataset.go === view));
   document.querySelectorAll(".tabs button[aria-current]").forEach(b => b.setAttribute("aria-current", "page"));
@@ -1349,7 +1397,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "13.6", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "13.7", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -1359,7 +1407,7 @@ function renderFw() {
   el.style.color = v < APP_MIN_FW ? "var(--warn)" : "";
 }
 function render() {
-  renderFw(); renderFwCard(); try { renderSetHome(); } catch (e) { console.error(e); } try { renderMr(); } catch (e) { console.error(e); }
+  renderFw(); renderFwCard(); try { renderSetHome(); renderMasterSum(); } catch (e) { console.error(e); } try { renderMr(); } catch (e) { console.error(e); }
   $("demoBanner").hidden = mode !== "demo";
   renderWifi();
   if (!state) { $("gateState").textContent = "Warte auf Blackbox …"; $("gateHint").textContent = ""; return; }
@@ -1470,11 +1518,16 @@ function renderGateLoop() {
 $("gateSvg").addEventListener("click", () => { $("gateTimes").hidden = !$("gateTimes").hidden; });
 
 const hm = t => new Date(t * 1000).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+let codeFilter = "act";
 function renderCodes() {
-  const box = $("codes"); box.innerHTML = ""; $("codeCnt").textContent = state.codes.length ? "· " + state.codes.length : "";
-  if (!state.codes.length) { box.innerHTML = '<div class="empty">Noch keine Codes. Erzeuge oben den ersten.</div>'; return; }
+  const box = $("codes"); box.innerHTML = "";
   const now = Date.now() / 1000;
-  state.codes.forEach((c, i) => {
+  const isDone = c => { const g = !c.multi && !c.used && c.uses > 0 && now < c.to; return !g && ((!c.multi && (c.used || c.uses > 0)) || now >= c.to); };
+  const nDone = state.codes.filter(isDone).length, nAct = state.codes.length - nDone;
+  $("cntAct").textContent = "· " + nAct; $("cntDone").textContent = "· " + nDone;
+  const list = state.codes.filter(c => (codeFilter === "done") === isDone(c));
+  if (!list.length) { box.innerHTML = codeFilter === "done" ? '<div class="empty">Keine benutzten oder abgelaufenen Codes.</div>' : '<div class="empty">Keine aktiven Codes. Tippe oben auf „+ Neuer Code“.</div>'; return; }
+  list.forEach((c, i) => {
     let st = "on", txt = "Aktiv";
     const inGrace = !c.multi && !c.used && c.uses > 0 && now < c.to;   // Einmalcode in seiner Nachlaufzeit
     if (inGrace) { txt = "Noch " + Math.max(1, Math.ceil((c.to - now) / 60)) + " Min."; }
@@ -1765,11 +1818,37 @@ $("make").onclick = async () => {
     r.door = r.door ?? door; if (r.grace === undefined && params.grace !== undefined) r.grace = params.grace;
     graceMin = GRACE_DEFAULT; renderGraces();   // nächster Code wieder mit 5 Minuten
     if (multi) { r.multi = true; r.unl = !params.until; Object.assign(r, winInfo || {}); }
-    openSheet(r, label);
+    closeNew(); openSheet(r, label);
+    if (codeFilter !== "act") document.querySelector('#codeSeg button[data-f="act"]').click();   // neuen Code gleich in der Liste zeigen
     if (mode === "demo") render();
   } catch (e) { toast(e.message, true); }
   finally { $("make").disabled = false; $("make").textContent = "Code erzeugen"; }
 };
+// ---------- Codes-Bereich ab App 13.7: Liste zuerst, "Neuer Code" als Fenster, Mastercode als eigene Seite ----------
+function setCodePage(p) { document.querySelectorAll("#v-codes .cpage").forEach(el => el.hidden = el.dataset.c !== p); window.scrollTo({ top: 0, behavior: "auto" }); }
+function updMoreSum() {
+  const parts = [multi ? "Mehrfach" : "Einmal"];
+  if (!multi && fwVer() >= 13.3) parts.push(graceMin ? "Nachlauf " + graceMin + " Min" : "ohne Nachlauf");
+  parts.push(later ? "Start später" : "ab jetzt"); parts.push(codeLen + " Ziffern");
+  $("moreSum").textContent = parts.join(" · ");
+}
+function openNew() { updMoreSum(); $("newSheet").hidden = false; setTimeout(() => { try { $("who").focus({ preventScroll: true }); } catch (e) {} }, 250); }
+function closeNew() { $("newSheet").hidden = true; $("newMore").open = false; }
+$("newCode").onclick = openNew; $("newClose").onclick = closeNew; $("newBg").onclick = closeNew;
+$("newSheet").addEventListener("click", () => setTimeout(updMoreSum, 0));
+$("openMaster").onclick = () => setCodePage("master");
+$("masterBack").onclick = () => setCodePage("home");
+document.querySelectorAll("#codeSeg button").forEach(b => b.onclick = () => {
+  codeFilter = b.dataset.f;
+  document.querySelectorAll("#codeSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  $("codeSeg").classList.toggle("right", codeFilter === "done"); if (state) renderCodes();
+});
+function renderMasterSum() {
+  const m = state && state.mr, n = (state && state.ml) || 4;
+  let r = "alle Rechte";
+  if (m && fwVer() >= 13.4) { const lim = !m.gate || !m.door || !m.dm || !m.gf || !m.pin || !m.vac || m.win; r = lim ? "eingeschränkt" + (m.win ? " · nur zu bestimmten Zeiten" : "") : "alle Rechte"; }
+  $("sumMaster").textContent = "•".repeat(n) + " · " + r;
+}
 
 function openSheet(r, label) {
   lastCode = r.code;
