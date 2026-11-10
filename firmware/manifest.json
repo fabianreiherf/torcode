@@ -1,10 +1,10 @@
 {
- "notes": "Einmalcodes mit Nachlaufzeit (ab Werk 5 Minuten)",
+ "notes": "Rechte des Mastercodes einstellbar",
  "blackbox": {
-  "ver": "13.3",
-  "file": "firmware/blackbox-13.3.bin",
-  "size": 1297664,
-  "sha": "d8132a81b5a619dccf2ae85dbabd59cbeaee1f0ec873e323cd1d0130a45cdef5"
+  "ver": "13.4",
+  "file": "firmware/blackbox-13.4.bin",
+  "size": 1300800,
+  "sha": "f8a45233a349349a2d1f44fb037689e9916ec50d33c5ae8d49c7514e6a2e6f13"
  },
  "display": {
   "ver": "13.3",
