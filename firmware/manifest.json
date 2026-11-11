@@ -1,10 +1,10 @@
 {
- "notes": "Rechte des Mastercodes einstellbar",
+ "notes": "Mitteilungen: App zeigt, ob die letzte Mitteilung bei Apple angekommen ist",
  "blackbox": {
-  "ver": "13.4",
-  "file": "firmware/blackbox-13.4.bin",
-  "size": 1300800,
-  "sha": "f8a45233a349349a2d1f44fb037689e9916ec50d33c5ae8d49c7514e6a2e6f13"
+  "ver": "13.5",
+  "file": "firmware/blackbox-13.5.bin",
+  "size": 1301536,
+  "sha": "dfda02833460ce016529edf9bbf8ecbfd0ce0eca4c50146d1bf04457e54806fc"
  },
  "display": {
   "ver": "13.3",

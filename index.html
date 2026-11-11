@@ -905,6 +905,7 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
         <div class="field"><label class="note" for="pushName">Name dieses Handys</label>
           <div class="name-row"><input type="text" id="pushName" maxlength="23" placeholder="z. B. iPhone Fabian" enterkeyhint="done"><button class="btn small" id="pushNameSave" type="button">Speichern</button></div></div>
         <div class="push-list" id="pushToggles"></div>
+        <p class="note" id="pushLast" hidden></p>
         <div class="push-row">
           <button class="btn ghost small" id="pushTest" type="button">Test senden</button>
           <button class="btn ghost small" id="pushOff" type="button">Ausschalten</button>
@@ -1509,7 +1510,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.5", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.6", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -2667,8 +2668,35 @@ if (canPush() && location.protocol === "https:") navigator.serviceWorker.registe
 const myPid = () => mode === "demo" ? demoPid : +(store.get("torcode.pid") || 0);
 const setPid = v => { if (mode === "demo") demoPid = v; else if (v) store.set("torcode.pid", String(v)); else store.del("torcode.pid"); };
 function b64uBytes(s) { s = s.replace(/-/g, "+").replace(/_/g, "/"); const b = atob(s + "=".repeat((4 - s.length % 4) % 4)); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+// ab 14.6 (Blackbox 13.5): Ergebnis der letzten Zustellung, wie es Apple/Google der Blackbox gemeldet hat
+function pushResult(d) {
+  if (!d || d.rc === undefined) return null;
+  const rc = d.rc, ok = rc >= 200 && rc < 300;
+  const tx = ok ? "Bei Apple abgegeben – die Blackbox hat alles richtig gemacht"
+    : rc === 403 ? "Apple lehnt den Absender ab (Fehler 403). Meist stimmt die Uhrzeit der Blackbox nicht"
+    : rc === 404 || rc === 410 ? "Anmeldung abgelaufen (Fehler " + rc + "). Bitte Mitteilungen aus- und wieder einschalten"
+    : rc === 400 ? "Apple lehnt die Mitteilung ab (Fehler 400)"
+    : rc === 413 ? "Mitteilung zu groß (Fehler 413)"
+    : rc === 429 ? "Zu viele Mitteilungen in kurzer Zeit (Fehler 429), später nochmal"
+    : rc >= 500 ? "Störung bei Apple (Fehler " + rc + "), später nochmal"
+    : rc === -101 ? "Die Blackbox kennt die Uhrzeit noch nicht (kein Internet-Zeitserver)"
+    : rc === -102 ? "Die Blackbox hatte gerade kein WLAN"
+    : rc <= -103 && rc >= -106 ? "Interner Fehler der Blackbox (" + rc + ")"
+    : rc === -11 ? "Apple hat nicht rechtzeitig geantwortet (Zeitüberschreitung)"
+    : rc < 0 ? "Keine Verbindung zu Apple (Fehler " + rc + ", freier Speicher " + (d.hk || "?") + " KB)"
+    : "Unerwartete Antwort von Apple (" + rc + ")";
+  return { ok, t: tx, at: d.at || 0 };
+}
+let pushTestAt = 0, pushTestSeen = 0;
 function renderPush() {
   const list = (state && state.push) || [], me = list.find(x => x.id === myPid());
+  const pl = $("pushLast"), res = pushResult(me);
+  pl.hidden = !res;
+  if (res) pl.textContent = (res.ok ? "✓ " : "✗ ") + "Letzte Mitteilung " + (res.at ? "um " + hm(res.at) + ": " : ": ") + res.t + (res.ok ? "." : ".");
+  if (pushTestAt && res && res.at && res.at !== pushTestSeen && Date.now() - pushTestAt < 60000) {
+    pushTestAt = 0;
+    toast(res.ok ? "Test bei Apple abgegeben – sollte jetzt aufploppen" : res.t, !res.ok);
+  }
   const note = $("pushNote"), demo = mode === "demo";
   let why = "";
   if (!demo) {
@@ -2748,7 +2776,14 @@ $("pushNameSave").addEventListener("pointerdown", e => e.preventDefault());   //
 $("pushNameSave").onclick = savePushName;
 $("pushName").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); savePushName(); } });
 $("pushName").addEventListener("change", savePushName);
-$("pushTest").onclick = async () => { try { await send("pushTest", { pid: myPid() }); if (mode !== "demo") toast("Test geschickt – kommt gleich an"); } catch (e) { toast(e.message, true); } };
+$("pushTest").onclick = async () => {
+  try {
+    const me = state && (state.push || []).find(x => x.id === myPid());
+    pushTestSeen = (me && me.at) || 0;
+    await send("pushTest", { pid: myPid() });
+    if (mode !== "demo") { pushTestAt = Date.now(); toast("Test wird gesendet …"); }
+  } catch (e) { toast(e.message, true); }
+};
 $("pushOff").onclick = async () => {
   try {
     if (mode !== "demo" && canPush()) { const reg = swReg || await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); }
