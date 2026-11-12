@@ -232,7 +232,7 @@ textarea { width: 100%; font: 14px var(--font-ui); border-radius: 12px; padding:
 .durs.wrap { flex-wrap: wrap; overflow: visible; margin: 0; padding-inline: 0; }
 #psPrev { font-family: var(--font-ui); font-size: 20px; }
 #personSheet .codes .tagrow .more { cursor: pointer; }
-select#csPerson { width: 100%; background: var(--tile, #1b2131); color: inherit; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font: inherit; }
+select#csPerson, select.mesel { width: 100%; background: var(--tile, #1b2131); color: inherit; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font: inherit; }
 .name-row input { flex: 1; min-width: 0; }
 .name-row .btn { flex: none; }
 #logMore { margin-top: 12px; width: 100%; }
@@ -899,6 +899,12 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
       <button class="sback" type="button">‹ Einstellungen</button>
       <h2>Mitteilungen</h2>
       <div class="settings-grid">
+    <div class="card" id="mePerCard" hidden>
+      <span class="label" style="--acc:#16a34a">Dieses Handy</span>
+      <div class="field"><label class="note" for="mePer">Gehört zu</label>
+        <select id="mePer" class="mesel"></select></div>
+      <p class="note" id="mePerNote">Öffnest du das Tor mit diesem Handy, begrüßt das Display die Person wie bei ihrem Code oder Chip – mit „Tür öffnen“, wenn sie das darf.</p>
+    </div>
     <div class="card" id="pushCard">
       <span class="label" style="--acc:#2f5fff">Auf diesem Handy</span>
       <p class="note" id="pushNote">Mitteilungen der Blackbox direkt aufs Handy, ohne weitere App.</p>
@@ -1193,7 +1199,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "13.7", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
+    vapid: "demo", fw: "13.8", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
       { id: 1, name: "Andre Koch", gm: 1, greet: "", nm: 0, disp: "", code: "4711", on: true, door: true, gf: true, win: false, days: 31, fm: 420, tm: 1080, last: Math.floor(Date.now() / 1000) - 5400, via: "Chip Schlüssel", hello: "Moin Andre!" },
       { id: 2, name: "Reinigung Müller", gm: 2, greet: "", nm: 1, disp: "", code: "2580", on: true, door: false, gf: false, win: true, days: 31, fm: 360, tm: 540, last: Math.floor(Date.now() / 1000) - 3 * 86400, via: "Code", hello: "Guten Tag Reinigung Müller!" }
     ], push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
@@ -1511,7 +1517,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.7", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.8", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -1530,7 +1536,7 @@ function render() {
   { const ok = fwVer() >= 12.4; $("mGf").disabled = !ok; if (!ok) $("mGf").checked = false; $("mGf").closest(".toggle").style.opacity = ok ? "" : ".5";
     $("mGfNote").textContent = ok ? "„Tor auf“ und „Tor zu“ am Display gehen auch, wenn die Schiebetür nicht verriegelt ist." : "Erst mit Blackbox-Firmware 12.4 oder neuer."; }
   if (!mOk && $("codeMulti").checked) { $("codeMulti").checked = false; setMulti(false); }
-  renderGate(); renderDoor(); renderCodes(); renderPersons(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderTravel(); renderCfg(); renderChipSheet(); renderPersonSheet();
+  renderGate(); renderDoor(); renderCodes(); renderPersons(); renderChips(); renderLearn(); renderLog(); renderMaster(); renderAuthCfg(); renderPush(); renderMePer(); renderTravel(); renderCfg(); renderChipSheet(); renderPersonSheet();
 }
 
 // ---------- Tür ----------
@@ -1898,6 +1904,19 @@ function holdButton(btn, onDone) {
   btn.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); onDone(); } });
   btn.addEventListener("contextmenu", e => e.preventDefault());
 }
+// ab 14.8 (Blackbox 13.8): Handy einer Person zuordnen – nur auf diesem Handy gespeichert
+const mePerson = () => { const v = +(store.get("torcode.person") || 0); return v && state && (state.persons || []).some(p => p.id === v) ? v : 0; };
+function renderMePer() {
+  const card = $("mePerCard"); card.hidden = !state || fwVer() < 13.8; if (card.hidden) return;
+  const sel = $("mePer"); if (document.activeElement === sel) return;
+  const ps = (state.persons || []).slice().sort((a, b) => a.name.localeCompare(b.name, "de")), cur = mePerson();
+  const key = ps.map(p => p.id + ":" + p.name).join("|") + "#" + cur;
+  if (sel.dataset.key === key) return; sel.dataset.key = key;
+  sel.innerHTML = '<option value="0">niemand – ohne Begrüßung</option>' + ps.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
+  sel.value = String(cur);
+}
+$("mePer").onchange = e => { const v = +e.target.value; if (v) store.set("torcode.person", String(v)); else store.del("torcode.person");
+  const p = (state.persons || []).find(x => x.id === v); e.target.dataset.key = ""; renderMePer(); toast(p ? "Dieses Handy gehört jetzt zu " + p.name : "Keine Person zugeordnet"); };
 function myName() { const me = state && (state.push || []).find(x => x.id === myPid()); return me ? me.name : ""; }
 async function gateCmd(op, label) {
   if (op === "stop" && state) {                                        // sofort an der aktuellen Stelle anhalten
@@ -1910,7 +1929,8 @@ async function gateCmd(op, label) {
     const up = op === "open", sp = curPos(), t = state.travel || {};
     if ((up && sp < 100) || (!up && sp > 0)) { gLocal = { mv: up ? 1 : 2, start: Date.now(), dur: (up ? t.o : t.c) || 12000, sp }; renderGate(); }
   }
-  try { await send(op, { by: myName() }); toast(label); }
+  const per = op === "open" ? mePerson() : 0;
+  try { await send(op, per ? { by: myName(), per } : { by: myName() }); toast(label); }
   catch (e) { gLocal = null; renderGate(); toast(e.message, true); }
 }
 holdButton($("btnOpen"), () => gateCmd("open", "Tor wird geöffnet"));
