@@ -724,6 +724,7 @@ input[type="text"], input[type="password"], input[type="datetime-local"], input[
         <span class="label" style="--acc:#a78bfa">Rechte</span>
       <div class="mr" id="mrBox" hidden>
         <label class="toggle" for="mrGate"><span><b>Tor öffnen über die Tastatur</b></span><input type="checkbox" id="mrGate" data-mr="gate"><span class="sw"></span></label>
+        <label class="toggle" for="mrAd" id="mrAdRow" hidden><span><b>Tür an der Tastatur automatisch entriegeln</b><br><span class="note">Mastercode draußen eingeben → das Schloss entriegelt und der Zylinder schiebt die Lagertür auf.</span></span><input type="checkbox" id="mrAd" data-mr="ad"><span class="sw"></span></label>
         <label class="toggle" for="mrDoor"><span><b>Tür entriegeln</b><br><span class="note">Nach der Eingabe „Tür öffnen“ am Display.</span></span><input type="checkbox" id="mrDoor" data-mr="door"><span class="sw"></span></label>
         <label class="toggle" for="mrDm"><span><b>Tür beliebig oft</b><br><span class="note">Aus: einmal pro Eingabe.</span></span><input type="checkbox" id="mrDm" data-mr="dm"><span class="sw"></span></label>
         <label class="toggle" for="mrGf"><span><b>Tor-Knöpfe auch bei offener Schiebetür</b></span><input type="checkbox" id="mrGf" data-mr="gf"><span class="sw"></span></label>
@@ -1192,7 +1193,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "13.4", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true }, ota: { on: false, res: "" }, logp: true, persons: [
+    vapid: "demo", fw: "13.7", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
       { id: 1, name: "Andre Koch", gm: 1, greet: "", nm: 0, disp: "", code: "4711", on: true, door: true, gf: true, win: false, days: 31, fm: 420, tm: 1080, last: Math.floor(Date.now() / 1000) - 5400, via: "Chip Schlüssel", hello: "Moin Andre!" },
       { id: 2, name: "Reinigung Müller", gm: 2, greet: "", nm: 1, disp: "", code: "2580", on: true, door: false, gf: false, win: true, days: 31, fm: 360, tm: 540, last: Math.floor(Date.now() / 1000) - 3 * 86400, via: "Code", hello: "Guten Tag Reinigung Müller!" }
     ], push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
@@ -1510,7 +1511,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.6", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.7", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -2576,13 +2577,15 @@ function renderMr() {
   const box = $("mrBox"), m = state && state.mr;
   box.hidden = !m || fwVer() < 13.4; if (box.hidden) return;
   const set = (id, v) => { const el = $(id); if (document.activeElement !== el) el.checked = !!v; };
+  $("mrAdRow").hidden = m.ad === undefined; set("mrAd", m.ad);
   set("mrGate", m.gate); set("mrDoor", m.door); set("mrDm", m.dm); set("mrGf", m.gf); set("mrPin", m.pin); set("mrVac", m.vac); set("mrPush", m.push);
   $("mrDm").disabled = !m.door;
   $("mrGate").disabled = !m.pin && m.gate; $("mrPin").disabled = !m.gate && m.pin;   // eins bleibt immer an
   if (!mrWinOpen) { $("mrWin").checked = !!m.win; $("mrWinBox").hidden = !m.win; mrDays = m.days ?? 127; $("mrFrom").value = hhmm(m.fm ?? 420); $("mrTo").value = hhmm((m.tm ?? 1080) % 1440); renderMrDays(); }
   const notes = [];
   if (m.win) notes.push("Gilt nur " + ((m.days & 127) === 127 ? "täglich" : WD.filter((d, i) => m.days >> i & 1).join(", ")) + " · " + hhmm(m.fm) + "–" + hhmm(m.tm % 1440) + " Uhr.");
-  if (!m.gate) notes.push("Die Tastatur öffnet mit dem Mastercode nicht.");
+  if (!m.gate) notes.push(m.ad ? "Die Tastatur öffnet mit dem Mastercode nur die Tür, nicht das Tor." : "Die Tastatur öffnet mit dem Mastercode nicht.");
+  if (m.ad) notes.push("Mastercode an der Tastatur entriegelt automatisch die Lagertür.");
   if (!m.vac && state.cfg && state.cfg.vac) notes.push("Urlaubsmodus ist an – der Mastercode ist gerade gesperrt.");
   if (!m.gate || !m.pin) notes.push("„Tor öffnen“ und „Tür am Display“ können nicht beide aus sein, damit du dich nicht aussperrst.");
   $("mrNote").textContent = notes.join(" "); $("mrNote").className = "note" + (notes.length && (m.win || !m.gate || !m.vac) ? " warn" : "");

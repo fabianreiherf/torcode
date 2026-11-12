@@ -1,10 +1,10 @@
 {
- "notes": "Mitteilungen kommen wieder an (Speicher für die Verbindung zu Apple)",
+ "notes": "Mastercode an der Tastatur kann die Lagertür automatisch entriegeln (Einstellung beim Mastercode)",
  "blackbox": {
-  "ver": "13.6",
-  "file": "firmware/blackbox-13.6.bin",
-  "size": 1301712,
-  "sha": "f705b112d79ca600f751e59856ce445fb37c436dc270918f3afb83332f5bf945"
+  "ver": "13.7",
+  "file": "firmware/blackbox-13.7.bin",
+  "size": 1302112,
+  "sha": "e3521618d648c03899b58926ba78d4367ca0cfa4aa8c244ad7fa710044e325e3"
  },
  "display": {
   "ver": "13.3",
