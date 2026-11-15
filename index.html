@@ -1199,7 +1199,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "13.8", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
+    vapid: "demo", fw: "13.9", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
       { id: 1, name: "Andre Koch", gm: 1, greet: "", nm: 0, disp: "", code: "4711", on: true, door: true, gf: true, win: false, days: 31, fm: 420, tm: 1080, last: Math.floor(Date.now() / 1000) - 5400, via: "Chip Schlüssel", hello: "Moin Andre!" },
       { id: 2, name: "Reinigung Müller", gm: 2, greet: "", nm: 1, disp: "", code: "2580", on: true, door: false, gf: false, win: true, days: 31, fm: 360, tm: 540, last: Math.floor(Date.now() / 1000) - 3 * 86400, via: "Code", hello: "Guten Tag Reinigung Müller!" }
     ], push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
@@ -1253,7 +1253,7 @@ function connect() {
     const s = msg.toString();
     if (topic === b + "/online") { online = s === "1"; updateConn(); return; }
     let j; try { j = JSON.parse(s); } catch (e) { return; }
-    if (topic === b + "/state") { j._rx = Date.now(); state = j; if (j.gm && j.gm.mv) gLocal = null; online = true; render(); updateConn(); }
+    if (topic === b + "/state") { j._rx = Date.now(); state = j; if (j.gm && j.gm.mv) gLocal = null; online = true; render(); updateConn(); pushAutoFix(); }
     else if (topic === b + "/resp" && pending.has(j.id)) { const p = pending.get(j.id); pending.delete(j.id); j.ok ? p.res(j) : p.rej(Object.assign(new Error(j.error || "Abgelehnt"), { data: j })); }
   });
   client.on("error", e => { setConn("warn", /auth|Not authorized/i.test(e.message) ? "Zugangsdaten falsch" : "Verbindungsfehler"); });
@@ -1517,7 +1517,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.8", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "14.9", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -2778,7 +2778,7 @@ $("pushEnable").onclick = async () => {
     const j = sub.toJSON();
     const name = isIOS ? "iPhone" : "Handy";
     const r = await send("pushSub", { ep: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, mask: PUSH_DEFAULT, name });
-    setPid(r.pid); toast("Mitteilungen eingeschaltet");
+    setPid(r.pid); store.set("torcode.ep", j.endpoint); store.set("torcode.pushFix", String(Date.now())); toast("Mitteilungen eingeschaltet");
     if (state && state.push && !state.push.some(x => x.id === r.pid)) state.push.push({ id: r.pid, name, mask: PUSH_DEFAULT });
     renderPush(); $("pushName").focus();
   } catch (e) { toast(e.message || "Einschalten hat nicht geklappt", true); }
@@ -2807,6 +2807,33 @@ $("pushTest").onclick = async () => {
     if (mode !== "demo") { pushTestAt = Date.now(); toast("Test wird gesendet …"); }
   } catch (e) { toast(e.message, true); }
 };
+// Ab 13.9: Anmeldung still erneuern. iOS entwertet die Anmeldung einer Web-App manchmal im Hintergrund –
+// Apple nimmt die Mitteilung dann noch an, das Handy zeigt aber nichts. Beim Öffnen (höchstens alle 6 Stunden,
+// sofort wenn die Anmeldung fehlt oder sich geändert hat) holt die App eine neue und gibt sie der Blackbox.
+// Auswahl, Name und die Zuordnung zur Person bleiben erhalten.
+let pushFixBusy = false, pushFixDone = 0;
+async function pushAutoFix(force) {
+  try {
+    if (pushFixBusy || mode === "demo" || !state || !state.vapid || !canPush() || vnum(state.fw) < 13.9) return;
+    if (Notification.permission !== "granted") return;
+    const pid = myPid(); if (!pid || !(state.push || []).some(x => x.id === pid)) return;
+    if (!force && Date.now() - pushFixDone < 60000) return;
+    pushFixBusy = true; pushFixDone = Date.now();
+    const reg = swReg || await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    const last = +(store.get("torcode.pushFix") || 0);
+    const stale = !sub || sub.endpoint !== store.get("torcode.ep") || Date.now() - last > 6 * 3600e3;
+    if (!force && !stale) return;
+    if (sub) { try { await sub.unsubscribe(); } catch (e) {} }
+    sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uBytes(state.vapid) });
+    const j = sub.toJSON();
+    const me = state.push.find(x => x.id === pid);
+    const r = await send("pushSub", { ep: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, mask: me.mask, name: me.name, old: pid });
+    setPid(r.pid); store.set("torcode.ep", j.endpoint); store.set("torcode.pushFix", String(Date.now()));
+  } catch (e) { /* still – beim nächsten Öffnen wieder versuchen */ }
+  finally { pushFixBusy = false; }
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pushAutoFix(); });
 $("pushOff").onclick = async () => {
   try {
     if (mode !== "demo" && canPush()) { const reg = swReg || await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); }

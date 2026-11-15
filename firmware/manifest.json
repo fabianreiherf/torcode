@@ -1,10 +1,10 @@
 {
- "notes": "Tor per App: Display begrüßt die Person, der das Handy gehört",
+ "notes": "Mitteilungen: App erneuert die Anmeldung des Handys automatisch",
  "blackbox": {
-  "ver": "13.8",
-  "file": "firmware/blackbox-13.8.bin",
-  "size": 1302528,
-  "sha": "29cae0db14223388aa96fd86c640a2bceb5e73fd2a8904874e85312a58ccfbd6"
+  "ver": "13.9",
+  "file": "firmware/blackbox-13.9.bin",
+  "size": 1302768,
+  "sha": "4c942b6e34aa422832fa275d7e745f83e9af92661d1646435b222722a9debc91"
  },
  "display": {
   "ver": "13.3",
