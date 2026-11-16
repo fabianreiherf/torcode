@@ -1199,7 +1199,7 @@ function demoState() {
     gm: { mv: 0, sp: 0, pos: 0 },
     travel: { o: 12300, c: 12100, lo: 12200, lc: 12000, no: 46, nc: 44, bo: 11800, bc: 11700, bat: n - 70 * 86400 },
     cfg: { ow: true, owm: 15, tw: false, twt: 1200, ac: false, acm: 10, vac: false, b2: true, b3: true, wk: true, sched: [{ on: true, days: 31, min: 1080 }, { on: true, days: 32, min: 840 }] },
-    vapid: "demo", fw: "13.9", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
+    vapid: "demo", fw: "14.0", dfw: "13.3", mr: { gate: true, door: true, dm: true, gf: true, pin: true, vac: true, win: false, days: 127, fm: 420, tm: 1080, push: true, ad: false }, ota: { on: false, res: "" }, logp: true, persons: [
       { id: 1, name: "Andre Koch", gm: 1, greet: "", nm: 0, disp: "", code: "4711", on: true, door: true, gf: true, win: false, days: 31, fm: 420, tm: 1080, last: Math.floor(Date.now() / 1000) - 5400, via: "Chip Schlüssel", hello: "Moin Andre!" },
       { id: 2, name: "Reinigung Müller", gm: 2, greet: "", nm: 1, disp: "", code: "2580", on: true, door: false, gf: false, win: true, days: 31, fm: 360, tm: 540, last: Math.floor(Date.now() / 1000) - 3 * 86400, via: "Code", hello: "Guten Tag Reinigung Müller!" }
     ], push: [{ id: 2, name: "Beispiel: iPhone Lager", mask: 1 | 8 | 16 | 256 }],
@@ -1517,7 +1517,7 @@ function renderWifi() {
 }
 var FW_CHUNK = 4096, FW_NAME = { blackbox: "Blackbox", display: "Display" };
 var fwMan = null, fwManErr = false, fwBusy = false, demoOta = null;
-var APP_VER = "14.9", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
+var APP_VER = "15.0", APP_MIN_FW = 12.6;   // App-Stand; ältere Blackbox-Firmware wird in den Einstellungen gemeldet
 function renderFw() {
   const el = $("fwInfo"); if (!el) return;
   if (!state) { el.textContent = ""; return; }
@@ -2250,7 +2250,11 @@ async function loadStats() {
   if (wkBusy) return;
   if (state && state.stats === false) { $("wkEvents").innerHTML = '<div class="empty">Die Blackbox speichert noch keine Statistik. Beim Hochladen der Firmware „Partition Scheme: Huge APP (3MB No OTA/1MB SPIFFS)“ wählen.</div>'; return; }
   wkBusy = true; $("wkTitle").textContent = "Lade …";
-  try { wkData = await send("stats", { week: wkBack }); renderStats(); }
+  try {
+    wkData = await send("stats", { week: wkBack }, 20000);
+    wkData.ev = (wkData.ev || []).map(e => Array.isArray(e) ? { t: e[0], k: e[1], w: e[2] } : e);   // ab Firmware 14.0 kompakt
+    renderStats();
+  }
   catch (e) { $("wkTitle").textContent = "Keine Daten"; toast(e.message, true); }
   finally { wkBusy = false; }
 }

@@ -1,10 +1,10 @@
 {
- "notes": "Mitteilungen: App erneuert die Anmeldung des Handys automatisch",
+ "notes": "Verlauf älterer Wochen lädt zuverlässig (weniger Speicher für Antworten)",
  "blackbox": {
-  "ver": "13.9",
-  "file": "firmware/blackbox-13.9.bin",
-  "size": 1302768,
-  "sha": "4c942b6e34aa422832fa275d7e745f83e9af92661d1646435b222722a9debc91"
+  "ver": "14.0",
+  "file": "firmware/blackbox-14.0.bin",
+  "size": 1305024,
+  "sha": "42a466571af8d5976913060e0437cd7b6a2f9169e76945b36b5d516228b6f1ea"
  },
  "display": {
   "ver": "13.3",
