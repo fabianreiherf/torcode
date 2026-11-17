@@ -1,0 +1,367 @@
+{
+ "app": [
+  {
+   "v": "15.1",
+   "d": "2026-11-17",
+   "c": [
+    "Änderungsverlauf für App, Blackbox und Display unter Firmware & Sicherung"
+   ]
+  },
+  {
+   "v": "15.0",
+   "d": "2026-11-16",
+   "c": [
+    "Verlauf älterer Wochen lädt zuverlässig (wartet länger auf die Blackbox)"
+   ]
+  },
+  {
+   "v": "14.9",
+   "d": "2026-11-15",
+   "c": [
+    "Anmeldung für Mitteilungen wird beim Öffnen automatisch erneuert – Auswahl, Name und Person bleiben"
+   ]
+  },
+  {
+   "v": "14.8",
+   "d": "2026-11-12",
+   "c": [
+    "„Dieses Handy · Gehört zu“: Handy einer Person zuordnen – beim Öffnen per App begrüßt das Display diese Person"
+   ]
+  },
+  {
+   "v": "14.7",
+   "d": "2026-11-12",
+   "c": [
+    "Mastercode-Recht „Tür an der Tastatur automatisch entriegeln“ (ein-/ausschaltbar)"
+   ]
+  },
+  {
+   "v": "14.6",
+   "d": "2026-11-11",
+   "c": [
+    "Mitteilungen: Ergebnis der letzten Zustellung je Handy mit Erklärung bei Fehlern",
+    "Rückmeldung nach „Test senden“"
+   ]
+  },
+  {
+   "v": "14.5",
+   "d": "2026-11-10",
+   "c": [
+    "Torbild springt nicht mehr zurück, Hallenlampe flackert nicht doppelt"
+   ]
+  },
+  {
+   "v": "14.4",
+   "d": "2026-11-10",
+   "c": [
+    "Hallenbild: Lagertür fährt beim Entriegeln auf, VTK-Banner, Deckenlampe nach Sonnenuntergang"
+   ]
+  },
+  {
+   "v": "14.3",
+   "d": "2026-11-10",
+   "c": [
+    "Erledigte Codes zeigen „Benutzt am …“ oder „Nicht benutzt“"
+   ]
+  },
+  {
+   "v": "14.2",
+   "d": "2026-11-10",
+   "c": [
+    "Animationen: Torbild, Licht in der Halle, Überschriften und Zahlen"
+   ]
+  },
+  {
+   "v": "14.1",
+   "d": "2026-11-10",
+   "c": [
+    "Untere Leiste sitzt ganz unten am Bildschirmrand"
+   ]
+  },
+  {
+   "v": "14.0",
+   "d": "2026-11-10",
+   "c": [
+    "Neues Glas-Design mit dunklen Verläufen und durchscheinenden Karten"
+   ]
+  },
+  {
+   "v": "13.8",
+   "d": "2026-11-10",
+   "c": [
+    "App-Version wird unter Firmware angezeigt"
+   ]
+  },
+  {
+   "v": "13.7",
+   "d": "2026-11-10",
+   "c": [
+    "Codes neu aufgeteilt: Liste Aktiv/Erledigt, „Neuer Code“ als Fenster, eigene Mastercode-Seite"
+   ]
+  },
+  {
+   "v": "13.6",
+   "d": "2026-11-10",
+   "c": [
+    "Untere Leiste bleibt beim Scrollen auf dem iPhone fest"
+   ]
+  },
+  {
+   "v": "13.5",
+   "d": "2026-11-10",
+   "c": [
+    "Hellere Karten, Einstellungen mit Übersicht und Unterseiten"
+   ]
+  },
+  {
+   "v": "13.4",
+   "d": "2026-11-10",
+   "c": [
+    "Rechte des Mastercodes einstellbar (Tor, Tür, Urlaubsmodus, Mitteilung, Zeitfenster …)"
+   ]
+  },
+  {
+   "v": "13.3",
+   "d": "2026-11-09",
+   "c": [
+    "Nachlaufzeit für Einmalcodes einstellbar"
+   ]
+  },
+  {
+   "v": "13.0",
+   "d": "2026-11-09",
+   "c": [
+    "Firmware-Update für Blackbox und Display direkt aus der App",
+    "„Personen sichern“ und „Personen zurückholen“"
+   ]
+  },
+  {
+   "v": "12.6",
+   "d": "2026-11-09",
+   "c": [
+    "Reiter „Personen“: Name, Anrede, persönlicher Code, mehrere Chips und gemeinsame Rechte",
+    "Mitteilung „Person öffnet“, Begrüßung beim Mastercode"
+   ]
+  },
+  {
+   "v": "12.5",
+   "d": "2026-11-09",
+   "c": [
+    "Verlauf bis 14 Tage zurück mit „Ältere Einträge laden“",
+    "Knopf „Speichern“ beim Handynamen, Versionsanzeige ganz unten"
+   ]
+  },
+  {
+   "v": "12.4",
+   "d": "2026-11-08",
+   "c": [
+    "Pro Chip und Mehrfachcode einstellbar: „Tor auch bei offener Schiebetür“"
+   ]
+  },
+  {
+   "v": "12.3",
+   "d": "2026-11-08",
+   "c": [
+    "Tor-Warnungen pro Handy einzeln wählbar",
+    "Einstellungen in Gruppen, farbige Streifen bei Chips und Codes",
+    "Behoben: „Dieses Handy ist nicht angemeldet“"
+   ]
+  },
+  {
+   "v": "12.2",
+   "d": "2026-11-07",
+   "c": [
+    "Mehrfachcodes (bis Datum oder unbegrenzt, optional mit Zeitfenster)",
+    "Zeitplan „Tor schließen“"
+   ]
+  }
+ ],
+ "blackbox": [
+  {
+   "v": "14.0",
+   "d": "2026-11-16",
+   "c": [
+    "Verlauf älterer Wochen lädt zuverlässig – Antworten brauchen nur noch halb so viel Speicher",
+    "Klare Fehlermeldung statt „Blackbox antwortet nicht“",
+    "Abgeschnittene Umlaute in Namen werden bereinigt"
+   ]
+  },
+  {
+   "v": "13.9",
+   "d": "2026-11-15",
+   "c": [
+    "App kann die Anmeldung für Mitteilungen still erneuern – Auswahl und Name bleiben"
+   ]
+  },
+  {
+   "v": "13.8",
+   "d": "2026-11-12",
+   "c": [
+    "Tor per App: Display begrüßt die Person, der das Handy gehört (mit ihren Rechten)"
+   ]
+  },
+  {
+   "v": "13.7",
+   "d": "2026-11-12",
+   "c": [
+    "Mastercode an der Tastatur entriegelt auf Wunsch die Lagertür"
+   ]
+  },
+  {
+   "v": "13.6",
+   "d": "2026-11-11",
+   "c": [
+    "Mitteilungen kommen auch bei knappem Speicher an (Verbindung wird kurz getrennt und neu aufgebaut)"
+   ]
+  },
+  {
+   "v": "13.5",
+   "d": "2026-11-11",
+   "c": [
+    "Ergebnis jeder Zustellung von Mitteilungen wird an die App gemeldet"
+   ]
+  },
+  {
+   "v": "13.4",
+   "d": "2026-11-10",
+   "c": [
+    "Rechte des Mastercodes: Tor, Tür, Urlaubsmodus, Mitteilung, Zeitfenster"
+   ]
+  },
+  {
+   "v": "13.3",
+   "d": "2026-11-09",
+   "c": [
+    "Nachlaufzeit für Einmalcodes: nach der ersten Eingabe noch bis zu 30 Min. gültig"
+   ]
+  },
+  {
+   "v": "13.2",
+   "d": "2026-11-09",
+   "c": [
+    "Probelauf für das Fernupdate"
+   ]
+  },
+  {
+   "v": "13.1",
+   "d": "2026-11-09",
+   "c": [
+    "Arbeitsspeicher entlastet, nie mehr leerer Status"
+   ]
+  },
+  {
+   "v": "13.0",
+   "d": "2026-11-09",
+   "c": [
+    "Fernupdate über die App mit automatischer Rücknahme, wenn eine Version nicht startet",
+    "Zugangsdaten im Speicher der Blackbox",
+    "Neue Speicheraufteilung"
+   ]
+  },
+  {
+   "v": "12.6",
+   "d": "2026-11-09",
+   "c": [
+    "Personen mit Anrede, persönlichem Code und mehreren Chips",
+    "Begrüßung der Person am Display"
+   ]
+  },
+  {
+   "v": "12.5",
+   "d": "2026-11-09",
+   "c": [
+    "Verlauf dauerhaft im Flash (14 Tage, übersteht Stromausfall und Updates)"
+   ]
+  },
+  {
+   "v": "12.4",
+   "d": "2026-11-08",
+   "c": [
+    "Tor-Knöpfe am Display auch bei offener Schiebetür (Mastercode, pro Chip/Mehrfachcode)"
+   ]
+  },
+  {
+   "v": "12.3",
+   "d": "2026-11-08",
+   "c": [
+    "Tor-Warnungen einzeln pro Handy",
+    "Behoben: Handy wurde manchmal nicht erkannt"
+   ]
+  },
+  {
+   "v": "12.2",
+   "d": "2026-11-07",
+   "c": [
+    "Mehrfachcodes",
+    "Zeitplan „Tor schließen“ mit Hinweis 60 s vorher",
+    "Tor-Knöpfe am Display nur bei verriegelter Tür"
+   ]
+  },
+  {
+   "v": "12.1",
+   "d": "2026-11-03",
+   "c": [
+    "Begrüßung „Hallo <Name>“ am Display",
+    "Tür öffnen pro Anmeldung einmal, Bildschirm bleibt bis das Tor zu ist"
+   ]
+  }
+ ],
+ "display": [
+  {
+   "v": "13.3",
+   "d": "2026-11-09",
+   "c": [
+    "Ruhiger, dunkler Bildschirm während eines Updates (Feinschliff)"
+   ]
+  },
+  {
+   "v": "13.2",
+   "d": "2026-11-09",
+   "c": [
+    "Ruhiger Update-Bildschirm"
+   ]
+  },
+  {
+   "v": "13.1",
+   "d": "2026-11-09",
+   "c": [
+    "Probelauf für das Fernupdate"
+   ]
+  },
+  {
+   "v": "13.0",
+   "d": "2026-11-09",
+   "c": [
+    "Updates kommen über die App (über die Blackbox)"
+   ]
+  },
+  {
+   "v": "12.6",
+   "d": "2026-11-09",
+   "c": [
+    "Begrüßung der Person, z. B. „Moin Andre!“, auch nach Tageszeit"
+   ]
+  },
+  {
+   "v": "12.4",
+   "d": "2026-11-08",
+   "c": [
+    "Hinweis „Garage kann erst geschlossen werden …“ passt sich selbst an den Platz an"
+   ]
+  },
+  {
+   "v": "12.2",
+   "d": "2026-11-07",
+   "c": [
+    "Tor-Knöpfe nur bei verriegelter Tür, Zeitplan-Hinweis „Tor schließt in … s“ mit Abbruch"
+   ]
+  },
+  {
+   "v": "12.1",
+   "d": "2026-11-03",
+   "c": [
+    "„Hallo <Name>!“ nach Code oder Chip, Knöpfe Tor auf · Tür öffnen · Tor zu"
+   ]
+  }
+ ]
+}
